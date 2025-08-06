@@ -1,9 +1,13 @@
-import axios from 'axios'
+import axios from 'axios';
 
-window.axios = axios
+window.axios = axios;
+window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
-// ✅ This forces HTTPS if the page is served over HTTPS
-window.axios.defaults.baseURL = window.location.origin
+// Get token from meta tag
+const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-// Required headers
-window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
+if (token) {
+    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token;
+} else {
+    console.error('CSRF token not found');
+}
