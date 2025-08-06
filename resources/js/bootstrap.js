@@ -1,13 +1,15 @@
-import axios from 'axios';
+import axios from 'axios'
 
-window.axios = axios;
-window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+window.axios = axios
 
-// Get token from meta tag
-const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+// Required for Laravel
+window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
+
+// Get CSRF from meta tag
+const token = document.head.querySelector('meta[name="csrf-token"]')
 
 if (token) {
-    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token;
+    window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content
 } else {
-    console.error('CSRF token not found');
+    console.error('CSRF token not found')
 }
