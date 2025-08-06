@@ -29,6 +29,9 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        \Log::info('Session ID: ' . $request->session()->getId());
+        \Log::info('CSRF Token: ' . $request->session()->token());
+
         return [
             ...parent::share($request),
             'csrf_token' => $request->session()->token(),
