@@ -10,6 +10,7 @@ import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
 import Button from 'primevue/button';
+import Tree from 'primevue/tree';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -32,6 +33,7 @@ createInertiaApp({
             });
 
         app.component('Button', Button);
+        app.component('Tree', Tree);
 
         return app.mount(el);
     },
