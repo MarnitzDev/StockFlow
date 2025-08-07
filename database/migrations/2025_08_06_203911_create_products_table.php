@@ -9,6 +9,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+
     public function up(): void
     {
         Schema::create('products', function (Blueprint $table) {
@@ -18,6 +19,8 @@ return new class extends Migration
             $table->integer('stock')->default(0);
             $table->decimal('price', 10, 2);
             $table->string('category');
+            $table->integer('low_stock_threshold')->default(10);
+            $table->string('unit_of_measurement')->nullable();
             $table->timestamps();
         });
     }

@@ -37,6 +37,33 @@ const calculateTotalQuantity = computed(() => {
 const calculateTotalValue = computed(() => {
     return props.products.reduce((total, product) => total + (product.price * product.stock), 0).toFixed(2);
 });
+
+
+// STOCK
+
+const stockMovementDialog = ref(false);
+const selectedProduct = ref(null);
+const stockMovementForm = useForm({
+    quantity: 0,
+    type: 'in',
+    reason: '',
+});
+
+const openStockMovementDialog = (product) => {
+    selectedProduct.value = product;
+    stockMovementDialog.value = true;
+};
+
+const submitStockMovement = () => {
+    stockMovementForm.post(route('products.updateStock', selectedProduct.value.id), {
+        preserveScroll: true,
+        onSuccess: () => {
+            stockMovementDialog.value = false;
+            stockMovementForm.reset();
+        },
+    });
+};
+
 </script>
 
 <template>
@@ -80,6 +107,9 @@ const calculateTotalValue = computed(() => {
                                 <Link :href="route('products.edit', product.id)" class="text-indigo-600 hover:text-indigo-900 mr-2">Edit</Link>
                                 <Link :href="route('products.destroy', product.id)" method="delete" as="button" class="text-red-600 hover:text-red-900" @click="confirm('Are you sure you want to delete this product?')">Delete</Link>
                             </td>
+                            <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">
+                                <Button label="Update Stock" icon="pi pi-plus" @click="openStockMovementDialog(product)" />
+                            </td>
                         </tr>
                         </tbody>
                     </table>
@@ -87,6 +117,7 @@ const calculateTotalValue = computed(() => {
             </div>
         </div>
 
+        <!-- Create New Product -->
         <Dialog v-model:visible="visible" modal header="Create New Product" :style="{ width: '50vw' }">
             <form @submit.prevent="submit">
                 <div class="mb-4">
@@ -112,6 +143,31 @@ const calculateTotalValue = computed(() => {
                 <div class="flex items-center justify-end">
                     <Button label="Cancel" icon="pi pi-times" @click="visible = false" class="p-button-text" />
                     <Button label="Create" icon="pi pi-check" type="submit" autofocus />
+                </div>
+            </form>
+        </Dialog>
+
+        <!-- Stock Movement Dialog -->
+        <Dialog v-model:visible="stockMovementDialog" modal header="Update Stock" :style="{ width: '50vw' }">
+            <form @submit.prevent="submitStockMovement">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="quantity">Quantity</label>
+                    <input v-model="stockMovementForm.quantity" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="quantity" type="number" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="type">Type</label>
+                    <select v-model="stockMovementForm.type" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="type" required>
+                        <option value="in">Stock In</option>
+                        <option value="out">Stock Out</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="reason">Reason</label>
+                    <textarea v-model="stockMovementForm.reason" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="reason"></textarea>
+                </div>
+                <div class="flex items-center justify-end">
+                    <Button label="Cancel" icon="pi pi-times" @click="stockMovementDialog = false" class="p-button-text" />
+                    <Button label="Update" icon="pi pi-check" type="submit" autofocus />
                 </div>
             </form>
         </Dialog>

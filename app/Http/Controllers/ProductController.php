@@ -59,4 +59,37 @@ class ProductController extends Controller
         $product->delete();
         return redirect()->route('products.index')->with('message', 'Product deleted successfully');
     }
+
+    public function updateStock(Request $request, Product $product)
+    {
+        $request->validate([
+            'quantity' => 'required|integer',
+            'type' => 'required|in:in,out',
+            'reason' => 'nullable|string',
+        ]);
+
+        $movement = new StockMovement([
+            'quantity' => $request->quantity,
+            'type' => $request->type,
+            'reason' => $request->reason,
+        ]);
+
+        $product->stockMovements()->save($movement);
+
+        if ($request->type === 'in') {
+            $product->stock += $request->quantity;
+        } else {
+            $product->stock -= $request->quantity;
+        }
+
+        $product->save();
+
+        return redirect()->route('products.index')->with('message', 'Stock updated successfully');
+    }
+
+    public function lowStockAlert()
+    {
+        $lowStockProducts = Product::where('stock', '<=', DB::raw('low_stock_threshold'))->get();
+        return Inertia::render('Products/LowStock', ['products' => $lowStockProducts]);
+    }
 }
