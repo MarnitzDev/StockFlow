@@ -24,6 +24,9 @@ const showingNavigationDropdown = ref(false);
                 <NavLink :href="route('products.index')" :active="route().current('products.*')">
                     <i class="fas fa-box mr-2"></i> Products
                 </NavLink>
+                <NavLink :href="route('contacts.index')" :active="route().current('contacts.*')">
+                    <i class="fas fa-address-book mr-2"></i> Contacts
+                </NavLink>
                 <!-- Add more sidebar items as needed -->
             </nav>
         </div>

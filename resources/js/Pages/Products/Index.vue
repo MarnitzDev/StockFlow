@@ -18,6 +18,7 @@ const form = useForm({
     stock: 0,
     price: 0,
     category: '',
+    low_stock_threshold: 0,
 });
 
 const submit = () => {
@@ -55,12 +56,17 @@ const openStockMovementDialog = (product) => {
 };
 
 const submitStockMovement = () => {
+    console.log('Submitting stock movement:', stockMovementForm);
     stockMovementForm.post(route('products.updateStock', selectedProduct.value.id), {
         preserveScroll: true,
         onSuccess: () => {
+            console.log('Stock movement submitted successfully');
             stockMovementDialog.value = false;
             stockMovementForm.reset();
         },
+        onError: (errors) => {
+            console.error('Error submitting stock movement:', errors);
+        }
     });
 };
 
@@ -79,7 +85,6 @@ const submitStockMovement = () => {
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
                     <div class="flex justify-between text-sm text-gray-600 mb-4">
-                        <span>Folders: 0</span>
                         <span>Items: {{ products.length }}</span>
                         <span>Total Quantity: {{ calculateTotalQuantity }}</span>
                         <span>Total Value: ${{ calculateTotalValue }}</span>
@@ -93,6 +98,7 @@ const submitStockMovement = () => {
                             <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 tracking-wider">Stock</th>
                             <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 tracking-wider">Price</th>
                             <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 tracking-wider">Category</th>
+                            <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 tracking-wider">Stock Threshold</th>
                             <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 tracking-wider">Actions</th>
                         </tr>
                         </thead>
@@ -103,6 +109,7 @@ const submitStockMovement = () => {
                             <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">{{ product.stock }}</td>
                             <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">{{ product.price }}</td>
                             <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">{{ product.category }}</td>
+                            <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">{{ product.low_stock_threshold }}</td>
                             <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">
                                 <Link :href="route('products.edit', product.id)" class="text-indigo-600 hover:text-indigo-900 mr-2">Edit</Link>
                                 <Link :href="route('products.destroy', product.id)" method="delete" as="button" class="text-red-600 hover:text-red-900" @click="confirm('Are you sure you want to delete this product?')">Delete</Link>
@@ -139,6 +146,10 @@ const submitStockMovement = () => {
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="category">Category</label>
                     <input v-model="form.category" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="category" type="text" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="category">Low Stock Threshold</label>
+                    <input v-model="form.low_stock_threshold" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="category" type="text" required>
                 </div>
                 <div class="flex items-center justify-end">
                     <Button label="Cancel" icon="pi pi-times" @click="visible = false" class="p-button-text" />

@@ -90,28 +90,37 @@ class ProductController extends Controller
 
     public function updateStock(Request $request, Product $product)
     {
+        \Log::info('Update Stock Request:', $request->all());
+        \Log::info('Product:', $product->toArray());
+
         $validated = $request->validate([
-            'quantity' => 'required|integer|min:1',
+            'quantity' => 'required|integer',
             'type' => 'required|in:in,out',
             'reason' => 'nullable|string|max:255',
         ]);
 
+        \Log::info('Validated Data:', $validated);
+
         DB::transaction(function () use ($product, $validated) {
-            StockMovement::create([
+            $stockMovement = StockMovement::create([
                 'product_id' => $product->id,
-                'quantity' => $validated['quantity'],
+                'quantity' => abs($validated['quantity']),
                 'type' => $validated['type'],
                 'reason' => $validated['reason'] ?? 'Stock update',
             ]);
+
+            \Log::info('Stock Movement Created:', $stockMovement->toArray());
 
             if ($validated['type'] === 'in') {
                 $product->increment('stock', $validated['quantity']);
             } else {
                 $product->decrement('stock', $validated['quantity']);
             }
+
+            \Log::info('Product After Update:', $product->fresh()->toArray());
         });
 
-        return redirect()->route('products.index')->with('message', 'Stock updated successfully');
+        return redirect()->back()->with('message', 'Stock updated successfully');
     }
 
     public function lowStockAlert()
