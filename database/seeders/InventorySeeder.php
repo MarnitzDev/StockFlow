@@ -15,7 +15,7 @@ class InventorySeeder extends Seeder
         $categories = Category::count() > 0 ? Category::all() : Category::factory(5)->create();
 
         // Create 50 inventory items
-        Inventory::factory(50)->create()->each(function ($inventory) use ($categories) {
+        Inventory::factory(5)->create()->each(function ($inventory) use ($categories) {
             // Assign a random category
             $inventory->category()->associate($categories->random())->save();
 

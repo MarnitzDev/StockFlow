@@ -23,7 +23,6 @@ const calculateTotalValue = computed(() => {
 });
 
 // STOCK
-
 const stockMovementDialog = ref(false);
 const selectedItem = ref(null);
 const stockMovementForm = useForm({
@@ -38,7 +37,6 @@ const openStockMovementDialog = (item) => {
 };
 
 const submitStockMovement = () => {
-    console.log('Submitting stock movement:', stockMovementForm);
     stockMovementForm.post(route('inventory.updateStock', selectedItem.value.id), {
         preserveScroll: true,
         onSuccess: () => {
@@ -77,7 +75,16 @@ const submitStockMovement = () => {
                                paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                                :rowsPerPageOptions="[10,20,50]"
                                currentPageReportTemplate="Showing {first} to {last} of {totalRecords}">
-                        <Column field="name" header="Name" sortable></Column>
+                        <Column header="">
+                            <template #body="slotProps">
+                                <img :src="slotProps.data.primary_image?.image_path"
+                                     :alt="slotProps.data.name"
+                                     class="w-16 h-16 object-cover rounded"
+                                     @error="handleImageError"
+                                />
+                            </template>
+                        </Column>
+                        <Column field="name" header="Item" sortable></Column>
                         <Column field="sku" header="SKU" sortable></Column>
                         <Column field="quantity" header="Quantity" sortable></Column>
                         <Column field="price" header="Price" sortable>

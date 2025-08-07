@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Inventory;
+use App\Models\InventoryImage;
 use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +13,7 @@ class InventoryController extends Controller
 {
     public function items()
     {
-        $inventoryItems = Inventory::with('category')->get();
+        $inventoryItems = Inventory::with(['category', 'images', 'primaryImage'])->get();
         return Inertia::render('Inventory/Items', ['items' => $inventoryItems]);
     }
 
@@ -127,5 +128,15 @@ class InventoryController extends Controller
     {
         $lowStockItems = Inventory::where('stock', '<=', DB::raw('low_stock_threshold'))->get();
         return Inertia::render('Inventory/LowStock', ['items' => $lowStockItems]);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(InventoryImage::class);
+    }
+
+    public function primaryImage()
+    {
+        return $this->hasOne(InventoryImage::class)->where('is_primary', true);
     }
 }

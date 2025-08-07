@@ -73,7 +73,7 @@ class Inventory extends Model
 
     public function images()
     {
-        return $this->hasMany(InventoryImage::class)->orderBy('order');
+        return $this->hasMany(InventoryImage::class);
     }
 
     public function primaryImage()
