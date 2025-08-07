@@ -73,35 +73,26 @@ const submitStockMovement = () => {
                         <span>Total Quantity: {{ calculateTotalQuantity }}</span>
                         <span>Total Value: ${{ calculateTotalValue }}</span>
                     </div>
-
-                    <table class="min-w-full mt-4">
-                        <thead>
-                        <tr>
-                            <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 tracking-wider">Name</th>
-                            <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 tracking-wider">SKU</th>
-                            <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 tracking-wider">quantity</th>
-                            <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 tracking-wider">Price</th>
-                            <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 tracking-wider">Category</th>
-                            <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 tracking-wider">Stock Threshold</th>
-                            <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 tracking-wider">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr v-for="item in items" :key="item.id">
-                            <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">{{ item.name }}</td>
-                            <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">{{ item.sku }}</td>
-                            <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">{{ item.quantity }}</td>
-                            <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">{{ item.price }}</td>
-                            <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">{{ item.category.name }}</td>
-                            <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">{{ item.low_stock_threshold }}</td>
-                            <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">
-<!--                                <Link :href="route('inventory.edit', item.id)" class="text-indigo-600 hover:text-indigo-900 mr-2">Edit</Link>-->
-<!--                                <Link :href="route('inventory.destroy', item.id)" method="delete" as="button" class="text-red-600 hover:text-red-900" @click="confirm('Are you sure you want to delete this item?')">Delete</Link>-->
-                                <Button label="Update Stock" icon="pi pi-plus" @click="openStockMovementDialog(item)" />
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <DataTable :value="items" :paginator="true" :rows="10"
+                               paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+                               :rowsPerPageOptions="[10,20,50]"
+                               currentPageReportTemplate="Showing {first} to {last} of {totalRecords}">
+                        <Column field="name" header="Name" sortable></Column>
+                        <Column field="sku" header="SKU" sortable></Column>
+                        <Column field="quantity" header="Quantity" sortable></Column>
+                        <Column field="price" header="Price" sortable>
+                            <template #body="slotProps">
+                                {{ new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(slotProps.data.price) }}
+                            </template>
+                        </Column>
+                        <Column field="category.name" header="Category" sortable></Column>
+                        <Column field="low_stock_threshold" header="Stock Threshold" sortable></Column>
+                        <Column header="Actions">
+                            <template #body="slotProps">
+                                <Button label="Update Stock" icon="pi pi-plus" @click="openStockMovementDialog(slotProps.data)" />
+                            </template>
+                        </Column>
+                    </DataTable>
                 </div>
             </div>
         </div>
