@@ -2,7 +2,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Link } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
-import Button from 'primevue/button';
+import { FilterMatchMode } from '@primevue/core/api';
 import { useForm } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -50,6 +50,10 @@ const submitStockMovement = () => {
     });
 };
 
+// DATA TABLE
+const filters = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+});
 </script>
 
 <template>
@@ -71,10 +75,26 @@ const submitStockMovement = () => {
                         <span>Total Quantity: {{ calculateTotalQuantity }}</span>
                         <span>Total Value: ${{ calculateTotalValue }}</span>
                     </div>
-                    <DataTable :value="items" :paginator="true" :rows="10"
-                               paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-                               :rowsPerPageOptions="[10,20,50]"
-                               currentPageReportTemplate="Showing {first} to {last} of {totalRecords}">
+
+                    <!-- Add this search input -->
+                    <div class="mb-4">
+                        <span class="p-input-icon-left">
+                            <i class="pi pi-search" />
+                            <InputText v-model="filters['global'].value" placeholder="Search items..." />
+                        </span>
+                    </div>
+
+                    <DataTable
+                        :value="items"
+                        :paginator="true"
+                        :rows="10"
+                        paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+                        :rowsPerPageOptions="[10,20,50]"
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+                        :filters="filters"
+                        filterDisplay="menu"
+                        :globalFilterFields="['name', 'sku', 'category.name']"
+                    >
                         <Column header="">
                             <template #body="slotProps">
                                 <img :src="slotProps.data.primary_image?.image_path"
