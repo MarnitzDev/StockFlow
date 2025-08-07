@@ -21,20 +21,10 @@ const showingNavigationDropdown = ref(false);
                 <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
                     <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
                 </NavLink>
-                <NavLink :href="route('products.index')" :active="route().current('products.*')">
-                    <i class="fas fa-box mr-2"></i> Products
-                </NavLink>
-                <NavLink :href="route('contacts.index')" :active="route().current('contacts.*')">
-                    <i class="fas fa-address-book mr-2"></i> Contacts
-                </NavLink>
-                <NavLink :href="route('inventory.report')" :active="route().current('inventory.report')">
-                    <i class="fas fa-chart-bar mr-2"></i> Reports
-                </NavLink>
-                <!-- New Organization Dropdown -->
                 <Dropdown align="right" width="48">
                     <template #trigger>
                         <button class="flex items-center w-full px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900">
-                            <i class="fas fa-building mr-2"></i> Organization
+                            <i class="fas fa-building mr-2"></i> Inventory
                             <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                             </svg>
@@ -42,20 +32,26 @@ const showingNavigationDropdown = ref(false);
                     </template>
 
                     <template #content>
-                        <DropdownLink :href="route('organization.profile')">
-                            Profile
+                        <DropdownLink :href="route('inventory.items')">
+                            Items
                         </DropdownLink>
-                        <DropdownLink :href="route('organization.branding')">
-                            Branding
-                        </DropdownLink>
-                        <DropdownLink :href="route('organization.locations')">
-                            Locations
-                        </DropdownLink>
-                        <DropdownLink :href="route('organization.currency')">
-                            Currency
-                        </DropdownLink>
+<!--                        <DropdownLink :href="route('inventory.items')">-->
+<!--                            Item Groups-->
+<!--                        </DropdownLink>-->
+<!--                        <DropdownLink :href="route('inventory.items')">-->
+<!--                            Stock Adjustments-->
+<!--                        </DropdownLink>-->
+<!--                        <DropdownLink :href="route('inventory.items')">-->
+<!--                            Stock History-->
+<!--                        </DropdownLink>-->
                     </template>
                 </Dropdown>
+<!--                <NavLink :href="route('contacts.index')" :active="route().current('contacts.*')">-->
+<!--                    <i class="fas fa-address-book mr-2"></i> Contacts-->
+<!--                </NavLink>-->
+<!--                <NavLink :href="route('inventory.report')" :active="route().current('inventory.report')">-->
+<!--                    <i class="fas fa-chart-bar mr-2"></i> Reports-->
+<!--                </NavLink>-->
             </nav>
         </div>
 
@@ -93,11 +89,11 @@ const showingNavigationDropdown = ref(false);
                         </template>
 
                         <template #content>
-                            <DropdownLink
-                                :href="route('profile.edit')"
-                            >
-                                Profile
-                            </DropdownLink>
+<!--                            <DropdownLink-->
+<!--                                :href="route('profile.edit')"-->
+<!--                            >-->
+<!--                                Profile-->
+<!--                            </DropdownLink>-->
                             <DropdownLink
                                 :href="route('logout')"
                                 method="post"

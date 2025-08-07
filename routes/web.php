@@ -1,11 +1,12 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ContactController;
-use App\Http\Controllers\InventoryReportController;
-use App\Http\Controllers\OrganizationController;
-use Illuminate\Foundation\Application;
+use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\SalesController;
+use App\Http\Controllers\PurchasesController;
+use App\Http\Controllers\ContactsController;
+use App\Http\Controllers\ReportsController;
+use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -13,8 +14,6 @@ Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
     ]);
 });
 
@@ -23,34 +22,47 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
-    Route::prefix('profile')->name('profile.')->group(function () {
-        Route::get('/', [ProfileController::class, 'edit'])->name('edit');
-        Route::patch('/', [ProfileController::class, 'update'])->name('update');
-        Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
+    // Inventory
+    Route::prefix('inventory')->name('inventory.')->group(function () {
+        Route::get('/items', [InventoryController::class, 'items'])->name('items');
+        Route::get('/categories', [InventoryController::class, 'categories'])->name('categories');
+        Route::get('/stock-adjustments', [InventoryController::class, 'stockAdjustments'])->name('stockAdjustments');
+        Route::get('/stock-history', [InventoryController::class, 'stockHistory'])->name('stockHistory');
     });
 
-    Route::prefix('products')->name('products.')->group(function () {
-        Route::get('/', [ProductController::class, 'index'])->name('index');
-        Route::get('/create', [ProductController::class, 'create'])->name('create');
-        Route::post('/', [ProductController::class, 'store'])->name('store');
-        Route::get('/{product}', [ProductController::class, 'show'])->name('show');
-        Route::get('/{product}/edit', [ProductController::class, 'edit'])->name('edit');
-        Route::put('/{product}', [ProductController::class, 'update'])->name('update');
-        Route::delete('/{product}', [ProductController::class, 'destroy'])->name('destroy');
-        Route::post('/{product}/update-stock', [ProductController::class, 'updateStock'])->name('updateStock');
-        Route::get('/low-stock-alert', [ProductController::class, 'lowStockAlert'])->name('lowStockAlert');
+    // Sales
+    Route::prefix('sales')->name('sales.')->group(function () {
+        Route::get('/orders', [SalesController::class, 'orders'])->name('orders');
+        Route::get('/invoices', [SalesController::class, 'invoices'])->name('invoices');
+        Route::get('/payments', [SalesController::class, 'payments'])->name('payments');
     });
 
-    Route::resource('contacts', ContactController::class);
-    Route::get('/inventory-report', [InventoryReportController::class, 'index'])->name('inventory.report');
-
-    Route::prefix('organization')->name('organization.')->middleware(['auth'])->group(function () {
-        Route::get('/profile', [OrganizationController::class, 'profile'])->name('profile');
-        Route::get('/branding', [OrganizationController::class, 'branding'])->name('branding');
-        Route::get('/locations', [OrganizationController::class, 'locations'])->name('locations');
-        Route::get('/currency', [OrganizationController::class, 'currency'])->name('currency');
+    // Purchases
+    Route::prefix('purchases')->name('purchases.')->group(function () {
+        Route::get('/orders', [PurchasesController::class, 'orders'])->name('orders');
+        Route::get('/bills', [PurchasesController::class, 'bills'])->name('bills');
+        Route::get('/payments', [PurchasesController::class, 'payments'])->name('payments');
     });
 
+    // Contacts
+    Route::prefix('contacts')->name('contacts.')->group(function () {
+        Route::get('/customers', [ContactsController::class, 'customers'])->name('customers');
+        Route::get('/suppliers', [ContactsController::class, 'suppliers'])->name('suppliers');
+    });
+
+    // Reports
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/inventory-valuation', [ReportsController::class, 'inventoryValuation'])->name('inventoryValuation');
+        Route::get('/sales', [ReportsController::class, 'sales'])->name('sales');
+        Route::get('/purchases', [ReportsController::class, 'purchases'])->name('purchases');
+    });
+
+    // Settings
+    Route::prefix('settings')->name('settings.')->group(function () {
+        Route::get('/company', [SettingsController::class, 'company'])->name('company');
+        Route::get('/users-permissions', [SettingsController::class, 'usersPermissions'])->name('usersPermissions');
+        Route::get('/billing', [SettingsController::class, 'billing'])->name('billing');
+    });
 });
 
 require __DIR__.'/auth.php';

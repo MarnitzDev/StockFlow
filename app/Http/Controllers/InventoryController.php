@@ -2,76 +2,76 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
+use App\Models\Inventory;
 use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
-class ProductController extends Controller
+class InventoryController extends Controller
 {
-    public function index()
+    public function items()
     {
-        $products = Product::all();
-        return Inertia::render('Products/Index', ['products' => $products]);
+        $inventoryItems = Inventory::with('category')->get();
+        return Inertia::render('Inventory/Items', ['items' => $inventoryItems]);
     }
 
     public function create()
     {
-        return Inertia::render('Products/Create');
+        return Inertia::render('Inventory/Create');
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'sku' => 'required|string|unique:products',
+            'sku' => 'required|string|unique:inventories',
             'stock' => 'required|integer|min:0',
             'price' => 'required|numeric|min:0',
-            'category' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
             'low_stock_threshold' => 'required|integer|min:0',
             'unit_of_measurement' => 'nullable|string|max:50',
         ]);
 
         DB::transaction(function () use ($validated) {
-            $product = Product::create($validated);
+            $inventoryItem = Inventory::create($validated);
 
             StockMovement::create([
-                'product_id' => $product->id,
+                'inventory_id' => $inventoryItem->id,
                 'quantity' => $validated['stock'],
                 'type' => 'in',
                 'reason' => 'Initial stock',
             ]);
         });
 
-        return redirect()->route('products.index')->with('message', 'Product created successfully');
+        return redirect()->route('inventory.items')->with('message', 'Inventory item created successfully');
     }
 
-    public function edit(Product $product)
+    public function edit(Inventory $inventory)
     {
-        return Inertia::render('Products/Edit', ['product' => $product]);
+        return Inertia::render('Inventory/Edit', ['item' => $inventory]);
     }
 
-    public function update(Request $request, Product $product)
+    public function update(Request $request, Inventory $inventory)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'sku' => 'required|string|unique:products,sku,' . $product->id,
+            'sku' => 'required|string|unique:inventories,sku,' . $inventory->id,
             'stock' => 'required|integer|min:0',
             'price' => 'required|numeric|min:0',
-            'category' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
             'low_stock_threshold' => 'required|integer|min:0',
             'unit_of_measurement' => 'nullable|string|max:50',
         ]);
 
-        DB::transaction(function () use ($product, $validated) {
-            $oldStock = $product->stock;
-            $product->update($validated);
+        DB::transaction(function () use ($inventory, $validated) {
+            $oldStock = $inventory->stock;
+            $inventory->update($validated);
 
             if ($oldStock != $validated['stock']) {
                 $difference = $validated['stock'] - $oldStock;
                 StockMovement::create([
-                    'product_id' => $product->id,
+                    'inventory_id' => $inventory->id,
                     'quantity' => abs($difference),
                     'type' => $difference > 0 ? 'in' : 'out',
                     'reason' => 'Stock adjustment',
@@ -79,19 +79,19 @@ class ProductController extends Controller
             }
         });
 
-        return redirect()->route('products.index')->with('message', 'Product updated successfully');
+        return redirect()->route('inventory.items')->with('message', 'Inventory item updated successfully');
     }
 
-    public function destroy(Product $product)
+    public function destroy(Inventory $inventory)
     {
-        $product->delete();
-        return redirect()->route('products.index')->with('message', 'Product deleted successfully');
+        $inventory->delete();
+        return redirect()->route('inventory.items')->with('message', 'Inventory item deleted successfully');
     }
 
-    public function updateStock(Request $request, Product $product)
+    public function updateStock(Request $request, Inventory $inventory)
     {
         \Log::info('Update Stock Request:', $request->all());
-        \Log::info('Product:', $product->toArray());
+        \Log::info('Inventory Item:', $inventory->toArray());
 
         $validated = $request->validate([
             'quantity' => 'required|integer',
@@ -101,9 +101,9 @@ class ProductController extends Controller
 
         \Log::info('Validated Data:', $validated);
 
-        DB::transaction(function () use ($product, $validated) {
+        DB::transaction(function () use ($inventory, $validated) {
             $stockMovement = StockMovement::create([
-                'product_id' => $product->id,
+                'inventory_id' => $inventory->id,
                 'quantity' => abs($validated['quantity']),
                 'type' => $validated['type'],
                 'reason' => $validated['reason'] ?? 'Stock update',
@@ -112,12 +112,12 @@ class ProductController extends Controller
             \Log::info('Stock Movement Created:', $stockMovement->toArray());
 
             if ($validated['type'] === 'in') {
-                $product->increment('stock', $validated['quantity']);
+                $inventory->increment('stock', $validated['quantity']);
             } else {
-                $product->decrement('stock', $validated['quantity']);
+                $inventory->decrement('stock', $validated['quantity']);
             }
 
-            \Log::info('Product After Update:', $product->fresh()->toArray());
+            \Log::info('Inventory Item After Update:', $inventory->fresh()->toArray());
         });
 
         return redirect()->back()->with('message', 'Stock updated successfully');
@@ -125,7 +125,7 @@ class ProductController extends Controller
 
     public function lowStockAlert()
     {
-        $lowStockProducts = Product::where('stock', '<=', DB::raw('low_stock_threshold'))->get();
-        return Inertia::render('Products/LowStock', ['products' => $lowStockProducts]);
+        $lowStockItems = Inventory::where('stock', '<=', DB::raw('low_stock_threshold'))->get();
+        return Inertia::render('Inventory/LowStock', ['items' => $lowStockItems]);
     }
 }
