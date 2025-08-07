@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\StockMovement;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class ProductController extends Controller
@@ -27,9 +29,20 @@ class ProductController extends Controller
             'stock' => 'required|integer|min:0',
             'price' => 'required|numeric|min:0',
             'category' => 'required|string|max:255',
+            'low_stock_threshold' => 'required|integer|min:0',
+            'unit_of_measurement' => 'nullable|string|max:50',
         ]);
 
-        Product::create($validated);
+        DB::transaction(function () use ($validated) {
+            $product = Product::create($validated);
+
+            StockMovement::create([
+                'product_id' => $product->id,
+                'quantity' => $validated['stock'],
+                'type' => 'in',
+                'reason' => 'Initial stock',
+            ]);
+        });
 
         return redirect()->route('products.index')->with('message', 'Product created successfully');
     }
@@ -47,9 +60,24 @@ class ProductController extends Controller
             'stock' => 'required|integer|min:0',
             'price' => 'required|numeric|min:0',
             'category' => 'required|string|max:255',
+            'low_stock_threshold' => 'required|integer|min:0',
+            'unit_of_measurement' => 'nullable|string|max:50',
         ]);
 
-        $product->update($validated);
+        DB::transaction(function () use ($product, $validated) {
+            $oldStock = $product->stock;
+            $product->update($validated);
+
+            if ($oldStock != $validated['stock']) {
+                $difference = $validated['stock'] - $oldStock;
+                StockMovement::create([
+                    'product_id' => $product->id,
+                    'quantity' => abs($difference),
+                    'type' => $difference > 0 ? 'in' : 'out',
+                    'reason' => 'Stock adjustment',
+                ]);
+            }
+        });
 
         return redirect()->route('products.index')->with('message', 'Product updated successfully');
     }
@@ -62,27 +90,26 @@ class ProductController extends Controller
 
     public function updateStock(Request $request, Product $product)
     {
-        $request->validate([
-            'quantity' => 'required|integer',
+        $validated = $request->validate([
+            'quantity' => 'required|integer|min:1',
             'type' => 'required|in:in,out',
-            'reason' => 'nullable|string',
+            'reason' => 'nullable|string|max:255',
         ]);
 
-        $movement = new StockMovement([
-            'quantity' => $request->quantity,
-            'type' => $request->type,
-            'reason' => $request->reason,
-        ]);
+        DB::transaction(function () use ($product, $validated) {
+            StockMovement::create([
+                'product_id' => $product->id,
+                'quantity' => $validated['quantity'],
+                'type' => $validated['type'],
+                'reason' => $validated['reason'] ?? 'Stock update',
+            ]);
 
-        $product->stockMovements()->save($movement);
-
-        if ($request->type === 'in') {
-            $product->stock += $request->quantity;
-        } else {
-            $product->stock -= $request->quantity;
-        }
-
-        $product->save();
+            if ($validated['type'] === 'in') {
+                $product->increment('stock', $validated['quantity']);
+            } else {
+                $product->decrement('stock', $validated['quantity']);
+            }
+        });
 
         return redirect()->route('products.index')->with('message', 'Stock updated successfully');
     }
