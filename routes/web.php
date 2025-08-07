@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\InventoryReportController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -40,6 +41,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::resource('contacts', ContactController::class);
+    Route::get('/inventory-report', [InventoryReportController::class, 'index'])->name('inventory.report');
+
 });
 
 require __DIR__.'/auth.php';

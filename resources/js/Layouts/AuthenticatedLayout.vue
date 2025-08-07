@@ -27,7 +27,9 @@ const showingNavigationDropdown = ref(false);
                 <NavLink :href="route('contacts.index')" :active="route().current('contacts.*')">
                     <i class="fas fa-address-book mr-2"></i> Contacts
                 </NavLink>
-                <!-- Add more sidebar items as needed -->
+                <NavLink :href="route('inventory.report')" :active="route().current('inventory.report')">
+                    <i class="fas fa-chart-bar mr-2"></i> Inventory Report
+                </NavLink>
             </nav>
         </div>
 
