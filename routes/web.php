@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\InventoryReportController;
+use App\Http\Controllers\OrganizationController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -42,6 +43,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('contacts', ContactController::class);
     Route::get('/inventory-report', [InventoryReportController::class, 'index'])->name('inventory.report');
+
+    Route::prefix('organization')->name('organization.')->middleware(['auth'])->group(function () {
+        Route::get('/profile', [OrganizationController::class, 'profile'])->name('profile');
+        Route::get('/branding', [OrganizationController::class, 'branding'])->name('branding');
+        Route::get('/locations', [OrganizationController::class, 'locations'])->name('locations');
+        Route::get('/currency', [OrganizationController::class, 'currency'])->name('currency');
+    });
 
 });
 
