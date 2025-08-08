@@ -13,11 +13,11 @@ const showingNavigationDropdown = ref(false);
 <template>
     <div class="flex h-screen bg-gray-100">
         <!-- Sidebar -->
-        <div class="w-64 bg-white shadow-md">
-            <div class="flex items-center justify-center h-16 border-b">
+        <div class="w-64 bg-white shadow-xl z-10 transition-all duration-300 ease-in-out">
+            <div class="flex items-center justify-center h-16">
                 <ApplicationLogo class="w-12 h-12" />
             </div>
-            <nav class="mt-5">
+            <nav class="mt-5 px-2">
                 <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
                     <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
                 </NavLink>

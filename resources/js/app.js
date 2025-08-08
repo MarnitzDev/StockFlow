@@ -15,6 +15,7 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup';
 import Row from 'primevue/row';
+import Menu from 'primevue/menu';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -42,6 +43,7 @@ createInertiaApp({
         app.component('Column', Column);
         app.component('ColumnGroup', ColumnGroup);
         app.component('Row', Row);
+        app.component('Menu', Menu);
 
         return app.mount(el);
     },
