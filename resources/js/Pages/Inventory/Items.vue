@@ -58,32 +58,41 @@ const filters = ref({
 
 <template>
     <AuthenticatedLayout>
-        <template #header>
-            <div class="flex justify-between items-center">
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">Inventory Items</h2>
-                <Link :href="route('inventory.create')" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Add New Item
-                </Link>
+        <div class="py-6 bg-gray-100 border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-2xl font-bold text-gray-800">Inventory Items</h3>
+                    <Link :href="route('inventory.create')" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Add New Item
+                    </Link>
+                </div>
+                <div class="flex flex-wrap justify-between items-center">
+                    <div class="flex space-x-4 text-sm text-gray-600">
+                        <span class="bg-white px-3 py-1 rounded-full shadow">Items: {{ items.length }}</span>
+                        <span class="bg-white px-3 py-1 rounded-full shadow">Total Quantity: {{ calculateTotalQuantity }}</span>
+                        <span class="bg-white px-3 py-1 rounded-full shadow">Total Value: ${{ calculateTotalValue }}</span>
+                    </div>
+                </div>
             </div>
-        </template>
-
+        </div>
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-                    <div class="flex justify-between text-sm text-gray-600 mb-4">
-                        <span>Items: {{ items.length }}</span>
-                        <span>Total Quantity: {{ calculateTotalQuantity }}</span>
-                        <span>Total Value: ${{ calculateTotalValue }}</span>
-                    </div>
-
-                    <!-- Add this search input -->
-                    <div class="mb-4">
-                        <span class="p-input-icon-left">
-                            <i class="pi pi-search" />
-                            <InputText v-model="filters['global'].value" placeholder="Search items..." />
+                    <div class="mb-4 flex justify-between items-center">
+                        <div class="w-80">
+                        <span class="p-input-icon-left w-full">
+                            <InputText v-model="filters['global'].value" placeholder="Search Inventory Items..." class="w-full" />
                         </span>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-sm">
+                                Export CSV
+                            </button>
+                            <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded text-sm">
+                                Print Report
+                            </button>
+                        </div>
                     </div>
-
                     <DataTable
                         :value="items"
                         :paginator="true"

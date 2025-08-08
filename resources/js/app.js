@@ -1,5 +1,6 @@
 import '../css/app.css';
 import './bootstrap';
+import 'primeicons/primeicons.css';
 
 import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
@@ -16,6 +17,8 @@ import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup';
 import Row from 'primevue/row';
 import Menu from 'primevue/menu';
+import IconField from 'primevue/iconfield';
+import InputIcon from 'primevue/inputicon';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -44,6 +47,8 @@ createInertiaApp({
         app.component('ColumnGroup', ColumnGroup);
         app.component('Row', Row);
         app.component('Menu', Menu);
+        app.component('IconField', IconField);
+        app.component('InputIcon', InputIcon);
 
         return app.mount(el);
     },
