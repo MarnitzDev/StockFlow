@@ -68,6 +68,12 @@
 
             <!-- Page Content -->
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
+                <!-- Summary section -->
+                <div class="py-6 bg-gray-100 border-b border-gray-200">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <slot name="summary"></slot>
+                    </div>
+                </div>
                 <div class="mx-auto px-6 py-8">
                     <slot />
                 </div>

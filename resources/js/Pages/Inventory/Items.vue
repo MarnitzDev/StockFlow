@@ -58,24 +58,22 @@ const filters = ref({
 
 <template>
     <AuthenticatedLayout>
-        <div class="py-6 bg-gray-100 border-b border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-2xl font-bold text-gray-800">Inventory Items</h3>
-                    <Link :href="route('inventory.create')" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        Add New Item
-                    </Link>
-                </div>
-                <div class="flex flex-wrap justify-between items-center">
-                    <div class="flex space-x-4 text-sm text-gray-600">
-                        <span class="bg-white px-3 py-1 rounded-full shadow">Items: {{ items.length }}</span>
-                        <span class="bg-white px-3 py-1 rounded-full shadow">Total Quantity: {{ calculateTotalQuantity }}</span>
-                        <span class="bg-white px-3 py-1 rounded-full shadow">Total Value: ${{ calculateTotalValue }}</span>
-                    </div>
+        <template #summary>
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-bold text-gray-800">Inventory Items</h3>
+                <Link :href="route('inventory.create')" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Add New Item
+                </Link>
+            </div>
+            <div class="flex flex-wrap justify-between items-center">
+                <div class="flex space-x-4 text-sm text-gray-600">
+                    <span class="bg-white px-3 py-1 rounded-full shadow">Items: {{ items.length }}</span>
+                    <span class="bg-white px-3 py-1 rounded-full shadow">Total Quantity: {{ calculateTotalQuantity }}</span>
+                    <span class="bg-white px-3 py-1 rounded-full shadow">Total Value: ${{ calculateTotalValue }}</span>
                 </div>
             </div>
-        </div>
-        <div class="py-12">
+        </template>
+        <div class="">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
                     <div class="mb-4 flex justify-between items-center">
