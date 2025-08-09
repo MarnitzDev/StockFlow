@@ -109,6 +109,7 @@ const menuItems = ref([
         icon: 'fas fa-shopping-cart',
         submenu: [
             { label: 'Orders', route: 'sales.orders.index' },
+            { label: 'Create Order', route: 'sales.orders.create' },
             // Add more sales-related submenu items as needed
         ]
     },

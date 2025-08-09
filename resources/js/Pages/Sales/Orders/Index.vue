@@ -57,7 +57,13 @@ defineProps({
                                     {{ order.status }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">
-                                    <Link :href="route('sales.orders.show', order.id)" class="text-indigo-600 hover:text-indigo-900">View</Link>
+                                    <Link
+                                        :href="route('sales.orders.show', order.id)"
+                                        class="text-indigo-600 hover:text-indigo-900 mr-2"
+                                        title="View Order Details"
+                                    >
+                                        <i class="fas fa-eye mr-1"></i> View
+                                    </Link>
                                 </td>
                             </tr>
                             </tbody>
