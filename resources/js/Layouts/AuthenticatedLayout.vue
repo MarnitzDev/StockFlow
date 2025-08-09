@@ -100,7 +100,7 @@ const menuItems = ref([
         submenu: [
             { label: 'Items', route: 'inventory.items' },
             { label: 'Categories', route: 'inventory.categories.index' },
-            // { label: 'Stock Adjustments', route: 'inventory.stockAdjustments' },
+            { label: 'Stock Adjustments', route: 'inventory.stockAdjustments' },
             // { label: 'Stock History', route: 'inventory.stockHistory' },
         ]
     },

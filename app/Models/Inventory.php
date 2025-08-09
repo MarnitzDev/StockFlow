@@ -14,14 +14,14 @@ class Inventory extends Model
         'name',
         'sku',
         'description',
-        'quantity',
+        'stock',
         'price',
         'category_id',
         'low_stock_threshold',
     ];
 
     protected $casts = [
-        'quantity' => 'integer',
+        'stock' => 'integer',
         'price' => 'decimal:2',
         'low_stock_threshold' => 'integer',
     ];
@@ -45,30 +45,30 @@ class Inventory extends Model
     // Scopes
     public function scopeLowStock($query)
     {
-        return $query->whereRaw('quantity <= low_stock_threshold');
+        return $query->whereRaw('stock <= low_stock_threshold');
     }
 
     // Methods
-    public function updateStock($quantity, $type = 'in')
+    public function updateStock($stock, $type = 'in')
     {
-        $this->quantity += ($type === 'in' ? $quantity : -$quantity);
+        $this->stock += ($type === 'in' ? $stock : -$stock);
         $this->save();
 
         // Create a stock movement record
         $this->stockMovements()->create([
-            'quantity' => $quantity,
+            'stock' => $stock,
             'type' => $type,
         ]);
     }
 
     public function isLowStock()
     {
-        return $this->quantity <= $this->low_stock_threshold;
+        return $this->stock <= $this->low_stock_threshold;
     }
 
     public function getTotalValue()
     {
-        return $this->quantity * $this->price;
+        return $this->stock * $this->price;
     }
 
     public function images()

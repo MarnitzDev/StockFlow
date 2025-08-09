@@ -12,13 +12,13 @@ const props = defineProps({
     }
 });
 
-const calculateTotalQuantity = computed(() => {
-    return props.items.reduce((total, item) => total + item.quantity, 0);
+const calculateTotalstock = computed(() => {
+    return props.items.reduce((total, item) => total + item.stock, 0);
 });
 
 const calculateTotalValue = computed(() => {
     return props.items.reduce((total, item) => {
-        return total + (item.quantity * parseFloat(item.price));
+        return total + (item.stock * parseFloat(item.price));
     }, 0).toFixed(2);
 });
 
@@ -26,7 +26,7 @@ const calculateTotalValue = computed(() => {
 const stockMovementDialog = ref(false);
 const selectedItem = ref(null);
 const stockMovementForm = useForm({
-    quantity: 0,
+    stock: 0,
     type: 'in',
     reason: '',
 });
@@ -68,7 +68,7 @@ const filters = ref({
             <div class="flex flex-wrap justify-between items-center">
                 <div class="flex space-x-4 text-sm text-gray-600">
                     <span class="bg-white px-3 py-1 rounded-full shadow">Items: {{ items.length }}</span>
-                    <span class="bg-white px-3 py-1 rounded-full shadow">Total Quantity: {{ calculateTotalQuantity }}</span>
+                    <span class="bg-white px-3 py-1 rounded-full shadow">Total stock: {{ calculateTotalstock }}</span>
                     <span class="bg-white px-3 py-1 rounded-full shadow">Total Value: ${{ calculateTotalValue }}</span>
                 </div>
             </div>
@@ -114,7 +114,7 @@ const filters = ref({
                         </Column>
                         <Column field="name" header="Item" sortable style="width: 200px"></Column>
                         <Column field="sku" header="SKU" sortable style="width: 150px"></Column>
-                        <Column field="quantity" header="Quantity" sortable style="width: 100px"></Column>
+                        <Column field="stock" header="stock" sortable style="width: 100px"></Column>
                         <Column field="price" header="Price" sortable style="width: 120px">
                             <template #body="slotProps">
                                 {{ new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(slotProps.data.price) }}

@@ -39,7 +39,7 @@ class InventoryController extends Controller
 
             StockMovement::create([
                 'inventory_id' => $inventoryItem->id,
-                'quantity' => $validated['stock'],
+                'stock' => $validated['stock'],
                 'type' => 'in',
                 'reason' => 'Initial stock',
             ]);
@@ -73,7 +73,7 @@ class InventoryController extends Controller
                 $difference = $validated['stock'] - $oldStock;
                 StockMovement::create([
                     'inventory_id' => $inventory->id,
-                    'quantity' => abs($difference),
+                    'stock' => abs($difference),
                     'type' => $difference > 0 ? 'in' : 'out',
                     'reason' => 'Stock adjustment',
                 ]);
@@ -95,7 +95,7 @@ class InventoryController extends Controller
         \Log::info('Inventory Item:', $inventory->toArray());
 
         $validated = $request->validate([
-            'quantity' => 'required|integer',
+            'stock' => 'required|integer',
             'type' => 'required|in:in,out',
             'reason' => 'nullable|string|max:255',
         ]);
@@ -105,7 +105,7 @@ class InventoryController extends Controller
         DB::transaction(function () use ($inventory, $validated) {
             $stockMovement = StockMovement::create([
                 'inventory_id' => $inventory->id,
-                'quantity' => abs($validated['quantity']),
+                'stock' => abs($validated['stock']),
                 'type' => $validated['type'],
                 'reason' => $validated['reason'] ?? 'Stock update',
             ]);
@@ -113,9 +113,9 @@ class InventoryController extends Controller
             \Log::info('Stock Movement Created:', $stockMovement->toArray());
 
             if ($validated['type'] === 'in') {
-                $inventory->increment('stock', $validated['quantity']);
+                $inventory->increment('stock', $validated['stock']);
             } else {
-                $inventory->decrement('stock', $validated['quantity']);
+                $inventory->decrement('stock', $validated['stock']);
             }
 
             \Log::info('Inventory Item After Update:', $inventory->fresh()->toArray());

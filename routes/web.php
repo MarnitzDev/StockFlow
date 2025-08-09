@@ -8,6 +8,7 @@ use App\Http\Controllers\PurchasesController;
 use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\StockAdjustmentController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -29,7 +30,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/create', [InventoryController::class, 'create'])->name('create');
         Route::post('/store', [InventoryController::class, 'store'])->name('store');
         Route::resource('categories', CategoryController::class);
-        Route::get('/stock-adjustments', [InventoryController::class, 'stockAdjustments'])->name('stockAdjustments');
+        // Stock Adjustments
+        Route::get('/stock-adjustments', [StockAdjustmentController::class, 'index'])->name('stockAdjustments');
+        Route::get('/stock-adjustments/create', [StockAdjustmentController::class, 'create'])->name('stockAdjustments.create');
+        Route::post('/stock-adjustments', [StockAdjustmentController::class, 'store'])->name('stockAdjustments.store');
+
         Route::get('/stock-history', [InventoryController::class, 'stockHistory'])->name('stockHistory');
     });
 

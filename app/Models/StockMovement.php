@@ -11,7 +11,7 @@ class StockMovement extends Model
 
     protected $fillable = [
         'inventory_id',
-        'quantity',
+        'stock',
         'type',
         'reason',
         'user_id',
@@ -20,7 +20,7 @@ class StockMovement extends Model
     ];
 
     protected $casts = [
-        'quantity' => 'integer',
+        'stock' => 'integer',
         'unit_price' => 'decimal:2',
     ];
 

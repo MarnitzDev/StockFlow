@@ -15,7 +15,7 @@ class InventoryFactory extends Factory
             'name' => $this->faker->words(3, true),
             'sku' => $this->faker->unique()->ean13,
             'description' => $this->faker->paragraph,
-            'quantity' => $this->faker->numberBetween(0, 1000),
+            'stock' => $this->faker->numberBetween(0, 1000),
             'price' => $this->faker->randomFloat(2, 10, 1000),
             'low_stock_threshold' => $this->faker->numberBetween(5, 50),
         ];
