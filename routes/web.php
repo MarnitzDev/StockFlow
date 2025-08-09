@@ -5,7 +5,7 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\PurchasesController;
-use App\Http\Controllers\ContactsController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StockAdjustmentController;
@@ -57,8 +57,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Contacts
     Route::prefix('contacts')->name('contacts.')->group(function () {
-        Route::get('/customers', [ContactsController::class, 'customers'])->name('customers');
-        Route::get('/suppliers', [ContactsController::class, 'suppliers'])->name('suppliers');
+        Route::resource('customers', CustomerController::class);
     });
 
     // Reports

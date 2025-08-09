@@ -113,6 +113,22 @@ const menuItems = ref([
             // Add more sales-related submenu items as needed
         ]
     },
+    {
+        label: 'Customers',
+        icon: 'fas fa-address-book',
+        submenu: [
+            { label: 'List All', route: 'contacts.customers.index' },
+            { label: 'Add New', route: 'contacts.customers.create' },
+        ]
+    },
+    {
+        label: 'Suppliers',
+        icon: 'fas fa-truck',
+        submenu: [
+            // { label: 'List All', route: 'contacts.suppliers.index' },
+            // { label: 'Add New', route: 'contacts.suppliers.create' },
+        ]
+    },
     // Uncomment and add routes as needed
     // { label: 'Contacts', icon: 'fas fa-address-book', route: 'contacts.index' },
     // { label: 'Reports', icon: 'fas fa-chart-bar', route: 'inventory.report' },
