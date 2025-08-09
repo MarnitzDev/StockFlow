@@ -101,8 +101,9 @@ const filters = ref({
                         :filters="filters"
                         filterDisplay="menu"
                         :globalFilterFields="['name', 'sku', 'category.name']"
+                        tableStyle="min-width: 50rem"
                     >
-                        <Column header="">
+                        <Column header="" style="width: 100px">
                             <template #body="slotProps">
                                 <img :src="slotProps.data.primary_image?.image_path"
                                      :alt="slotProps.data.name"
@@ -111,19 +112,19 @@ const filters = ref({
                                 />
                             </template>
                         </Column>
-                        <Column field="name" header="Item" sortable></Column>
-                        <Column field="sku" header="SKU" sortable></Column>
-                        <Column field="quantity" header="Quantity" sortable></Column>
-                        <Column field="price" header="Price" sortable>
+                        <Column field="name" header="Item" sortable style="width: 200px"></Column>
+                        <Column field="sku" header="SKU" sortable style="width: 150px"></Column>
+                        <Column field="quantity" header="Quantity" sortable style="width: 100px"></Column>
+                        <Column field="price" header="Price" sortable style="width: 120px">
                             <template #body="slotProps">
                                 {{ new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(slotProps.data.price) }}
                             </template>
                         </Column>
-                        <Column field="category.name" header="Category" sortable></Column>
-                        <Column field="low_stock_threshold" header="Stock Threshold" sortable></Column>
-                        <Column header="Actions">
+                        <Column field="category.name" header="Category" sortable style="width: 150px"></Column>
+                        <Column field="low_stock_threshold" header="Stock Threshold" sortable style="width: 150px"></Column>
+                        <Column header="Actions" style="width: 200px">
                             <template #body="slotProps">
-                                <Button label="Update Stock" icon="pi pi-plus" @click="openStockMovementDialog(slotProps.data)" />
+                                <Button icon="pi pi-plus" outlined rounded class="mr-2" label="Placeholder" @click="openStockMovementDialog(slotProps.data)" />
                             </template>
                         </Column>
                     </DataTable>

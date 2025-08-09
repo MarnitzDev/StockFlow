@@ -6,12 +6,13 @@ use Illuminate\Database\Seeder;
 use App\Models\Inventory;
 use App\Models\InventoryImage;
 use App\Models\Category;
+use Illuminate\Support\Str;
 
 class InventorySeeder extends Seeder
 {
     public function run()
     {
-        // Ensure we have categories
+        // Ensure we have categories with slugs
         $categories = Category::count() > 0 ? Category::all() : Category::factory(5)->create();
 
         // Create 50 inventory items

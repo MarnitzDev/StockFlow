@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\PurchasesController;
 use App\Http\Controllers\ContactsController;
@@ -23,12 +24,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     // Inventory
-    // Inventory
     Route::prefix('inventory')->name('inventory.')->group(function () {
         Route::get('/items', [InventoryController::class, 'items'])->name('items');
         Route::get('/create', [InventoryController::class, 'create'])->name('create');
         Route::post('/store', [InventoryController::class, 'store'])->name('store');
-        Route::get('/categories', [InventoryController::class, 'categories'])->name('categories');
+        Route::resource('categories', CategoryController::class);
         Route::get('/stock-adjustments', [InventoryController::class, 'stockAdjustments'])->name('stockAdjustments');
         Route::get('/stock-history', [InventoryController::class, 'stockHistory'])->name('stockHistory');
     });

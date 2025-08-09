@@ -2,7 +2,7 @@
     <div class="flex h-screen bg-gray-100">
         <!-- Sidebar -->
         <div class="w-64 bg-white shadow-xl z-10 transition-all duration-300 ease-in-out flex flex-col">
-            <div class="flex items-center justify-center h-16 border-b border-gray-200">
+            <div class="flex items-center justify-center h-20 border-b border-gray-200">
                 <ApplicationLogo class="w-12 h-12" />
             </div>
             <nav class="mt-5 flex-grow">
@@ -32,8 +32,8 @@
         <!-- Main Content -->
         <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Top Navigation -->
-            <header class="bg-white shadow">
-                <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+            <header class="bg-white shadow h-20">
+                <div class="py-4 px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between items-center">
                         <div class="flex-1 flex items-center">
                             <IconField class="w-full max-w-3xl mr-4">
@@ -99,10 +99,9 @@ const menuItems = ref([
         icon: 'fas fa-box',
         submenu: [
             { label: 'Items', route: 'inventory.items' },
-            // Uncomment and add routes as needed
-            // { label: 'Item Groups', route: 'inventory.groups' },
-            // { label: 'Stock Adjustments', route: 'inventory.adjustments' },
-            // { label: 'Stock History', route: 'inventory.history' },
+            { label: 'Categories', route: 'inventory.categories.index' },
+            // { label: 'Stock Adjustments', route: 'inventory.stockAdjustments' },
+            // { label: 'Stock History', route: 'inventory.stockHistory' },
         ]
     },
     // Uncomment and add routes as needed
