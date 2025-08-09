@@ -3,7 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\SalesController;
+use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\PurchasesController;
 use App\Http\Controllers\ContactsController;
 use App\Http\Controllers\ReportsController;
@@ -40,10 +40,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Sales
     Route::prefix('sales')->name('sales.')->group(function () {
-        Route::get('/orders', [SalesController::class, 'orders'])->name('orders');
-        Route::get('/invoices', [SalesController::class, 'invoices'])->name('invoices');
-        Route::get('/payments', [SalesController::class, 'payments'])->name('payments');
+        Route::resource('orders', SalesOrderController::class);
     });
+//    Route::prefix('sales')->name('sales.')->group(function () {
+//        Route::get('/orders', [SalesController::class, 'orders'])->name('orders');
+//        Route::get('/invoices', [SalesController::class, 'invoices'])->name('invoices');
+//        Route::get('/payments', [SalesController::class, 'payments'])->name('payments');
+//    });
 
     // Purchases
     Route::prefix('purchases')->name('purchases.')->group(function () {

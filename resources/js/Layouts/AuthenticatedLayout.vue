@@ -104,6 +104,14 @@ const menuItems = ref([
             // { label: 'Stock History', route: 'inventory.stockHistory' },
         ]
     },
+    {
+        label: 'Sales',
+        icon: 'fas fa-shopping-cart',
+        submenu: [
+            { label: 'Orders', route: 'sales.orders.index' },
+            // Add more sales-related submenu items as needed
+        ]
+    },
     // Uncomment and add routes as needed
     // { label: 'Contacts', icon: 'fas fa-address-book', route: 'contacts.index' },
     // { label: 'Reports', icon: 'fas fa-chart-bar', route: 'inventory.report' },
