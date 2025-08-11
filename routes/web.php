@@ -29,8 +29,9 @@ Route::get('/pos', [POSController::class, 'index'])->name('pos');
 Route::post('/pos/checkout', [POSController::class, 'checkout'])->name('pos.checkout');
 
 // Suppliers
-Route::get('/supplier-purchase', [SupplierController::class, 'index'])->name('supplier');
-//    Route::post('/supplier-purchase/checkout', [SupplierController::class, 'purchaseCheckout'])->name('supplier.purchase.checkout');
+Route::get('/suppliers', [SupplierController::class, 'index'])->name('supplier.index');
+Route::get('/suppliers/{supplier}', [SupplierController::class, 'show'])->name('supplier.show');
+Route::post('/suppliers/purchase-checkout', [SupplierController::class, 'purchaseCheckout'])->name('supplier.purchase.checkout');
 
 // Inventory Management
 Route::middleware(['auth', 'verified'])->group(function () {

@@ -2,7 +2,6 @@
 import { ref, computed } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import { Link } from '@inertiajs/vue3';
 
 interface Product {
     id: number;
@@ -24,17 +23,16 @@ interface CartItem extends Product {
 }
 
 const props = defineProps<{
+    supplier: Supplier;
     products: Product[];
-    suppliers: Supplier[];
 }>();
 
 const cart = ref<CartItem[]>([]);
-const selectedSupplier = ref<number | null>(null);
 
 const form = useForm({
     items: [] as { product_id: number; quantity: number; price: number }[],
     total: 0,
-    supplier_id: null as number | null,
+    supplier_id: props.supplier.id,
 });
 
 const addToCart = (product: Product) => {
@@ -66,7 +64,6 @@ const updateForm = () => {
         price: item.price,
     }));
     form.total = cart.value.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    form.supplier_id = selectedSupplier.value;
 };
 
 const checkout = () => {
@@ -75,7 +72,6 @@ const checkout = () => {
         preserveState: true,
         onSuccess: () => {
             cart.value = [];
-            selectedSupplier.value = null;
             updateForm();
         },
         onError: (errors) => {
@@ -91,28 +87,15 @@ const cartTotal = computed(() => {
 
 <template>
     <div class="min-h-screen bg-gray-100">
-        <Head title="StockFlow Supplier Purchase" />
+        <Head :title="`Purchase from ${supplier.name}`" />
 
         <nav class="bg-white border-b border-gray-100">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex">
-                        <div class="shrink-0 flex items-center">
-<!--                            <Link :href="route('welcome')">-->
-<!--                                <ApplicationLogo class="block h-9 w-auto fill-current text-gray-800" />-->
-<!--                            </Link>-->
-                        </div>
-                    </div>
-<!--                    <div class="flex items-center">-->
-<!--                        <Link :href="route('dashboard')" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Dashboard</Link>-->
-<!--                    </div>-->
-                </div>
-            </div>
+            <!-- ... (keep your existing nav) ... -->
         </nav>
 
         <header class="bg-white shadow">
             <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">Supplier Purchase</h2>
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">Purchase from {{ supplier.name }}</h2>
             </div>
         </header>
 
@@ -134,13 +117,6 @@ const cartTotal = computed(() => {
                             <!-- Purchase Cart -->
                             <div class="border p-4 rounded">
                                 <h2 class="text-xl font-bold mb-4">Purchase Cart</h2>
-                                <div class="mb-4">
-                                    <label for="supplier" class="block text-sm font-medium text-gray-700">Select Supplier</label>
-                                    <select v-model="selectedSupplier" @change="updateForm" id="supplier" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                                        <option value="">Select a supplier</option>
-                                        <option v-for="supplier in suppliers" :key="supplier.id" :value="supplier.id">{{ supplier.name }}</option>
-                                    </select>
-                                </div>
                                 <div v-for="item in cart" :key="item.id" class="mb-2 flex justify-between items-center">
                                     <span>{{ item.name }} ({{ item.quantity }})</span>
                                     <span>${{ (item.price * item.quantity).toFixed(2) }}</span>
@@ -149,7 +125,7 @@ const cartTotal = computed(() => {
                                 <div class="mt-4 pt-4 border-t">
                                     <p class="font-bold">Total: ${{ cartTotal }}</p>
                                 </div>
-                                <button @click="checkout" class="mt-4 w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600" :disabled="cart.length === 0 || !selectedSupplier">
+                                <button @click="checkout" class="mt-4 w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600" :disabled="cart.length === 0">
                                     Create Purchase Order
                                 </button>
                             </div>

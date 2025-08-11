@@ -16,6 +16,20 @@ class SupplierController extends Controller
 {
     public function index(): Response
     {
+        $suppliers = Supplier::all()->map(function ($supplier) {
+            return [
+                'id' => $supplier->id,
+                'name' => $supplier->name,
+            ];
+        });
+
+        return Inertia::render('Supplier/Index', [
+            'suppliers' => $suppliers,
+        ]);
+    }
+
+    public function show(Supplier $supplier): Response
+    {
         $products = Inventory::with(['category', 'primaryImage'])
             ->get()
             ->map(function ($product) {
@@ -30,16 +44,9 @@ class SupplierController extends Controller
                 ];
             });
 
-        $suppliers = Supplier::all()->map(function ($supplier) {
-            return [
-                'id' => $supplier->id,
-                'name' => $supplier->name,
-            ];
-        });
-
-        return Inertia::render('Supplier/App', [
+        return Inertia::render('Supplier/Show', [
+            'supplier' => $supplier,
             'products' => $products,
-            'suppliers' => $suppliers,
         ]);
     }
 
