@@ -14,7 +14,9 @@ return new class extends Migration
             $table->foreignId('supplier_id')->constrained('suppliers')->onDelete('cascade');
             $table->date('order_date');
             $table->decimal('total_amount', 10, 2);
-            $table->string('status')->default('pending'); // e.g., pending, completed, cancelled
+            $table->decimal('payment_amount', 10, 2)->nullable();
+            $table->timestamp('payment_date')->nullable();
+            $table->string('status')->default('pending');
             $table->timestamps();
         });
     }

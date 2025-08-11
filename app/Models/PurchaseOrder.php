@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Models;
@@ -15,6 +14,7 @@ class PurchaseOrder extends Model
         'order_date',
         'total_amount',
         'status',
+        'payment_date'
     ];
 
     public function supplier()
