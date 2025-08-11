@@ -30,7 +30,7 @@ class SupplierController extends Controller
 
     public function show(Supplier $supplier): Response
     {
-        $products = Inventory::with(['category', 'primaryImage'])
+        $products = $supplier->inventories()->with(['category', 'primaryImage'])
             ->get()
             ->map(function ($product) {
                 return [

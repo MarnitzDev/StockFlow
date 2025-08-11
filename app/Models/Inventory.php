@@ -18,6 +18,7 @@ class Inventory extends Model
         'price',
         'category_id',
         'low_stock_threshold',
+        'supplier_id',
     ];
 
     protected $casts = [
@@ -79,5 +80,10 @@ class Inventory extends Model
     public function primaryImage()
     {
         return $this->hasOne(InventoryImage::class)->where('is_primary', true);
+    }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
     }
 }

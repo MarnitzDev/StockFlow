@@ -17,6 +17,7 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null');
             $table->integer('low_stock_threshold')->default(10);
+            $table->foreignId('supplier_id')->nullable()->constrained('suppliers')->onDelete('set null');
             $table->timestamps();
             $table->softDeletes();
         });
