@@ -10,6 +10,7 @@ use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StockAdjustmentController;
 use App\Http\Controllers\POSController;
+use App\Http\Controllers\SupplierController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -23,14 +24,20 @@ Route::get('/', function () {
     ]);
 });
 
-
+// POS
 Route::get('/pos', [POSController::class, 'index'])->name('pos');
 Route::post('/pos/checkout', [POSController::class, 'checkout'])->name('pos.checkout');
 
+// Suppliers
+Route::get('/supplier-purchase', [SupplierController::class, 'index'])->name('supplier');
+//    Route::post('/supplier-purchase/checkout', [SupplierController::class, 'purchaseCheckout'])->name('supplier.purchase.checkout');
+
+// Inventory Management
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+
 
     // Inventory
     Route::prefix('inventory')->name('inventory.')->group(function () {

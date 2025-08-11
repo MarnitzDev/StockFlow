@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Inventory;
 use App\Models\SalesOrder;
 use App\Models\SalesOrderItem;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -26,7 +27,17 @@ class POSController extends Controller
                 ];
             });
 
-        return Inertia::render('POS/App', ['products' => $products]);
+        $suppliers = Supplier::all()->map(function ($supplier) {
+            return [
+                'id' => $supplier->id,
+                'name' => $supplier->name,
+            ];
+        });
+
+        return Inertia::render('Supplier/App', [
+            'products' => $products,
+            'suppliers' => $suppliers,
+        ]);
     }
 
     public function checkout(Request $request)
