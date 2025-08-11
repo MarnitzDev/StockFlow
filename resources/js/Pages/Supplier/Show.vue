@@ -28,6 +28,11 @@ const props = defineProps<{
 }>();
 
 const cart = ref<CartItem[]>([]);
+const quantities = ref<{ [key: number]: number }>({});
+
+props.products.forEach(product => {
+    quantities.value[product.id] = 1;
+});
 
 const form = useForm({
     items: [] as { product_id: number; quantity: number; price: number }[],
@@ -36,12 +41,16 @@ const form = useForm({
 });
 
 const addToCart = (product: Product) => {
+    const quantity = quantities.value[product.id];
+    if (!quantity || quantity < 1) return;
+
     const existingItem = cart.value.find(item => item.id === product.id);
     if (existingItem) {
-        existingItem.quantity += 1;
+        existingItem.quantity += quantity;
     } else {
-        cart.value.push({ ...product, quantity: 1 });
+        cart.value.push({ ...product, quantity });
     }
+    quantities.value[product.id] = 1;
     updateForm();
 };
 
@@ -99,36 +108,78 @@ const cartTotal = computed(() => {
             </div>
         </header>
 
-        <main>
-            <div class="py-12">
-                <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <div class="grid grid-cols-3 gap-4">
-                            <!-- Product Grid -->
-                            <div class="col-span-2 grid grid-cols-3 gap-4">
-                                <div v-for="product in products" :key="product.id" class="border p-4 rounded">
-                                    <img :src="product.image" :alt="product.name" class="w-full h-32 object-cover mb-2">
-                                    <h3 class="font-bold">{{ product.name }}</h3>
-                                    <p>${{ product.price.toFixed(2) }}</p>
-                                    <button @click="addToCart(product)" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Add to Cart</button>
-                                </div>
-                            </div>
+        <main class="py-12">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6 flex">
+                        <!-- Product Table -->
+                        <div class="flex-grow mr-6">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                <tr v-for="product in products" :key="product.id">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 h-10 w-10">
+                                                <img class="h-10 w-10 rounded-full object-cover" :src="product.image" :alt="product.name">
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900">{{ product.name }}</div>
+                                                <div class="text-sm text-gray-500">{{ product.category }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ product.sku }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${{ product.price.toFixed(2) }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ product.stock }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <input
+                                            type="number"
+                                            v-model="quantities[product.id]"
+                                            min="1"
+                                            :max="product.stock"
+                                            class="w-20 px-2 py-1 border rounded"
+                                        >
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <button
+                                            @click="addToCart(product)"
+                                            class="text-indigo-600 hover:text-indigo-900"
+                                            :disabled="!quantities[product.id] || quantities[product.id] < 1"
+                                        >
+                                            Add to Cart
+                                        </button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
 
-                            <!-- Purchase Cart -->
-                            <div class="border p-4 rounded">
-                                <h2 class="text-xl font-bold mb-4">Purchase Cart</h2>
-                                <div v-for="item in cart" :key="item.id" class="mb-2 flex justify-between items-center">
-                                    <span>{{ item.name }} ({{ item.quantity }})</span>
-                                    <span>${{ (item.price * item.quantity).toFixed(2) }}</span>
-                                    <button @click="removeFromCart(item)" class="text-red-500">Remove</button>
+                        <!-- Purchase Cart -->
+                        <div class="w-1/3 bg-gray-50 p-6 rounded-lg">
+                            <h2 class="text-xl font-bold mb-4">Purchase Order</h2>
+                            <div v-for="item in cart" :key="item.id" class="mb-2 flex justify-between items-center">
+                                <span class="text-sm">{{ item.name }} ({{ item.quantity }})</span>
+                                <div>
+                                    <span class="text-sm mr-2">${{ (item.price * item.quantity).toFixed(2) }}</span>
+                                    <button @click="removeFromCart(item)" class="text-red-500 text-sm">Remove</button>
                                 </div>
-                                <div class="mt-4 pt-4 border-t">
-                                    <p class="font-bold">Total: ${{ cartTotal }}</p>
-                                </div>
-                                <button @click="checkout" class="mt-4 w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600" :disabled="cart.length === 0">
-                                    Create Purchase Order
-                                </button>
                             </div>
+                            <div class="mt-4 pt-4 border-t">
+                                <p class="font-bold">Total: ${{ cartTotal }}</p>
+                            </div>
+                            <button @click="checkout" class="mt-4 w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors duration-300" :disabled="cart.length === 0">
+                                Create Purchase Order
+                            </button>
                         </div>
                     </div>
                 </div>
