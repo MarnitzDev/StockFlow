@@ -16,10 +16,11 @@ class SupplierController extends Controller
 {
     public function index(): Response
     {
-        $suppliers = Supplier::all()->map(function ($supplier) {
+        $suppliers = Supplier::with('image')->get()->map(function ($supplier) {
             return [
                 'id' => $supplier->id,
                 'name' => $supplier->name,
+                'image' => $supplier->image ? $supplier->image->image_path : null,
             ];
         });
 

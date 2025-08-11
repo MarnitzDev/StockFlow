@@ -7,6 +7,7 @@ use App\Models\Supplier;
 use App\Models\Inventory;
 use App\Models\Category;
 use App\Models\InventoryImage;
+use App\Models\SupplierImage;
 
 class SupplierWithInventorySeeder extends Seeder
 {
@@ -15,8 +16,14 @@ class SupplierWithInventorySeeder extends Seeder
         // Create some categories if they don't exist
         $categories = Category::count() > 0 ? Category::all() : Category::factory(5)->create();
 
-        // Create exactly 5 suppliers with their own inventories
+        // Create exactly 5 suppliers with their own inventories and one image each
         Supplier::factory(5)->create()->each(function ($supplier) use ($categories) {
+            // Create one image for each supplier
+            SupplierImage::create([
+                'supplier_id' => $supplier->id,
+                'image_path' => 'https://picsum.photos/seed/' . uniqid() . '/400/300',
+            ]);
+
             $inventoryCount = rand(5, 15);
             Inventory::factory($inventoryCount)->create([
                 'supplier_id' => $supplier->id,
