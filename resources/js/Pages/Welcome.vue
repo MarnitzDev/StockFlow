@@ -94,6 +94,20 @@ function handleImageError() {
                             >
                                 Register
                             </Link>
+                            <Link
+                                :href="route('pos')"
+                                class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
+                            >
+                                POS
+                            </Link>
+
+                            <Link
+                                :href="route('supplier.index')"
+                                class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
+                            >
+                                Supplier
+                            </Link>
+
                         </template>
                     </nav>
                 </header>
