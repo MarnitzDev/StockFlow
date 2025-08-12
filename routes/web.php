@@ -1,16 +1,15 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\SalesOrderController;
-use App\Http\Controllers\PurchasesController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\PurchasesController;
 use App\Http\Controllers\ReportsController;
+use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StockAdjustmentController;
-use App\Http\Controllers\POSController;
-use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\POS\POSController;
+use App\Http\Controllers\Vendors\VendorController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -24,27 +23,11 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
-// POS
-Route::get('/pos', [POSController::class, 'index'])->name('pos');
-Route::post('/pos/checkout', [POSController::class, 'checkout'])->name('pos.checkout');
-
 // Inventory Management
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('App/Dashboard');
     })->name('dashboard');
-
-    // Suppliers
-    Route::prefix('suppliers')->name('supplier.')->group(function () {
-        Route::get('/', [SupplierController::class, 'index'])->name('index');
-        Route::get('/{supplier}', [SupplierController::class, 'show'])->name('show');
-        Route::get('/{supplier}/purchase', [SupplierController::class, 'createPurchaseOrder'])->name('purchases.create');
-        Route::post('/{supplier}/purchase', [SupplierController::class, 'storePurchaseOrder'])->name('purchases.store');
-        Route::post('/purchase-checkout', [SupplierController::class, 'purchaseCheckout'])->name('purchases.checkout');
-        Route::get('/supplier/purchases', [SupplierController::class, 'purchaseHistory'])->name('purchases.history');
-        Route::get('/purchases/{purchaseOrder}', [SupplierController::class, 'purchaseShow'])->name('purchases.show');
-        Route::put('/purchases/{purchase}', [SupplierController::class, 'updatePurchase'])->name('purchases.update');
-    });
 
     // Inventory
     Route::prefix('inventory')->name('inventory.')->group(function () {
@@ -94,6 +77,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/company', [SettingsController::class, 'company'])->name('company');
         Route::get('/users-permissions', [SettingsController::class, 'usersPermissions'])->name('usersPermissions');
         Route::get('/billing', [SettingsController::class, 'billing'])->name('billing');
+    });
+});
+
+// POS
+Route::get('/pos', [POSController::class, 'index'])->name('pos');
+Route::post('/pos/checkout', [POSController::class, 'checkout'])->name('pos.checkout');
+
+// Vendors
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::prefix('vendors')->name('vendor.')->group(function () {
+        Route::get('/', [VendorController::class, 'index'])->name('index');
+        Route::get('/{vendor}', [VendorController::class, 'show'])->name('show');
+        Route::get('/{vendor}/purchase', [VendorController::class, 'createPurchaseOrder'])->name('purchases.create');
+        Route::post('/{vendor}/purchase', [VendorController::class, 'storePurchaseOrder'])->name('purchases.store');
+        Route::post('/purchase-checkout', [VendorController::class, 'purchaseCheckout'])->name('purchases.checkout');
+        Route::get('/vendor/purchases', [VendorController::class, 'purchaseHistory'])->name('purchases.history');
+        Route::get('/purchases/{purchaseOrder}', [VendorController::class, 'purchaseShow'])->name('purchases.show');
+        Route::put('/purchases/{purchase}', [VendorController::class, 'updatePurchase'])->name('purchases.update');
     });
 });
 

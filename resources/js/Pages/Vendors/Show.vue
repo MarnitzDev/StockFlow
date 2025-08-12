@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { Head, useForm, Link } from '@inertiajs/vue3';
-import SupplierLayout from '@/Layouts/SupplierLayout.vue';
+import VendorLayout from '@/Layouts/VendorLayout.vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 
 interface Product {
@@ -102,7 +102,7 @@ const showProductDetails = (product: Product) => {
 </script>
 
 <template>
-    <SupplierLayout>
+    <VendorLayout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Purchase from {{ supplier.name }}</h2>
         </template>
@@ -217,5 +217,5 @@ const showProductDetails = (product: Product) => {
                 </div>
             </div>
         </div>
-    </SupplierLayout>
+    </VendorLayout>
 </template>

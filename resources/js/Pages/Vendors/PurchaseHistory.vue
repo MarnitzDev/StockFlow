@@ -1,5 +1,5 @@
 <template>
-    <SupplierLayout>
+    <VendorLayout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Purchase History</h2>
         </template>
@@ -38,11 +38,11 @@
                 </div>
             </div>
         </div>
-    </SupplierLayout>
+    </VendorLayout>
 </template>
 
 <script setup>
-import SupplierLayout from '@/Layouts/SupplierLayout.vue';
+import VendorLayout from '@/Layouts/VendorLayout.vue';
 import { Link } from '@inertiajs/vue3';
 
 defineProps({

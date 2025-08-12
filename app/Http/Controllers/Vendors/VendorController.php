@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers\Vendors;
 
-use App\Http\Controllers\App\Controller;
+use App\Http\Controllers\Controller;
 use App\Models\Inventory;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
-use App\Models\Supplier;
+use App\Models\Vendors\Supplier;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class SupplierController extends Controller
+class VendorController extends Controller
 {
     public function index(): Response
     {

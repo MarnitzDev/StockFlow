@@ -1,7 +1,7 @@
 <template>
-    <SupplierLayout>
+    <VendorLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Suppliers</h2>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Vendors</h2>
         </template>
 
         <div class="py-12">
@@ -11,7 +11,7 @@
                         <Link
                             v-for="supplier in suppliers"
                             :key="supplier.id"
-                            :href="route('supplier.show', supplier.id)"
+                            :href="route('vendor.show', supplier.id)"
                             class="bg-white border rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col"
                         >
                             <div class="h-48 overflow-hidden">
@@ -29,12 +29,12 @@
                 </div>
             </div>
         </div>
-    </SupplierLayout>
+    </VendorLayout>
 </template>
 
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
-import SupplierLayout from '@/Layouts/SupplierLayout.vue';
+import VendorLayout from '@/Layouts/VendorLayout.vue';
 import { Link } from '@inertiajs/vue3';
 
 interface Supplier {

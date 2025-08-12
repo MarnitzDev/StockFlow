@@ -1,5 +1,5 @@
 <template>
-    <SupplierLayout>
+    <VendorLayout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Purchase Order Details</h2>
         </template>
@@ -49,12 +49,12 @@
                 </div>
             </div>
         </div>
-    </SupplierLayout>
+    </VendorLayout>
 </template>
 
 <script setup>
 import { useForm } from '@inertiajs/vue3';
-import SupplierLayout from '@/Layouts/SupplierLayout.vue';
+import VendorLayout from '@/Layouts/VendorLayout.vue';
 
 const props = defineProps({
     purchaseOrder: Object,

@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Inventory;
-use App\Models\Supplier;
+use App\Models\Vendors\Supplier;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class InventoryFactory extends Factory

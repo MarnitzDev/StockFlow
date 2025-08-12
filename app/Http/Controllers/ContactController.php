@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\App;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\StockMovement;
 use App\Models\Contact;
 use Illuminate\Http\Request;
 use Inertia\Inertia;

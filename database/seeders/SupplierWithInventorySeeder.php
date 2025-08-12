@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\Supplier;
-use App\Models\Inventory;
 use App\Models\Category;
+use App\Models\Inventory;
 use App\Models\InventoryImage;
 use App\Models\SupplierImage;
+use App\Models\Vendors\Supplier;
+use Illuminate\Database\Seeder;
 
 class SupplierWithInventorySeeder extends Seeder
 {

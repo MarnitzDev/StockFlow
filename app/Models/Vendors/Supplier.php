@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Vendors;
 
+use App\Models\Inventory;
+use App\Models\SupplierImage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 

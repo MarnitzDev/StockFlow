@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\POS;
 
+use App\Http\Controllers\Controller;
 use App\Models\Inventory;
-use App\Models\SalesOrder;
-use App\Models\SalesOrderItem;
-use App\Models\Supplier;
+use App\Models\Vendors\Supplier;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -34,7 +33,7 @@ class POSController extends Controller
             ];
         });
 
-        return Inertia::render('Vendors/App', [
+        return Inertia::render('POS/App', [
             'products' => $products,
             'suppliers' => $suppliers,
         ]);
