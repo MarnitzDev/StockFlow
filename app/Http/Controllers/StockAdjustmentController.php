@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\App;
 
-use App\Models\StockAdjustment;
 use App\Models\Inventory;
+use App\Models\StockAdjustment;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

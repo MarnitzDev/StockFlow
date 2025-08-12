@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\App;
 
-use App\Models\SalesOrder;
-use App\Models\Inventory;
 use App\Models\Customer;
+use App\Models\Inventory;
+use App\Models\SalesOrder;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 
 class SalesOrderController extends Controller

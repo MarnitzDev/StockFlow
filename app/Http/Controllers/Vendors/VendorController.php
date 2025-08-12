@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Vendors;
 
+use App\Http\Controllers\App\Controller;
 use App\Models\Inventory;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\Supplier;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Support\Facades\DB;
 
 class SupplierController extends Controller
 {
@@ -24,7 +25,7 @@ class SupplierController extends Controller
             ];
         });
 
-        return Inertia::render('Supplier/Index', [
+        return Inertia::render('Vendors/Index', [
             'suppliers' => $suppliers,
         ]);
     }
@@ -45,7 +46,7 @@ class SupplierController extends Controller
                 ];
             });
 
-        return Inertia::render('Supplier/Show', [
+        return Inertia::render('Vendors/Show', [
             'supplier' => $supplier,
             'products' => $products,
         ]);
@@ -101,7 +102,7 @@ class SupplierController extends Controller
     public function createPurchaseOrder(Supplier $supplier)
     {
         $products = $supplier->products;
-        return Inertia::render('Supplier/PurchaseOrder', [
+        return Inertia::render('Vendors/PurchaseOrder', [
             'supplier' => $supplier,
             'products' => $products,
         ]);
@@ -148,7 +149,7 @@ class SupplierController extends Controller
                 ];
             });
 
-        return Inertia::render('Supplier/PurchaseHistory', [
+        return Inertia::render('Vendors/PurchaseHistory', [
             'purchaseOrders' => $purchaseOrders
         ]);
     }
@@ -156,7 +157,7 @@ class SupplierController extends Controller
     public function purchaseShow(PurchaseOrder $purchaseOrder)
     {
         $purchaseOrder->load(['supplier', 'items.product']);
-        return Inertia::render('Supplier/PurchaseShow', [
+        return Inertia::render('Vendors/PurchaseShow', [
             'purchaseOrder' => $purchaseOrder
         ]);
     }

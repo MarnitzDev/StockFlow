@@ -34,7 +34,7 @@ class POSController extends Controller
             ];
         });
 
-        return Inertia::render('Supplier/App', [
+        return Inertia::render('Vendors/App', [
             'products' => $products,
             'suppliers' => $suppliers,
         ]);
