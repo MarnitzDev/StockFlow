@@ -12,6 +12,7 @@ import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
+import InputNumber from 'primevue/inputnumber';
 import Dropdown from 'primevue/dropdown';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
@@ -43,6 +44,7 @@ createInertiaApp({
 
         app.component('Button', Button);
         app.component('InputText', InputText);
+        app.component('InputNumber', InputNumber);
         app.component('Dropdown', Dropdown);
         app.component('DataTable', DataTable);
         app.component('Column', Column);

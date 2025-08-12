@@ -12,22 +12,43 @@ const form = useForm({
     total: 0,
 });
 
+const isCartEmpty = computed(() => cart.value.length === 0);
+
 const addToCart = (product) => {
+    const quantity = product.quantity || 1;
+    const availableQuantity = product.available_quantity;
+
+    if (quantity > availableQuantity) {
+        alert(`Sorry, only ${availableQuantity} item(s) available.`);
+        return;
+    }
+
     const existingItem = cart.value.find(item => item.id === product.id);
     if (existingItem) {
-        existingItem.quantity += 1;
+        const newQuantity = existingItem.quantity + quantity;
+        if (newQuantity > availableQuantity) {
+            alert(`Sorry, you can't add more. Only ${availableQuantity - existingItem.quantity} item(s) left.`);
+            return;
+        }
+        existingItem.quantity = newQuantity;
     } else {
-        cart.value.push({ ...product, quantity: 1 });
+        cart.value.push({ ...product, quantity });
     }
+
+    product.available_quantity -= quantity;
+    product.quantity = 1;
     updateForm();
 };
 
 const removeFromCart = (product) => {
     const index = cart.value.findIndex(item => item.id === product.id);
     if (index !== -1) {
+        const originalProduct = props.products.find(p => p.id === product.id);
         if (cart.value[index].quantity > 1) {
             cart.value[index].quantity -= 1;
+            originalProduct.available_quantity += 1;
         } else {
+            originalProduct.available_quantity += cart.value[index].quantity;
             cart.value.splice(index, 1);
         }
     }
@@ -97,7 +118,28 @@ const cartTotal = computed(() => {
                                     <img :src="product.image" :alt="product.name" class="w-full h-32 object-cover mb-2">
                                     <h3 class="font-bold">{{ product.name }}</h3>
                                     <p>${{ Number(product.price).toFixed(2) }}</p>
-                                    <button @click="addToCart(product)" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Add to Cart</button>
+                                    <p class="text-sm text-gray-600">Available: {{ product.stock }}</p>
+                                    <div class="flex items-center mt-2 space-x-2">
+                                        <InputNumber
+                                            v-model="product.quantity"
+                                            :min="1"
+                                            :max="product.stock"
+                                            showButtons
+                                            class="w-28"
+                                            size="small"
+                                            :inputStyle="{ width: '2rem' }"
+                                        />
+                                        <Button
+                                            @click="addToCart(product)"
+                                            icon="pi pi-shopping-cart"
+                                            size="small"
+                                            :disabled="product.available_quantity === 0"
+                                            class="flex-grow"
+                                            severity="contrast"
+                                        >
+                                            Add
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -107,14 +149,20 @@ const cartTotal = computed(() => {
                                 <div v-for="item in cart" :key="item.id" class="mb-2 flex justify-between items-center">
                                     <span>{{ item.name }} ({{ item.quantity }})</span>
                                     <span>${{ (item.price * item.quantity).toFixed(2) }}</span>
-                                    <button @click="removeFromCart(item)" class="text-red-500">Remove</button>
+                                    <Button @click="removeFromCart(item)" severity="danger" icon="pi pi-times" size="small" variant="text" rounded ></Button>
                                 </div>
                                 <div class="mt-4 pt-4 border-t">
                                     <p class="font-bold">Total: ${{ cartTotal }}</p>
                                 </div>
-                                <button @click="checkout" class="mt-4 w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600" :disabled="cart.length === 0">
-                                    Checkout
-                                </button>
+                                <Button
+                                    @click="checkout"
+                                    label="Checkout"
+                                    icon="pi pi-shopping-cart"
+                                    class="mt-4 w-full"
+                                    :disabled="isCartEmpty"
+                                >
+
+                                </Button>
                             </div>
                         </div>
                     </div>
