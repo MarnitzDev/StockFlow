@@ -93,10 +93,10 @@ import { Link } from '@inertiajs/vue3';
 const showingNavigationDropdown = ref(false);
 
 const menuItems = ref([
-    { label: 'Dashboard', icon: 'fas fa-tachometer-alt', route: 'dashboard' },
+    { label: 'Dashboard', icon: 'pi pi-home', route: 'dashboard' },
     {
         label: 'Inventory',
-        icon: 'fas fa-box',
+        icon: 'pi pi-box',
         submenu: [
             { label: 'Items', route: 'inventory.items' },
             { label: 'Categories', route: 'inventory.categories.index' },
@@ -106,7 +106,7 @@ const menuItems = ref([
     },
     {
         label: 'Sales',
-        icon: 'fas fa-shopping-cart',
+        icon: 'pi pi-shopping-cart',
         submenu: [
             { label: 'Orders', route: 'sales.orders.index' },
             { label: 'Create Order', route: 'sales.orders.create' },
@@ -114,8 +114,17 @@ const menuItems = ref([
         ]
     },
     {
+        label: 'Purchases',
+        icon: 'pi pi-shopping-bag',
+        submenu: [
+            { label: 'Orders', route: 'purchases.orders' },
+            { label: 'Bills', route: 'purchases.bills' },
+            { label: 'Payments', route: 'purchases.payments' },
+        ]
+    },
+    {
         label: 'Customers',
-        icon: 'fas fa-address-book',
+        icon: 'pi pi-users',
         submenu: [
             { label: 'List All', route: 'contacts.customers.index' },
             { label: 'Add New', route: 'contacts.customers.create' },
@@ -123,7 +132,7 @@ const menuItems = ref([
     },
     {
         label: 'Suppliers',
-        icon: 'fas fa-truck',
+        icon: 'pi pi-truck',
         submenu: [
             // { label: 'List All', route: 'contacts.suppliers.index' },
             // { label: 'Add New', route: 'contacts.suppliers.create' },
