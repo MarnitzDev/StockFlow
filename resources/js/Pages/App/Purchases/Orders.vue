@@ -1,12 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { PurchaseOrder } from '@/types';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import InputText from 'primevue/inputtext';
-import Button from 'primevue/button';
 
 interface Props {
     orders: PurchaseOrder[];
@@ -26,15 +22,17 @@ const lazyParams = ref({
     sortOrder: null,
 });
 
+const statusOptions = [
+    { label: 'Completed', value: 'completed' },
+    { label: 'Pending', value: 'pending' },
+    { label: 'Cancelled', value: 'cancelled' }
+];
+
 const loadLazyData = () => {
     loading.value = true;
-    // In a real application, you would fetch data from the server here
-    // For this example, we'll just use the props data
-    setTimeout(() => {
-        orders.value = props.orders;
-        totalRecords.value = props.orders.length;
-        loading.value = false;
-    }, 1000);
+    orders.value = props.orders;
+    totalRecords.value = props.orders.length;
+    loading.value = false;
 };
 
 onMounted(() => {
@@ -76,6 +74,14 @@ const getStatusSeverity = (status) => {
             return null;
     }
 };
+
+const viewOrder = (data: PurchaseOrder) => {
+    router.visit(route('purchases.show', { id: data.id }));
+};
+
+const editOrder = (data: PurchaseOrder) => {
+    router.visit(route('purchases.edit', { id: data.id }));
+};
 </script>
 
 <template>
@@ -91,7 +97,7 @@ const getStatusSeverity = (status) => {
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 bg-white border-b border-gray-200">
                         <DataTable
-                            :value="orders"
+                            :value="orders.data"
                             :lazy="true"
                             :paginator="true"
                             :rows="10"
@@ -111,7 +117,7 @@ const getStatusSeverity = (status) => {
                                     <InputText v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" placeholder="Search by order number" />
                                 </template>
                             </Column>
-                            <Column field="supplier.name" header="Supplier" sortable>
+                            <Column field="vendor.name" header="Supplier" sortable>
                                 <template #filter="{ filterModel, filterCallback }">
                                     <InputText v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" placeholder="Search by supplier" />
                                 </template>
@@ -131,7 +137,7 @@ const getStatusSeverity = (status) => {
                                     <span :class="'status-badge status-' + data.status.toLowerCase()">{{ data.status }}</span>
                                 </template>
                                 <template #filter="{ filterModel, filterCallback }">
-                                    <InputText v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" placeholder="Search by status" />
+                                    <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="statusOptions" optionLabel="label" optionValue="value" placeholder="Select a Status" class="p-column-filter" />
                                 </template>
                             </Column>
                             <Column header="Actions">

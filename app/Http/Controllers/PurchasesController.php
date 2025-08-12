@@ -10,9 +10,18 @@ use App\Models\Payment;
 
 class PurchasesController extends Controller
 {
-    public function orders()
+    public function orders(Request $request)
     {
-        $orders = PurchaseOrder::with('vendor')->orderBy('created_at', 'desc')->get();
+        $perPage = $request->input('rows', 10);
+        $sortField = $request->input('sortField', 'created_at');
+        $sortOrder = $request->input('sortOrder', 'desc');
+        $page = $request->input('page', 1);
+
+        $orders = PurchaseOrder::with('vendor')
+            ->when($sortField, function ($query, $sortField) use ($sortOrder) {
+                $query->orderBy($sortField, $sortOrder === '1' ? 'asc' : 'desc');
+            })
+            ->paginate($perPage, ['*'], 'page', $page);
 
         return Inertia::render('App/Purchases/Orders', [
             'orders' => $orders
