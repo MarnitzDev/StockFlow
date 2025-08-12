@@ -1,14 +1,16 @@
 <?php
 
-namespace Database\Factories;
+namespace Database\Factories\Vendors;
 
+use App\Models\Vendors\Vendor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Vendors\Supplier>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Vendors\Vendor>
  */
-class SupplierFactory extends Factory
+class VendorFactory extends Factory
 {
+    protected $model = Vendor::class;
     /**
      * Define the model's default state.
      *

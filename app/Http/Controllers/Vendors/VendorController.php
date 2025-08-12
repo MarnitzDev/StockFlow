@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Inventory;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
-use App\Models\Vendors\Supplier;
+use App\Models\Vendors\Vendor;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +17,7 @@ class VendorController extends Controller
 {
     public function index(): Response
     {
-        $suppliers = Supplier::with('image')->get()->map(function ($supplier) {
+        $suppliers = Vendor::with('image')->get()->map(function ($supplier) {
             return [
                 'id' => $supplier->id,
                 'name' => $supplier->name,
@@ -30,9 +30,9 @@ class VendorController extends Controller
         ]);
     }
 
-    public function show(Supplier $supplier): Response
+    public function show(Vendor $vendor): Response
     {
-        $products = $supplier->inventories()->with(['category', 'primaryImage'])
+        $products = $vendor->products()
             ->get()
             ->map(function ($product) {
                 return [
@@ -41,13 +41,13 @@ class VendorController extends Controller
                     'price' => (float) $product->price,
                     'sku' => $product->sku,
                     'stock' => $product->stock,
-                    'category' => $product->category ? $product->category->name : null,
-                    'image' => $product->primaryImage ? $product->primaryImage->image_path : null,
+                    'description' => $product->description,
+                    // Add image handling if needed
                 ];
             });
 
         return Inertia::render('Vendors/Show', [
-            'supplier' => $supplier,
+            'vendor' => $vendor,
             'products' => $products,
         ]);
     }
@@ -99,7 +99,7 @@ class VendorController extends Controller
         }
     }
 
-    public function createPurchaseOrder(Supplier $supplier)
+    public function createPurchaseOrder(Vendor $supplier)
     {
         $products = $supplier->products;
         return Inertia::render('Vendors/PurchaseOrder', [
@@ -108,7 +108,7 @@ class VendorController extends Controller
         ]);
     }
 
-    public function storePurchaseOrder(Request $request, Supplier $supplier)
+    public function storePurchaseOrder(Request $request, Vendor $supplier)
     {
         $validated = $request->validate([
             'items' => 'required|array',

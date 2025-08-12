@@ -7,13 +7,26 @@ use App\Models\SalesOrder;
 use App\Models\SalesOrderItem;
 use App\Models\Customer;
 use App\Models\Inventory;
+use App\Models\Category;
 use Faker\Factory as Faker;
+use Illuminate\Support\Str;
 
 class SalesOrderSeeder extends Seeder
 {
     public function run()
     {
         $faker = Faker::create();
+
+        // Ensure we have categories
+        if (Category::count() == 0) {
+            Category::create([
+                'name' => 'Default Category',
+                'slug' => Str::slug('Default Category'),
+            ]);
+        }
+
+        // Get all category IDs
+        $categoryIds = Category::pluck('id')->toArray();
 
         // Ensure we have customers
         if (Customer::count() == 0) {
@@ -33,15 +46,14 @@ class SalesOrderSeeder extends Seeder
 
         // Ensure we have inventory items
         if (Inventory::count() == 0) {
-            // You might want to call the InventorySeeder here or create some sample inventory items
-            // For now, let's create a few sample items
+            // Create a few sample items
             for ($i = 0; $i < 5; $i++) {
                 Inventory::create([
                     'name' => $faker->word,
                     'sku' => $faker->unique()->ean8,
                     'stock' => $faker->numberBetween(10, 100),
                     'price' => $faker->randomFloat(2, 10, 1000),
-                    'category_id' => 1, // Assuming you have at least one category
+                    'category_id' => $faker->randomElement($categoryIds),
                 ]);
             }
         }

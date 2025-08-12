@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Vendors\Supplier;
+use App\Models\Vendors\Vendor;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -25,7 +25,7 @@ class PurchaseOrder extends Model
 
     public function supplier()
     {
-        return $this->belongsTo(Supplier::class);
+        return $this->belongsTo(Vendor::class);
     }
 
     public function items()

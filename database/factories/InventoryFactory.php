@@ -3,7 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Inventory;
-use App\Models\Vendors\Supplier;
+use App\Models\Vendors\Vendor;
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class InventoryFactory extends Factory
@@ -19,7 +20,8 @@ class InventoryFactory extends Factory
             'stock' => $this->faker->numberBetween(0, 1000),
             'price' => $this->faker->randomFloat(2, 10, 1000),
             'low_stock_threshold' => $this->faker->numberBetween(5, 50),
-            'supplier_id' => Supplier::factory(),
+            'vendor_id' => Vendor::factory(),
+            'category_id' => Category::factory(),
         ];
     }
 }

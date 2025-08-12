@@ -4,7 +4,7 @@ namespace App\Http\Controllers\POS;
 
 use App\Http\Controllers\Controller;
 use App\Models\Inventory;
-use App\Models\Vendors\Supplier;
+use App\Models\Vendors\Vendor;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -26,7 +26,7 @@ class POSController extends Controller
                 ];
             });
 
-        $suppliers = Supplier::all()->map(function ($supplier) {
+        $suppliers = Vendor::all()->map(function ($supplier) {
             return [
                 'id' => $supplier->id,
                 'name' => $supplier->name,

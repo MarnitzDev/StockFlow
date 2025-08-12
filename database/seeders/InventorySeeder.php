@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\Category;
-use App\Models\Inventory;
-use App\Models\InventoryImage;
-use App\Models\Vendors\Supplier;
 use Illuminate\Database\Seeder;
+use App\Models\Inventory;
+use App\Models\Category;
+use App\Models\Vendors\Vendor;
+use App\Models\InventoryImage;
 
 class InventorySeeder extends Seeder
 {
@@ -14,12 +14,12 @@ class InventorySeeder extends Seeder
     {
         $categories = Category::count() > 0 ? Category::all() : Category::factory(5)->create();
 
-        $suppliers = Supplier::all();
+        $vendors = Vendor::all();
 
-        $suppliers->each(function ($supplier) use ($categories) {
+        $vendors->each(function ($vendor) use ($categories) {
             $itemCount = rand(5, 15);
             Inventory::factory($itemCount)->create([
-                'supplier_id' => $supplier->id,
+                'vendor_id' => $vendor->id,
             ])->each(function ($inventory) use ($categories) {
                 // Assign a random category
                 $inventory->category()->associate($categories->random())->save();
