@@ -17,16 +17,16 @@ class VendorController extends Controller
 {
     public function index(): Response
     {
-        $suppliers = Vendor::with('image')->get()->map(function ($supplier) {
+        $vendors = Vendor::with('image')->get()->map(function ($vendor) {
             return [
-                'id' => $supplier->id,
-                'name' => $supplier->name,
-                'image' => $supplier->image ? $supplier->image->image_path : null,
+                'id' => $vendor->id,
+                'name' => $vendor->name,
+                'image' => $vendor->image ? $vendor->image->image_path : null,
             ];
         });
 
         return Inertia::render('Vendors/Index', [
-            'suppliers' => $suppliers,
+            'vendors' => $vendors,
         ]);
     }
 
@@ -60,14 +60,14 @@ class VendorController extends Controller
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.price' => 'required|numeric|min:0',
             'total' => 'required|numeric|min:0',
-            'supplier_id' => 'required|exists:suppliers,id',
+            'vendor_id' => 'required|exists:vendors,id',
         ]);
 
         try {
             DB::beginTransaction();
 
             $purchaseOrder = PurchaseOrder::create([
-                'supplier_id' => $request->supplier_id,
+                'vendor_id' => $request->vendor_id,
                 'order_date' => now(),
                 'total_amount' => $request->total,
                 'status' => 'pending',
@@ -82,33 +82,32 @@ class VendorController extends Controller
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['price'],
                 ];
-
-                $inventory = Inventory::find($item['product_id']);
-                $inventory->stock += $item['quantity'];
-                $inventory->save();
             }
 
             PurchaseOrderItem::insert($purchaseOrderItems);
 
             DB::commit();
 
-            return redirect()->route('suppliers.purchases.show', $purchaseOrder->id)->with('success', 'Purchase order created successfully.');
+            return redirect()->route('vendor.purchases.show', $purchaseOrder->id)
+                ->with('success', 'Purchase order created successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('suppliers.purchases.index')->with('error', 'An error occurred while creating the purchase order.');
+            \Log::error('Error creating purchase order: ' . $e->getMessage());
+            return redirect()->route('vendor.purchases.history')
+                ->with('error', 'An error occurred while creating the purchase order.');
         }
     }
 
-    public function createPurchaseOrder(Vendor $supplier)
+    public function createPurchaseOrder(Vendor $vendor)
     {
-        $products = $supplier->products;
+        $products = $vendor->products;
         return Inertia::render('Vendors/PurchaseOrder', [
-            'supplier' => $supplier,
+            'vendor' => $vendor,
             'products' => $products,
         ]);
     }
 
-    public function storePurchaseOrder(Request $request, Vendor $supplier)
+    public function storePurchaseOrder(Request $request, Vendor $vendor)
     {
         $validated = $request->validate([
             'items' => 'required|array',
@@ -118,7 +117,7 @@ class VendorController extends Controller
             'total' => 'required|numeric|min:0',
         ]);
 
-        $purchaseOrder = $supplier->purchaseOrders()->create([
+        $purchaseOrder = $vendor->purchaseOrders()->create([
             'total_amount' => $validated['total'],
             'status' => 'pending',
         ]);
@@ -127,19 +126,19 @@ class VendorController extends Controller
             $purchaseOrder->items()->create($item);
         }
 
-        return redirect()->route('suppliers.show', $supplier->id)->with('success', 'Purchase order created successfully.');
+        return redirect()->route('vendor.show', $vendor->id)->with('success', 'Purchase order created successfully.');
     }
 
     public function purchaseHistory()
     {
-        $purchaseOrders = PurchaseOrder::with(['supplier', 'items.product'])
+        $purchaseOrders = PurchaseOrder::with(['vendor', 'items.product'])
             ->latest()
-            ->get()
-            ->map(function ($order) {
+            ->paginate(15)  // Or whatever number per page you prefer
+            ->through(function ($order) {
                 return [
                     'id' => $order->id,
                     'order_number' => $order->order_number,
-                    'supplier' => $order->supplier->name,
+                    'vendor' => $order->vendor->name,
                     'order_date' => $order->order_date instanceof \DateTime
                         ? $order->order_date->format('Y-m-d')
                         : $order->order_date,
@@ -156,7 +155,7 @@ class VendorController extends Controller
 
     public function purchaseShow(PurchaseOrder $purchaseOrder)
     {
-        $purchaseOrder->load(['supplier', 'items.product']);
+        $purchaseOrder->load(['vendor', 'items.product']);
         return Inertia::render('Vendors/PurchaseShow', [
             'purchaseOrder' => $purchaseOrder
         ]);
@@ -186,17 +185,17 @@ class VendorController extends Controller
 
                 DB::commit();
 
-                return redirect()->route('suppliers.index')
+                return redirect()->route('vendor.purchases.show', $purchase->id)
                     ->with('success', 'Purchase order paid and inventory updated successfully.');
             } catch (\Exception $e) {
                 DB::rollBack();
-                return redirect()->route('suppliers.index')
+                return redirect()->route('vendor.purchases.show', $purchase->id)
                     ->with('error', 'An error occurred while processing the payment: ' . $e->getMessage());
             }
         } else {
             $purchase->update($validated);
 
-            return redirect()->route('suppliers.index')
+            return redirect()->route('vendor.purchases.show', $purchase->id)
                 ->with('success', 'Purchase order updated successfully.');
         }
     }

@@ -8,32 +8,34 @@
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 bg-white border-b border-gray-200">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order Number</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Supplier</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Amount</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                            <tr v-for="order in purchaseOrders" :key="order.id">
-                                <td class="px-6 py-4 whitespace-nowrap">{{ order.order_number }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ order.supplier }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ order.order_date }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">${{ order.total_amount }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ order.status }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ order.items_count }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <Link :href="route('supplier.purchases.show', order.id)" class="text-indigo-600 hover:text-indigo-900">View</Link>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                        <DataTable :value="purchaseOrders.data" :paginator="true" :rows="purchaseOrders.per_page"
+                                   :totalRecords="purchaseOrders.total"
+                                   :rowsPerPageOptions="[5, 10, 20, 50]"
+                                   :lazy="true"
+                                   @page="onPage($event)"
+                                   paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                                   currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                                   responsiveLayout="scroll">
+                            <Column field="order_number" header="Order Number" sortable></Column>
+                            <Column field="vendor" header="Supplier" sortable></Column>
+                            <Column field="order_date" header="Date" sortable></Column>
+                            <Column field="total_amount" header="Total Amount" sortable>
+                                <template #body="slotProps">
+                                    ${{ typeof slotProps.data.total_amount === 'number' ? slotProps.data.total_amount.toFixed(2) : parseFloat(slotProps.data.total_amount || 0).toFixed(2) }}
+                                </template>
+                            </Column>
+                            <Column field="status" header="Status" sortable></Column>
+                            <Column field="items_count" header="Items" sortable></Column>
+                            <Column header="Actions">
+                                <template #body="slotProps">
+                                    <Link v-if="slotProps.data.id" :href="route('vendor.purchases.show', { purchaseOrder: slotProps.data.id })"
+                                          class="text-indigo-600 hover:text-indigo-900">
+                                        View
+                                    </Link>
+                                </template>
+                            </Column>
+                        </DataTable>
+                        <p v-if="purchaseOrders.data.length === 0" class="text-center mt-4">No purchase orders found.</p>
                     </div>
                 </div>
             </div>
@@ -44,8 +46,21 @@
 <script setup>
 import VendorLayout from '@/Layouts/VendorLayout.vue';
 import { Link } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 
-defineProps({
-    purchaseOrders: Array,
+const props = defineProps({
+    purchaseOrders: Object,
 });
+
+const form = useForm();
+
+const onPage = (event) => {
+    form.get(route('vendor.purchases.history'), {
+        page: event.page + 1,
+        perPage: event.rows,
+    }, {
+        preserveState: true,
+        preserveScroll: true,
+    });
+};
 </script>

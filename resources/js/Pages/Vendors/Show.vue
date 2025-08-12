@@ -75,7 +75,7 @@ const updateForm = () => {
 };
 
 const checkout = () => {
-    form.post(route('vendors.purchases.checkout'), {
+    form.post(route('vendor.purchases.checkout'), {
         preserveScroll: true,
         preserveState: true,
         onSuccess: () => {
