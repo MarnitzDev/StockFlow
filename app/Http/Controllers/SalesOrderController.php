@@ -15,14 +15,14 @@ class SalesOrderController extends Controller
     public function index()
     {
         $salesOrders = SalesOrder::with(['customer', 'items.inventory'])->latest()->get();
-        return Inertia::render('Sales/Orders/Index', ['salesOrders' => $salesOrders]);
+        return Inertia::render('App/Sales/Orders/Index', ['salesOrders' => $salesOrders]);
     }
 
     public function create()
     {
         $customers = Customer::all();
         $inventoryItems = Inventory::all();
-        return Inertia::render('Sales/Orders/Create', [
+        return Inertia::render('App/Sales/Orders/Create', [
             'customers' => $customers,
             'inventoryItems' => $inventoryItems,
         ]);
@@ -92,7 +92,7 @@ class SalesOrderController extends Controller
     {
         $salesOrder = SalesOrder::with(['customer', 'items.inventory'])->findOrFail($id);
 
-        return Inertia::render('Sales/Orders/Show', [
+        return Inertia::render('App/Sales/Orders/Show', [
             'salesOrder' => $salesOrder
         ]);
     }

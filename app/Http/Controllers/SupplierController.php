@@ -91,10 +91,10 @@ class SupplierController extends Controller
 
             DB::commit();
 
-            return redirect()->route('supplier.purchases.show', $purchaseOrder->id)->with('success', 'Purchase order created successfully.');
+            return redirect()->route('suppliers.purchases.show', $purchaseOrder->id)->with('success', 'Purchase order created successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('supplier.purchases.index')->with('error', 'An error occurred while creating the purchase order.');
+            return redirect()->route('suppliers.purchases.index')->with('error', 'An error occurred while creating the purchase order.');
         }
     }
 
@@ -126,13 +126,29 @@ class SupplierController extends Controller
             $purchaseOrder->items()->create($item);
         }
 
-        return redirect()->route('supplier.show', $supplier->id)->with('success', 'Purchase order created successfully.');
+        return redirect()->route('suppliers.show', $supplier->id)->with('success', 'Purchase order created successfully.');
     }
 
-    public function purchaseIndex()
+    public function purchaseHistory()
     {
-        $purchaseOrders = PurchaseOrder::with('supplier')->latest()->get();
-        return Inertia::render('Supplier/PurchaseIndex', [
+        $purchaseOrders = PurchaseOrder::with(['supplier', 'items.product'])
+            ->latest()
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'supplier' => $order->supplier->name,
+                    'order_date' => $order->order_date instanceof \DateTime
+                        ? $order->order_date->format('Y-m-d')
+                        : $order->order_date,
+                    'total_amount' => $order->total_amount,
+                    'status' => $order->status,
+                    'items_count' => $order->items->count(),
+                ];
+            });
+
+        return Inertia::render('Supplier/PurchaseHistory', [
             'purchaseOrders' => $purchaseOrders
         ]);
     }
@@ -169,17 +185,17 @@ class SupplierController extends Controller
 
                 DB::commit();
 
-                return redirect()->route('supplier.index')
+                return redirect()->route('suppliers.index')
                     ->with('success', 'Purchase order paid and inventory updated successfully.');
             } catch (\Exception $e) {
                 DB::rollBack();
-                return redirect()->route('supplier.index')
+                return redirect()->route('suppliers.index')
                     ->with('error', 'An error occurred while processing the payment: ' . $e->getMessage());
             }
         } else {
             $purchase->update($validated);
 
-            return redirect()->route('supplier.index')
+            return redirect()->route('suppliers.index')
                 ->with('success', 'Purchase order updated successfully.');
         }
     }

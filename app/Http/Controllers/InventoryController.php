@@ -14,12 +14,12 @@ class InventoryController extends Controller
     public function items()
     {
         $inventoryItems = Inventory::with(['category', 'images', 'primaryImage'])->get();
-        return Inertia::render('Inventory/Items', ['items' => $inventoryItems]);
+        return Inertia::render('App/Inventory/Items', ['items' => $inventoryItems]);
     }
 
     public function create()
     {
-        return Inertia::render('Inventory/Create');
+        return Inertia::render('App/Inventory/Create');
     }
 
     public function store(Request $request)
@@ -50,7 +50,7 @@ class InventoryController extends Controller
 
     public function edit(Inventory $inventory)
     {
-        return Inertia::render('Inventory/Edit', ['item' => $inventory]);
+        return Inertia::render('App/Inventory/Edit', ['item' => $inventory]);
     }
 
     public function update(Request $request, Inventory $inventory)
@@ -127,7 +127,7 @@ class InventoryController extends Controller
     public function lowStockAlert()
     {
         $lowStockItems = Inventory::where('stock', '<=', DB::raw('low_stock_threshold'))->get();
-        return Inertia::render('Inventory/LowStock', ['items' => $lowStockItems]);
+        return Inertia::render('App/Inventory/LowStock', ['items' => $lowStockItems]);
     }
 
     public function images()

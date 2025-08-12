@@ -11,12 +11,12 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::all();
-        return Inertia::render('Inventory/Categories/Index', ['categories' => $categories]);
+        return Inertia::render('App/Inventory/Categories/Index', ['categories' => $categories]);
     }
 
     public function create()
     {
-        return Inertia::render('Inventory/Categories/Create');
+        return Inertia::render('App/Inventory/Categories/Create');
     }
 
     public function store(Request $request)
@@ -34,7 +34,7 @@ class CategoryController extends Controller
 
     public function edit(Category $category)
     {
-        return Inertia::render('Inventory/Categories/Edit', ['category' => $category]);
+        return Inertia::render('App/Inventory/Categories/Edit', ['category' => $category]);
     }
 
     public function update(Request $request, Category $category)

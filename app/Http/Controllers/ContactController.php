@@ -11,12 +11,12 @@ class ContactController extends Controller
     public function index()
     {
         $contacts = Contact::all();
-        return Inertia::render('Contacts/Index', ['contacts' => $contacts]);
+        return Inertia::render('App/Contacts/Index', ['contacts' => $contacts]);
     }
 
     public function create()
     {
-        return Inertia::render('Contacts/Create');
+        return Inertia::render('App/Contacts/Create');
     }
 
     public function store(Request $request)
@@ -36,7 +36,7 @@ class ContactController extends Controller
 
     public function edit(Contact $contact)
     {
-        return Inertia::render('Contacts/Edit', ['contact' => $contact]);
+        return Inertia::render('App/Contacts/Edit', ['contact' => $contact]);
     }
 
     public function update(Request $request, Contact $contact)
@@ -74,7 +74,7 @@ class ContactController extends Controller
             $inventoryHistory = StockMovement::where('type', 'out')->get();
         }
 
-        return Inertia::render('Contacts/Show', [
+        return Inertia::render('App/Contacts/Show', [
             'contact' => $contact,
             'inventoryHistory' => $inventoryHistory
         ]);

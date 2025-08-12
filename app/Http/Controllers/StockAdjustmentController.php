@@ -12,13 +12,13 @@ class StockAdjustmentController extends Controller
     public function index()
     {
         $stockAdjustments = StockAdjustment::with(['inventory', 'user'])->latest()->get();
-        return Inertia::render('Inventory/StockAdjustments/Index', ['stockAdjustments' => $stockAdjustments]);
+        return Inertia::render('App/Inventory/StockAdjustments/Index', ['stockAdjustments' => $stockAdjustments]);
     }
 
     public function create()
     {
         $inventoryItems = Inventory::all();
-        return Inertia::render('Inventory/StockAdjustments/Create', ['inventoryItems' => $inventoryItems]);
+        return Inertia::render('App/Inventory/StockAdjustments/Create', ['inventoryItems' => $inventoryItems]);
     }
 
     public function store(Request $request)

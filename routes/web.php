@@ -31,7 +31,7 @@ Route::post('/pos/checkout', [POSController::class, 'checkout'])->name('pos.chec
 // Inventory Management
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
+        return Inertia::render('App/Dashboard');
     })->name('dashboard');
 
     // Suppliers
@@ -41,7 +41,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/{supplier}/purchase', [SupplierController::class, 'createPurchaseOrder'])->name('purchases.create');
         Route::post('/{supplier}/purchase', [SupplierController::class, 'storePurchaseOrder'])->name('purchases.store');
         Route::post('/purchase-checkout', [SupplierController::class, 'purchaseCheckout'])->name('purchases.checkout');
-        Route::get('/purchases', [SupplierController::class, 'purchaseIndex'])->name('purchases.index');
+        Route::get('/supplier/purchases', [SupplierController::class, 'purchaseHistory'])->name('purchases.history');
         Route::get('/purchases/{purchaseOrder}', [SupplierController::class, 'purchaseShow'])->name('purchases.show');
         Route::put('/purchases/{purchase}', [SupplierController::class, 'updatePurchase'])->name('purchases.update');
     });

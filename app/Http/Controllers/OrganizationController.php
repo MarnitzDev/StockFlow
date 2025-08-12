@@ -9,21 +9,21 @@ class OrganizationController extends Controller
 {
     public function profile()
     {
-        return Inertia::render('Organization/Profile');
+        return Inertia::render('App/Organization/Profile');
     }
 
     public function branding()
     {
-        return Inertia::render('Organization/Branding');
+        return Inertia::render('App/Organization/Branding');
     }
 
     public function locations()
     {
-        return Inertia::render('Organization/Locations');
+        return Inertia::render('App/Organization/Locations');
     }
 
     public function currency()
     {
-        return Inertia::render('Organization/Currency');
+        return Inertia::render('App/Organization/Currency');
     }
 }

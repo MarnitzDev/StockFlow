@@ -11,10 +11,15 @@ class PurchaseOrder extends Model
 
     protected $fillable = [
         'supplier_id',
+        'order_number',
         'order_date',
         'total_amount',
         'status',
-        'payment_date'
+        'payment_date',
+    ];
+
+    protected $casts = [
+        'order_date' => 'datetime',
     ];
 
     public function supplier()

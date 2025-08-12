@@ -11,6 +11,7 @@ return new class extends Migration
     {
         Schema::create('purchase_orders', function (Blueprint $table) {
             $table->id();
+            $table->string('order_number')->nullable();
             $table->foreignId('supplier_id')->constrained('suppliers')->onDelete('cascade');
             $table->date('order_date');
             $table->decimal('total_amount', 10, 2);
