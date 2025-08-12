@@ -8,6 +8,7 @@ use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StockAdjustmentController;
+use App\Http\Controllers\SuppliersController;
 use App\Http\Controllers\POS\POSController;
 use App\Http\Controllers\Vendors\VendorController;
 use Illuminate\Foundation\Application;
@@ -60,9 +61,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/payments', [PurchasesController::class, 'payments'])->name('payments');
     });
 
-    // Contacts
-    Route::prefix('contacts')->name('contacts.')->group(function () {
-        Route::resource('customers', CustomerController::class);
+    // Suppliers
+    Route::prefix('suppliers')->name('suppliers.')->group(function () {
+        Route::get('/', [SuppliersController::class, 'index'])->name('index');
+        Route::get('/create', [SuppliersController::class, 'create'])->name('create');
+        Route::post('/', [SuppliersController::class, 'store'])->name('store');
+        Route::get('/{supplier}/edit', [SuppliersController::class, 'edit'])->name('edit');
+        Route::put('/{supplier}', [SuppliersController::class, 'update'])->name('update');
+        Route::delete('/{supplier}', [SuppliersController::class, 'destroy'])->name('destroy');
     });
 
     // Reports

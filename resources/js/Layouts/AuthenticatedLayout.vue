@@ -126,15 +126,15 @@ const menuItems = ref([
         label: 'Customers',
         icon: 'pi pi-users',
         submenu: [
-            { label: 'List All', route: 'contacts.customers.index' },
-            { label: 'Add New', route: 'contacts.customers.create' },
+            // { label: 'List All', route: 'customers.index' },
+            // { label: 'Add New', route: 'customers.create' },
         ]
     },
     {
         label: 'Suppliers',
         icon: 'pi pi-truck',
         submenu: [
-            // { label: 'List All', route: 'contacts.suppliers.index' },
+            { label: 'List All', route: 'suppliers.index' },
             // { label: 'Add New', route: 'contacts.suppliers.create' },
         ]
     },
