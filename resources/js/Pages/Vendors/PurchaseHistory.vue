@@ -6,6 +6,7 @@
 
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <FlashMessage />
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
                     <div class="mb-4 flex justify-between items-center">
                         <div class="w-80">
@@ -70,6 +71,7 @@ import { Link } from '@inertiajs/vue3';
 import { useForm } from '@inertiajs/vue3';
 import { ref } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
+import FlashMessage from '@/Components/FlashMessage.vue';
 
 const props = defineProps({
     purchaseOrders: Object,

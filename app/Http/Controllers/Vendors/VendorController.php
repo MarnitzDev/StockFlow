@@ -88,8 +88,7 @@ class VendorController extends Controller
 
             DB::commit();
 
-            return redirect()->route('vendor.purchases.show', $purchaseOrder->id)
-                ->with('success', 'Purchase order created successfully.');
+            return redirect()->route('vendor.purchases.show', $purchaseOrder->id);
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Error creating purchase order: ' . $e->getMessage());
@@ -185,7 +184,7 @@ class VendorController extends Controller
 
                 DB::commit();
 
-                return redirect()->route('vendor.purchases.show', $purchase->id)
+                return redirect()->route('vendor.purchases.history', $purchase->id)
                     ->with('success', 'Purchase order paid and inventory updated successfully.');
             } catch (\Exception $e) {
                 DB::rollBack();
