@@ -95,12 +95,12 @@ const cartTotal = computed(() => {
                     <div class="grid grid-cols-3 gap-4">
                         <!-- Product Grid -->
                         <div class="col-span-2 grid grid-cols-3 gap-4">
-                            <div v-for="product in products" :key="product.id" class="border p-4 rounded">
+                            <div v-for="product in products" :key="product.id" class="border p-4 rounded relative">
                                 <img :src="product.image" :alt="product.name" class="w-full h-32 object-cover mb-2">
                                 <h3 class="font-bold">{{ product.name }}</h3>
                                 <p>${{ Number(product.price).toFixed(2) }}</p>
                                 <p class="text-sm text-gray-600">Available: {{ product.stock }}</p>
-                                <div class="flex items-center mt-2 space-x-2">
+                                <div class="flex items-center mt-2 space-x-2" v-if="product.stock !== 0">
                                     <InputNumber
                                         v-model="product.quantity"
                                         :min="1"
@@ -114,12 +114,14 @@ const cartTotal = computed(() => {
                                         @click="addToCart(product)"
                                         icon="pi pi-shopping-cart"
                                         size="small"
-                                        :disabled="product.available_quantity === 0"
                                         class="flex-grow"
                                         severity="contrast"
                                     >
                                         Add
                                     </Button>
+                                </div>
+                                <div v-if="product.stock === 0" class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-80 flex items-center justify-center">
+                                    <span class="text-white font-bold text-lg">Sold Out</span>
                                 </div>
                             </div>
                         </div>

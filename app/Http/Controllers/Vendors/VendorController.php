@@ -35,6 +35,7 @@ class VendorController extends Controller
         $products = $vendor->products()
             ->get()
             ->map(function ($product) {
+                $inventory = Inventory::where('sku', $product->sku)->first();
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
@@ -42,7 +43,7 @@ class VendorController extends Controller
                     'sku' => $product->sku,
                     'stock' => $product->stock,
                     'description' => $product->description,
-                    // Add image handling if needed
+                    'inventory_stock' => $inventory ? $inventory->stock : 0,
                 ];
             });
 

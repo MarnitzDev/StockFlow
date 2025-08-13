@@ -10,12 +10,15 @@
 <!--                            </Link>-->
                         </div>
                         <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                            <Link :href="route('pos.index')" :active="route().current('pos.index')">
+                            <NavLink :href="route('home')" :active="route().current('home')">
+                                Home
+                            </NavLink>
+                            <NavLink :href="route('pos.index')" :active="route().current('pos.index')">
                                 POS
-                            </Link>
-                            <Link :href="route('pos.history')" :active="route().current('pos.history')">
+                            </NavLink>
+                            <NavLink :href="route('pos.history')" :active="route().current('pos.history')">
                                 Order History
-                            </Link>
+                            </NavLink>
                         </div>
                     </div>
                     <div class="hidden sm:flex sm:items-center sm:ml-6">
@@ -38,5 +41,5 @@
 </template>
 
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import NavLink from '@/Components/NavLink.vue';
 </script>

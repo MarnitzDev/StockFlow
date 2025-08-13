@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
+import NavLink from '@/Components/NavLink.vue';
+
 
 const currentRoute = computed(() => usePage().url);
 
@@ -20,50 +21,15 @@ const isActive = (route: string) => {
                             <!-- You can add a logo here if needed -->
                         </div>
                         <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                            <Link
-                                :href="route('home')"
-                                :class="[
-                                    'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 focus:outline-none transition duration-150 ease-in-out',
-                                    isActive(route('home'))
-                                        ? 'border-indigo-500 text-gray-900'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                ]"
-                            >
+                            <NavLink :href="route('home')" :active="isActive(route('home'))">
                                 Home
-                            </Link>
-                            <Link
-                                :href="route('dashboard')"
-                                :class="[
-                                    'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 focus:outline-none transition duration-150 ease-in-out',
-                                    isActive(route('dashboard'))
-                                        ? 'border-indigo-500 text-gray-900'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                ]"
-                            >
-                                Dashboard
-                            </Link>
-                            <Link
-                                :href="route('vendor.index')"
-                                :class="[
-                                    'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 focus:outline-none transition duration-150 ease-in-out',
-                                    isActive(route('vendor.index'))
-                                        ? 'border-indigo-500 text-gray-900'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                ]"
-                            >
-                                Suppliers
-                            </Link>
-                            <Link
-                                :href="route('vendor.purchases.history')"
-                                :class="[
-                                    'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 focus:outline-none transition duration-150 ease-in-out',
-                                    isActive(route('vendor.purchases.history'))
-                                        ? 'border-indigo-500 text-gray-900'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                ]"
-                            >
+                            </NavLink>
+                            <NavLink :href="route('vendor.index')" :active="isActive(route('vendor.index'))">
+                                Vendors
+                            </NavLink>
+                            <NavLink :href="route('vendor.purchases.history')" :active="isActive(route('vendor.purchases.history'))">
                                 Purchase History
-                            </Link>
+                            </NavLink>
                         </div>
                     </div>
                     <div class="hidden sm:flex sm:items-center sm:ml-6">

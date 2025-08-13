@@ -7,6 +7,7 @@ use App\Models\Inventory;
 use App\Models\Category;
 use App\Models\Vendors\Vendor;
 use App\Models\InventoryImage;
+use App\Models\Vendors\VendorProduct;
 
 class InventorySeeder extends Seeder
 {
@@ -18,23 +19,30 @@ class InventorySeeder extends Seeder
         $categories = Category::count() > 0 ? Category::all() : Category::factory(5)->create();
         $this->command->info("Number of categories: " . $categories->count());
 
-        $vendors = Vendor::all();
-        $this->command->info("Number of vendors: " . $vendors->count());
-
         $totalCreated = 0;
-        $maxItems = 15; // Set your desired maximum here
+        $maxItems = 15;
 
-        $vendors->each(function ($vendor) use ($categories, &$totalCreated, $maxItems) {
+        $allVendorProducts = VendorProduct::all()->unique('sku');
+        $this->command->info("Total unique vendor products: " . $allVendorProducts->count());
+
+        foreach ($allVendorProducts as $vendorProduct) {
             if ($totalCreated >= $maxItems) {
-                return false;
+                break;
             }
 
-            $itemCount = min(rand(5, 15), $maxItems - $totalCreated);
-            $created = Inventory::factory($itemCount)->create([
-                'vendor_id' => $vendor->id,
-            ])->each(function ($inventory) use ($categories) {
-                // Assign a random category
-                $inventory->category()->associate($categories->random())->save();
+            $existingInventory = Inventory::where('sku', $vendorProduct->sku)->first();
+
+            if (!$existingInventory) {
+                $inventory = Inventory::create([
+                    'name' => $vendorProduct->name,
+                    'sku' => $vendorProduct->sku,
+                    'description' => $vendorProduct->description,
+                    'price' => $vendorProduct->price,
+                    'stock' => rand(0, min($vendorProduct->stock, 20)),
+                    'vendor_id' => $vendorProduct->vendor_id,
+                    'category_id' => $categories->random()->id,
+                    'low_stock_threshold' => rand(1, 5),
+                ]);
 
                 $imageCount = rand(1, 2);
                 for ($i = 0; $i < $imageCount; $i++) {
@@ -45,15 +53,13 @@ class InventorySeeder extends Seeder
                         'order' => $i,
                     ]);
                 }
-            })->count();
 
-            $totalCreated += $created;
-            $this->command->info("Created $created items for vendor {$vendor->name}");
-
-            if ($totalCreated >= $maxItems) {
-                return false; // Stop the loop if we've reached the maximum
+                $totalCreated++;
+                $this->command->info("Created inventory item for SKU: {$vendorProduct->sku}");
+            } else {
+                $this->command->info("Skipped existing SKU: {$vendorProduct->sku}");
             }
-        });
+        }
 
         $finalCount = Inventory::count();
         $this->command->info("Final inventory count: $finalCount");
