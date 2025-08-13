@@ -157,7 +157,13 @@ class VendorController extends Controller
     {
         $purchaseOrder->load(['vendor', 'items.product']);
         return Inertia::render('Vendors/PurchaseShow', [
-            'purchaseOrder' => $purchaseOrder
+            'purchaseOrder' => $purchaseOrder,
+            'pricingConfig' => [
+                'taxRate' => config('pricing.tax_rate'),
+                'discountRate' => config('pricing.discount_rate'),
+                'vendorMarkup' => config('pricing.vendor_markup'),
+                'inventoryValuationMethod' => config('pricing.inventory_valuation_method'),
+            ],
         ]);
     }
 

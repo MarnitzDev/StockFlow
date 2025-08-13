@@ -4,12 +4,17 @@ namespace App\Models\Vendors;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Casts\PriceCast;
 
 class VendorProduct extends Model
 {
     use HasFactory;
 
     protected $fillable = ['vendor_id', 'name', 'sku', 'price', 'stock', 'description'];
+
+    protected $casts = [
+        'price' => PriceCast::class.':vendor',
+    ];
 
     public function vendor()
     {

@@ -25,6 +25,10 @@ const props = defineProps<{
 const printReceipt = () => {
     window.print();
 };
+
+const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+};
 </script>
 
 <template>
@@ -54,14 +58,14 @@ const printReceipt = () => {
                         <tr v-for="item in order.items" :key="item.id" class="border-b">
                             <td class="py-2">{{ item.inventory.name }}</td>
                             <td class="text-right py-2">{{ item.quantity }}</td>
-                            <td class="text-right py-2">${{ item.unit_price.toFixed(2) }}</td>
-                            <td class="text-right py-2">${{ (item.quantity * item.unit_price).toFixed(2) }}</td>
+                            <td class="text-right py-2">{{ formatCurrency(item.unit_price) }}</td>
+                            <td class="text-right py-2">{{ formatCurrency(item.quantity * item.unit_price) }}</td>
                         </tr>
                         </tbody>
                         <tfoot>
                         <tr>
                             <td colspan="3" class="text-right font-bold py-2">Total:</td>
-                            <td class="text-right font-bold py-2">${{ order.total_amount.toFixed(2) }}</td>
+                            <td class="text-right font-bold py-2">{{ formatCurrency(order.total_amount) }}</td>
                         </tr>
                         </tfoot>
                     </table>

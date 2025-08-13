@@ -12,7 +12,6 @@
                         <p><strong>Supplier:</strong> {{ purchaseOrder.vendor.name }}</p>
                         <p><strong>Date:</strong> {{ purchaseOrder.order_date }}</p>
                         <p><strong>Status:</strong> {{ purchaseOrder.status }}</p>
-                        <p><strong>Total Amount:</strong> ${{ purchaseOrder.total_amount }}</p>
 
                         <h4 class="text-lg font-semibold mt-6 mb-2">Order Items</h4>
                         <table class="min-w-full divide-y divide-gray-200">
@@ -21,6 +20,8 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Price</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subtotal</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tax</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                             </tr>
                             </thead>
@@ -28,13 +29,23 @@
                             <tr v-for="item in purchaseOrder.items" :key="item.id">
                                 <td class="px-6 py-4 whitespace-nowrap">{{ item.product.name }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap">{{ item.quantity }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">${{ item.unit_price }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">${{ item.quantity * item.unit_price }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ formatCurrency(item.unit_price) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ formatCurrency(calculateSubtotal(item)) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ formatCurrency(calculateTax(item)) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ formatCurrency(calculateTotal(item)) }}</td>
                             </tr>
                             </tbody>
                         </table>
 
-                        <!-- Complete Payment button -->
+                        <!-- Order Summary -->
+                        <div class="mt-8">
+                            <h4 class="text-lg font-semibold mb-2">Order Summary</h4>
+                            <p><strong>Subtotal:</strong> {{ formatCurrency(calculateOrderSubtotal()) }}</p>
+                            <p><strong>Tax:</strong> {{ formatCurrency(calculateOrderTax()) }}</p>
+                            <p><strong>Total:</strong> {{ formatCurrency(calculateOrderTotal()) }}</p>
+                        </div>
+
+                        <!-- Complete Payment button-->
                         <div v-if="purchaseOrder.status !== 'paid'" class="mt-8">
                             <button
                                 @click="completePayment"
@@ -56,14 +67,53 @@
 import { useForm } from '@inertiajs/vue3';
 import VendorLayout from '@/Layouts/VendorLayout.vue';
 import FlashMessage from "@/Components/FlashMessage.vue";
+import { computed } from 'vue';
 
 const props = defineProps({
     purchaseOrder: Object,
+    pricingConfig: {
+        type: Object,
+        required: true,
+    },
 });
 
 const form = useForm({
     status: 'paid'
 });
+
+const taxRate = computed(() => props.pricingConfig.taxRate);
+const discountRate = computed(() => props.pricingConfig.discountRate);
+const vendorMarkup = computed(() => props.pricingConfig.vendorMarkup);
+
+const formatCurrency = (value) => {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+};
+
+const calculateSubtotal = (item) => {
+    return item.quantity * item.unit_price;
+};
+
+const calculateTax = (item) => {
+    return calculateSubtotal(item) * taxRate.value;
+};
+
+const calculateTotal = (item) => {
+    const subtotal = calculateSubtotal(item);
+    const tax = calculateTax(item);
+    return subtotal + tax;
+};
+
+const calculateOrderSubtotal = () => {
+    return props.purchaseOrder.items.reduce((sum, item) => sum + calculateSubtotal(item), 0);
+};
+
+const calculateOrderTax = () => {
+    return props.purchaseOrder.items.reduce((sum, item) => sum + calculateTax(item), 0);
+};
+
+const calculateOrderTotal = () => {
+    return calculateOrderSubtotal() + calculateOrderTax();
+};
 
 const completePayment = () => {
     console.log("complete payment clicked for order:", props.purchaseOrder.id);
