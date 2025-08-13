@@ -1,10 +1,27 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { ref } from 'vue';
+import { FilterMatchMode } from '@primevue/core/api';
 import { Link } from '@inertiajs/vue3';
 
-defineProps({
+const props = defineProps({
     salesOrders: Array,
 });
+
+const filters = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+});
+
+const formatDate = (value) => {
+    if (value) {
+        return new Date(value).toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        });
+    }
+    return '';
+};
 </script>
 
 <template>
@@ -17,57 +34,52 @@ defineProps({
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 bg-white border-b border-gray-200">
-                        <div class="mb-4">
-                            <Link :href="route('sales.orders.create')" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                                Create Sales Order
-                            </Link>
-                        </div>
-                        <table class="min-w-full">
-                            <thead>
-                            <tr>
-                                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                                    Order Number
-                                </th>
-                                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                                    Customer
-                                </th>
-                                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                                    Total Amount
-                                </th>
-                                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                                    Status
-                                </th>
-                                <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                                    Actions
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr v-for="order in salesOrders" :key="order.id">
-                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">
-                                    {{ order.order_number }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">
-                                    {{ order.customer.name }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">
-                                    ${{ order.total_amount }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">
-                                    {{ order.status }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">
+                        <DataTable
+                            :value="salesOrders"
+                            :paginator="true"
+                            :rows="10"
+                            :filters="filters"
+                            filterDisplay="menu"
+                            :globalFilterFields="['order_number', 'customer.name', 'total_amount', 'status']"
+                            responsiveLayout="scroll"
+                        >
+                            <template #header>
+                                <div class="flex flex-wrap gap-2 items-center justify-between">
+                                    <h4 class="m-0">Sales Orders</h4>
+                                    <IconField>
+                                        <InputIcon>
+                                            <i class="pi pi-search" />
+                                        </InputIcon>
+                                        <InputText v-model="filters['global'].value" placeholder="Search..." />
+                                    </IconField>
+                                </div>
+                            </template>
+
+                            <Column field="order_number" header="Order Number" sortable></Column>
+                            <Column field="created_at" header="Date" sortable>
+                                <template #body="slotProps">
+                                    {{ formatDate(slotProps.data.created_at) }}
+                                </template>
+                            </Column>
+                            <Column field="customer.name" header="Customer" sortable></Column>
+                            <Column field="total_amount" header="Total Amount" sortable>
+                                <template #body="slotProps">
+                                    R {{ slotProps.data.total_amount }}
+                                </template>
+                            </Column>
+                            <Column field="status" header="Status" sortable></Column>
+                            <Column header="Actions">
+                                <template #body="slotProps">
                                     <Link
-                                        :href="route('sales.orders.show', order.id)"
+                                        :href="route('sales.orders.show', slotProps.data.id)"
                                         class="text-indigo-600 hover:text-indigo-900 mr-2"
                                         title="View Order Details"
                                     >
-                                        <i class="fas fa-eye mr-1"></i> View
+                                        <i class="pi pi-eye mr-1"></i> View
                                     </Link>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                                </template>
+                            </Column>
+                        </DataTable>
                     </div>
                 </div>
             </div>

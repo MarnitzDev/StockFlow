@@ -54,80 +54,78 @@ const submitStockMovement = () => {
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
+
+const editItem = (item) => {
+    // Implement edit functionality
+    console.log('Edit item:', item);
+};
+
+const deleteItem = (item) => {
+    // Implement delete functionality
+    console.log('Delete item:', item);
+};
 </script>
 
 <template>
     <AuthenticatedLayout>
-        <template #summary>
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-2xl font-bold text-gray-800">Inventory Items</h3>
-                <Link :href="route('inventory.create')" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Add New Item
-                </Link>
-            </div>
-            <div class="flex flex-wrap justify-between items-center">
-                <div class="flex space-x-4 text-sm text-gray-600">
-                    <span class="bg-white px-3 py-1 rounded-full shadow">Items: {{ items.length }}</span>
-                    <span class="bg-white px-3 py-1 rounded-full shadow">Total stock: {{ calculateTotalstock }}</span>
-                    <span class="bg-white px-3 py-1 rounded-full shadow">Total Value: ${{ calculateTotalValue }}</span>
-                </div>
-            </div>
+        <template #header>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Inventory Items</h2>
         </template>
-        <div class="">
+
+        <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-                    <div class="mb-4 flex justify-between items-center">
-                        <div class="w-80">
-                        <span class="p-input-icon-left w-full">
-                            <InputText v-model="filters['global'].value" placeholder="Search Inventory Items..." class="w-full" />
-                        </span>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-sm">
-                                Export CSV
-                            </button>
-                            <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded text-sm">
-                                Print Report
-                            </button>
-                        </div>
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6 bg-white border-b border-gray-200">
+                        <DataTable
+                            :value="items"
+                            :paginator="true"
+                            :rows="10"
+                            :filters="filters"
+                            filterDisplay="menu"
+                            :globalFilterFields="['name', 'sku', 'category.name', 'stock', 'price']"
+                            responsiveLayout="scroll"
+                        >
+                            <template #header>
+                                <div class="flex flex-wrap gap-2 items-center justify-between">
+                                    <h4 class="m-0">Inventory Items</h4>
+                                    <IconField>
+                                        <InputIcon>
+                                            <i class="pi pi-search" />
+                                        </InputIcon>
+                                        <InputText v-model="filters['global'].value" placeholder="Search..." />
+                                    </IconField>
+                                </div>
+                            </template>
+
+                            <Column field="name" header="Name" sortable></Column>
+                            <Column header="Image">
+                                <template #body="slotProps">
+                                    <img :src="slotProps.data.primary_image?.image_path" :alt="slotProps.data.name" class="w-12 shadow-2 rounded" />
+                                </template>
+                            </Column>
+                            <Column field="sku" header="SKU" sortable></Column>
+                            <Column field="category.name" header="Category" sortable></Column>
+                            <Column field="stock" header="Stock" sortable>
+                                <template #body="slotProps">
+                                    <span :class="{'text-green-500': slotProps.data.stock > slotProps.data.low_stock_threshold, 'text-red-500': slotProps.data.stock <= slotProps.data.low_stock_threshold}">
+                                        {{ slotProps.data.stock }}
+                                    </span>
+                                </template>
+                            </Column>
+                            <Column field="price" header="Price" sortable>
+                                <template #body="slotProps">
+<!--                                    {{ formatCurrency(slotProps.data.price) }}-->
+                                </template>
+                            </Column>
+                            <Column header="Actions">
+                                <template #body="slotProps">
+                                    <Button icon="pi pi-plus" outlined rounded class="mr-2" @click="openStockMovementDialog(slotProps.data)" />
+                                    <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editItem(slotProps.data)" />
+                                    <Button icon="pi pi-trash" outlined rounded severity="danger" @click="deleteItem(slotProps.data)" />
+                                </template>
+                            </Column>
+                        </DataTable>
                     </div>
-                    <DataTable
-                        :value="items"
-                        :paginator="true"
-                        :rows="10"
-                        paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-                        :rowsPerPageOptions="[10,20,50]"
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
-                        :filters="filters"
-                        filterDisplay="menu"
-                        :globalFilterFields="['name', 'sku', 'category.name']"
-                        tableStyle="min-width: 50rem"
-                    >
-                        <Column header="" style="width: 100px">
-                            <template #body="slotProps">
-                                <img :src="slotProps.data.primary_image?.image_path"
-                                     :alt="slotProps.data.name"
-                                     class="w-16 h-16 object-cover rounded"
-                                     @error="handleImageError"
-                                />
-                            </template>
-                        </Column>
-                        <Column field="name" header="Item" sortable style="width: 200px"></Column>
-                        <Column field="sku" header="SKU" sortable style="width: 150px"></Column>
-                        <Column field="stock" header="stock" sortable style="width: 100px"></Column>
-                        <Column field="price" header="Price" sortable style="width: 120px">
-                            <template #body="slotProps">
-                                {{ new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(slotProps.data.price) }}
-                            </template>
-                        </Column>
-                        <Column field="category.name" header="Category" sortable style="width: 150px"></Column>
-                        <Column field="low_stock_threshold" header="Stock Threshold" sortable style="width: 150px"></Column>
-                        <Column header="Actions" style="width: 200px">
-                            <template #body="slotProps">
-                                <Button icon="pi pi-plus" outlined rounded class="mr-2" label="Placeholder" @click="openStockMovementDialog(slotProps.data)" />
-                            </template>
-                        </Column>
-                    </DataTable>
                 </div>
             </div>
         </div>

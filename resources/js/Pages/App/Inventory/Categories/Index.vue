@@ -1,10 +1,29 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Link } from '@inertiajs/vue3';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import { ref } from 'vue';
 
-defineProps({
+const props = defineProps({
     categories: Array
 });
+
+const expandedRows = ref({});
+
+const formatCurrency = (value) => {
+    return new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR' }).format(value);
+};
+
+const onRowExpand = (event) => {
+    // You can add any logic here that needs to run when a row is expanded
+    console.log('Row expanded:', event.data);
+};
+
+const onRowCollapse = (event) => {
+    // You can add any logic here that needs to run when a row is collapsed
+    console.log('Row collapsed:', event.data);
+};
 </script>
 
 <template>
@@ -22,25 +41,43 @@ defineProps({
                             Add New Category
                         </Link>
                     </div>
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead>
-                        <tr>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Slug</th>
-                            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-for="category in categories" :key="category.id">
-                            <td class="px-6 py-4 whitespace-nowrap">{{ category.name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ category.slug }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <Link :href="route('inventory.categories.edit', category.id)" class="text-indigo-600 hover:text-indigo-900 mr-2">Edit</Link>
+                    <DataTable
+                        :value="categories"
+                        v-model:expandedRows="expandedRows"
+                        @row-expand="onRowExpand"
+                        @row-collapse="onRowCollapse"
+                        dataKey="id"
+                        class="p-datatable-sm"
+                    >
+                        <Column :expander="true" headerStyle="width: 3rem" />
+                        <Column field="name" header="Category Name" sortable></Column>
+                        <Column field="slug" header="Slug" sortable></Column>
+                        <Column header="Actions">
+                            <template #body="slotProps">
+                                <Link :href="route('inventory.categories.edit', slotProps.data.id)" class="text-indigo-600 hover:text-indigo-900 mr-2">Edit</Link>
                                 <!-- Add delete functionality here -->
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                            </template>
+                        </Column>
+                        <template #expansion="slotProps">
+                            <div class="p-3">
+                                <DataTable :value="slotProps.data.inventory_items" class="p-datatable-sm" :showHeaders="slotProps.data.inventory_items.length > 0">
+                                    <template #empty>
+                                        <div class="p-4">
+                                            No items found in this category.
+                                        </div>
+                                    </template>
+                                    <Column field="name" header="Name"></Column>
+                                    <Column field="sku" header="SKU"></Column>
+                                    <Column field="stock" header="Stock"></Column>
+                                    <Column field="price" header="Price">
+                                        <template #body="itemProps">
+                                            {{ formatCurrency(itemProps.data.price) }}
+                                        </template>
+                                    </Column>
+                                </DataTable>
+                            </div>
+                        </template>
+                    </DataTable>
                 </div>
             </div>
         </div>
