@@ -9,52 +9,95 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 bg-white border-b border-gray-200">
                         <h3 class="text-lg font-semibold mb-4">Order #{{ purchaseOrder.order_number }}</h3>
-                        <p><strong>Supplier:</strong> {{ purchaseOrder.vendor.name }}</p>
-                        <p><strong>Date:</strong> {{ purchaseOrder.order_date }}</p>
-                        <p><strong>Status:</strong> {{ purchaseOrder.status }}</p>
-
-                        <h4 class="text-lg font-semibold mt-6 mb-2">Order Items</h4>
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Price</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subtotal</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tax</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                            </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                            <tr v-for="item in purchaseOrder.items" :key="item.id">
-                                <td class="px-6 py-4 whitespace-nowrap">{{ item.product.name }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ item.quantity }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ formatCurrency(item.unit_price) }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ formatCurrency(calculateSubtotal(item)) }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ formatCurrency(calculateTax(item)) }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ formatCurrency(calculateTotal(item)) }}</td>
-                            </tr>
-                            </tbody>
-                        </table>
-
-                        <!-- Order Summary -->
-                        <div class="mt-8">
-                            <h4 class="text-lg font-semibold mb-2">Order Summary</h4>
-                            <p><strong>Subtotal:</strong> {{ formatCurrency(calculateOrderSubtotal()) }}</p>
-                            <p><strong>Tax:</strong> {{ formatCurrency(calculateOrderTax()) }}</p>
-                            <p><strong>Total:</strong> {{ formatCurrency(calculateOrderTotal()) }}</p>
+                        <div class="grid grid-cols-3 gap-6 mb-6 bg-gray-50 p-4 rounded-lg">
+                            <div class="flex flex-col">
+                                <span class="text-sm text-gray-600 mb-1">Supplier</span>
+                                <span class="font-semibold">{{ purchaseOrder.vendor.name }}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-sm text-gray-600 mb-1">Date</span>
+                                <span class="font-semibold">{{ formatDate(purchaseOrder.order_date) }}</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-sm text-gray-600 mb-1">Status</span>
+                                <span class="font-semibold">{{ purchaseOrder.status }}</span>
+                            </div>
                         </div>
 
-                        <!-- Complete Payment button-->
+
+                        <h4 class="text-lg font-semibold mt-6 mb-2">Order Items</h4>
+                        <DataTable :value="purchaseOrder.items" responsiveLayout="scroll" class="p-datatable-sm">
+                            <ColumnGroup type="header">
+                                <Row>
+                                    <Column header="Product Details" :colspan="2" />
+                                    <Column header="Pricing" :colspan="4" />
+                                </Row>
+                                <Row>
+                                    <Column header="Product" />
+                                    <Column header="Quantity" />
+                                    <Column header="Unit Price" />
+                                    <Column header="Subtotal" />
+                                    <Column header="Tax" />
+                                    <Column header="Total" />
+                                </Row>
+                            </ColumnGroup>
+
+                            <Column field="product.name" />
+                            <Column field="quantity" />
+                            <Column field="unit_price">
+                                <template #body="slotProps">
+                                    {{ formatCurrency(slotProps.data.unit_price) }}
+                                </template>
+                            </Column>
+                            <Column>
+                                <template #body="slotProps">
+                                    {{ formatCurrency(calculateSubtotal(slotProps.data)) }}
+                                </template>
+                            </Column>
+                            <Column>
+                                <template #body="slotProps">
+                                    {{ formatCurrency(calculateTax(slotProps.data)) }}
+                                </template>
+                            </Column>
+                            <Column>
+                                <template #body="slotProps">
+                                    {{ formatCurrency(calculateTotal(slotProps.data)) }}
+                                </template>
+                            </Column>
+
+                            <ColumnGroup type="footer">
+                                <Row>
+                                    <Column footer="Totals:" :colspan="3" />
+                                    <Column>
+                                        <template #footer>
+                                            <span>
+                                                {{ formatCurrency(calculateOrderSubtotal()) }}
+                                            </span>
+                                        </template>
+                                    </Column>
+                                    <Column>
+                                        <template #footer>
+                                            <span>
+                                                {{ formatCurrency(calculateOrderTax()) }}
+                                            </span>
+                                        </template>
+                                    </Column>
+                                    <Column>
+                                        <template #footer>
+                                            <span class="font-black text-lg">
+                                                {{ formatCurrency(calculateOrderTotal()) }}
+                                            </span>
+                                        </template>
+                                    </Column>
+                                </Row>
+                            </ColumnGroup>
+                        </DataTable>
+
                         <div v-if="purchaseOrder.status !== 'paid'" class="mt-8">
-                            <button
-                                @click="completePayment"
-                                :disabled="form.processing"
-                                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-                            >
-                                <span v-if="form.processing">Processing...</span>
-                                <span v-else>Complete Payment</span>
-                            </button>
+                            <Button label="Complete Payment" icon="pi pi-check"
+                                    @click="completePayment"
+                                    :loading="form.processing"
+                                    :disabled="form.processing" />
                         </div>
                     </div>
                 </div>
@@ -68,6 +111,9 @@ import { useForm } from '@inertiajs/vue3';
 import VendorLayout from '@/Layouts/VendorLayout.vue';
 import FlashMessage from "@/Components/FlashMessage.vue";
 import { computed } from 'vue';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import Button from 'primevue/button';
 
 const props = defineProps({
     purchaseOrder: Object,
@@ -87,6 +133,10 @@ const vendorMarkup = computed(() => props.pricingConfig.vendorMarkup);
 
 const formatCurrency = (value) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+};
+
+const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 };
 
 const calculateSubtotal = (item) => {
@@ -115,8 +165,13 @@ const calculateOrderTotal = () => {
     return calculateOrderSubtotal() + calculateOrderTax();
 };
 
+const orderSummary = computed(() => [
+    { label: 'Subtotal', value: calculateOrderSubtotal() },
+    { label: 'Tax', value: calculateOrderTax() },
+    { label: 'Total', value: calculateOrderTotal() }
+]);
+
 const completePayment = () => {
-    console.log("complete payment clicked for order:", props.purchaseOrder.id);
     if (form.processing) return;
 
     form.put(route('vendor.purchases.update', props.purchaseOrder.id), {
