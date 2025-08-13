@@ -5,8 +5,11 @@ namespace App\Http\Controllers\POS;
 use App\Http\Controllers\Controller;
 use App\Models\Inventory;
 use App\Models\Vendors\Vendor;
+use App\Models\SalesOrder;
+use App\Models\Customer;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Str;
 
 class POSController extends Controller
 {
@@ -33,14 +36,117 @@ class POSController extends Controller
             ];
         });
 
-        return Inertia::render('POS/App', [
+        return Inertia::render('POS/Index', [
             'products' => $products,
             'suppliers' => $suppliers,
         ]);
     }
 
+
     public function checkout(Request $request)
     {
+        $request->validate([
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|exists:inventories,id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.price' => 'required|numeric|min:0',
+            'customer_name' => 'nullable|string|max:255',
+            'customer_email' => 'nullable|email',
+            'total' => 'required|numeric|min:0',
+        ]);
 
+        $customerName = $request->customer_name ?: 'Walk-in Customer';
+        $customerEmail = $request->customer_email ?: 'walkin_' . time() . '@example.com';
+
+        $customer = Customer::firstOrCreate(
+            ['email' => $customerEmail],
+            [
+                'name' => $customerName,
+                'email' => $customerEmail,
+            ]
+        );
+
+        $salesOrder = SalesOrder::create([
+            'order_number' => 'POS-' . Str::random(8),
+            'customer_id' => $customer->id,
+            'total_amount' => $request->total,
+            'status' => 'pending',
+        ]);
+
+        foreach ($request->items as $item) {
+            $salesOrder->items()->create([
+                'inventory_id' => $item['product_id'],
+                'quantity' => $item['quantity'],
+                'unit_price' => $item['price'],
+                'subtotal' => $item['price'] * $item['quantity'],
+            ]);
+        }
+
+        return Inertia::render('POS/OrderDetails', [
+            'order' => $salesOrder->load('items.inventory', 'customer'),
+        ]);
+    }
+
+    public function confirmOrder(Request $request, $id)
+    {
+        $request->validate([
+            'payment_method' => 'required|in:cash,card',
+        ]);
+
+        $salesOrder = SalesOrder::findOrFail($id);
+
+        if ($salesOrder->status !== 'pending') {
+            return Inertia::render('POS/OrderError', [
+                'message' => 'This order has already been processed.',
+            ]);
+        }
+
+        \DB::beginTransaction();
+
+        try {
+            foreach ($salesOrder->items as $item) {
+                $inventory = $item->inventory;
+                if ($inventory->stock < $item->quantity) {
+                    throw new \Exception("Insufficient stock for {$inventory->name}");
+                }
+                $inventory->decrement('stock', $item->quantity);
+            }
+
+            $salesOrder->update([
+                'status' => 'completed',
+                'notes' => 'POS Sale - ' . $request->payment_method,
+            ]);
+
+            \DB::commit();
+
+            return Inertia::render('POS/OrderConfirmation', [
+                'order' => $salesOrder->fresh()->load('items.inventory', 'customer'),
+            ]);
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return Inertia::render('POS/OrderError', [
+                'message' => 'Error processing order: ' . $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function orderHistory()
+    {
+        $orders = SalesOrder::with('customer')
+            ->where('status', 'completed')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return Inertia::render('POS/OrderHistory', [
+            'orders' => $orders,
+        ]);
+    }
+
+    public function show($id)
+    {
+        $order = SalesOrder::with(['items.inventory', 'customer'])->findOrFail($id);
+        return Inertia::render('POS/OrderDetails', [
+            'order' => $order
+        ]);
     }
 }

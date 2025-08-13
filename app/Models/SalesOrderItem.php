@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class SalesOrderItem extends Model
 {
-    use HasFactory;
-
     protected $fillable = ['sales_order_id', 'inventory_id', 'quantity', 'unit_price', 'subtotal'];
 
     public function salesOrder()

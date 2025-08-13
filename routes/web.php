@@ -24,6 +24,15 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
+// POS
+Route::prefix('pos')->name('pos.')->group(function () {
+    Route::get('/', [POSController::class, 'index'])->name('index');
+    Route::post('/checkout', [POSController::class, 'checkout'])->name('checkout');
+    Route::post('/confirm/{id}', [POSController::class, 'confirmOrder'])->name('confirm');
+    Route::get('/history', [POSController::class, 'orderHistory'])->name('history');
+    Route::get('/order/{id}', [POSController::class, 'show'])->name('show');
+});
+
 // Inventory Management
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
@@ -85,10 +94,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/billing', [SettingsController::class, 'billing'])->name('billing');
     });
 });
-
-// POS
-Route::get('/pos', [POSController::class, 'index'])->name('pos');
-Route::post('/pos/checkout', [POSController::class, 'checkout'])->name('pos.checkout');
 
 // Vendors
 Route::middleware(['auth', 'verified'])->group(function () {

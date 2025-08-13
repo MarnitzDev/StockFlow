@@ -6,6 +6,7 @@ use App\Models\Vendors\VendorProduct;
 use App\Models\Vendors\VendorImage;
 use App\Models\Vendors\Vendor;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class VendorProductSeeder extends Seeder
 {
@@ -25,19 +26,28 @@ class VendorProductSeeder extends Seeder
         $vendors = Vendor::all();
 
         foreach ($vendors as $vendor) {
-            $productsCount = rand(5, 15);  // Each vendor will have 5 to 15 products
+            $productsCount = rand(5, 10);
 
             for ($i = 0; $i < $productsCount; $i++) {
                 VendorProduct::create([
                     'vendor_id' => $vendor->id,
                     'name' => $this->getRandomProductName(),
-                    'sku' => 'SKU-' . strtoupper(substr($vendor->name, 0, 3)) . '-' . rand(1000, 9999),
-                    'price' => rand(10, 1000) / 10,  // Random price between 1.0 and 100.0
+                    'sku' => $this->generateUniqueSku($vendor->name),
+                    'price' => rand(10, 1000) / 10,
                     'stock' => rand(0, 100),
                     'description' => 'This is a sample product description for ' . $vendor->name . '.',
                 ]);
             }
         }
+    }
+
+    private function generateUniqueSku($vendorName)
+    {
+        do {
+            $sku = 'SKU-' . strtoupper(substr($vendorName, 0, 3)) . '-' . rand(1000, 9999) . '-' . Str::random(4);
+        } while (VendorProduct::where('sku', $sku)->exists());
+
+        return $sku;
     }
 
     private function getRandomProductName()
