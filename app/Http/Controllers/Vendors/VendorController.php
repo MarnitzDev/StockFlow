@@ -7,6 +7,8 @@ use App\Models\Inventory;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\Vendors\Vendor;
+use App\Services\PurchaseOrderService;
+use App\Http\Resources\PurchaseOrderResource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +17,13 @@ use Inertia\Response;
 
 class VendorController extends Controller
 {
+    protected $purchaseOrderService;
+
+    public function __construct(PurchaseOrderService $purchaseOrderService)
+    {
+        $this->purchaseOrderService = $purchaseOrderService;
+    }
+
     public function index(): Response
     {
         $vendors = Vendor::all()->map(function ($vendor) {
@@ -34,30 +43,32 @@ class VendorController extends Controller
 
     public function show(Vendor $vendor): Response
     {
-        $products = $vendor->products()
-            ->get()
-            ->map(function ($product) {
-                $inventory = Inventory::where('sku', $product->sku)->first();
-                return [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'price' => (float) $product->price,
-                    'sku' => $product->sku,
-                    'stock' => $product->stock,
-                    'description' => $product->description,
-                    'inventory_stock' => $inventory ? $inventory->stock : 0,
-                    'image_url' => $product->image_url ?? null,
-                ];
-            });
+        $vendor->load('products');
+        $products = $vendor->products->map(function ($product) {
+            $inventory = Inventory::where('sku', $product->sku)->first();
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'price' => (float) $product->price,
+                'sku' => $product->sku,
+                'stock' => $product->stock ?? 0,
+                'description' => $product->description,
+                'inventory_stock' => $inventory ? $inventory->stock : 0,
+                'image_url' => $product->image_url ?? null,
+            ];
+        });
 
-        return Inertia::render('Vendors/Show', [
+        $calculatedTotals = $this->purchaseOrderService->calculateProductTotals($products);
+
+        return Inertia::render('Vendors/PurchaseOrderCreate', [
             'vendor' => [
                 'id' => $vendor->id,
                 'name' => $vendor->name
             ],
-            'products' => $products,
+            'calculatedTotals' => $calculatedTotals,
         ]);
     }
+
 
     public function purchaseCheckout(Request $request): RedirectResponse
     {
@@ -107,7 +118,7 @@ class VendorController extends Controller
     public function createPurchaseOrder(Vendor $vendor)
     {
         $products = $vendor->products;
-        return Inertia::render('Vendors/PurchaseOrder', [
+        return Inertia::render('Vendors/PurchaseOrderDetails', [
             'vendor' => $vendor,
             'products' => $products,
         ]);
@@ -162,14 +173,11 @@ class VendorController extends Controller
     public function purchaseShow(PurchaseOrder $purchaseOrder)
     {
         $purchaseOrder->load(['vendor', 'items.product']);
+        $calculatedTotals = $this->purchaseOrderService->calculateTotals($purchaseOrder);
+
         return Inertia::render('Vendors/PurchaseShow', [
-            'purchaseOrder' => $purchaseOrder,
-            'pricingConfig' => [
-                'taxRate' => config('pricing.tax_rate'),
-                'discountRate' => config('pricing.discount_rate'),
-                'vendorMarkup' => config('pricing.vendor_markup'),
-                'inventoryValuationMethod' => config('pricing.inventory_valuation_method'),
-            ],
+            'purchaseOrder' => new PurchaseOrderResource($purchaseOrder),
+            'calculatedTotals' => $calculatedTotals,
         ]);
     }
 

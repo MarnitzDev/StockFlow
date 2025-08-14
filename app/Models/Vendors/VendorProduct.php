@@ -2,9 +2,9 @@
 
 namespace App\Models\Vendors;
 
+use App\Services\PriceService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Casts\PriceCast;
 
 class VendorProduct extends Model
 {
@@ -21,7 +21,7 @@ class VendorProduct extends Model
         'image_url'
     ];
     protected $casts = [
-        'price' => PriceCast::class.':vendor',
+        'price' => 'decimal:2',
     ];
 
     public function vendor()
