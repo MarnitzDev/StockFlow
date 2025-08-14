@@ -104,6 +104,10 @@ const selectedProduct = ref<VendorProduct | null>(null);
 const showProductDetails = (product: VendorProduct) => {
     selectedProduct.value = product;
 };
+
+const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR' }).format(value);
+};
 </script>
 
 <template>
@@ -126,12 +130,13 @@ const showProductDetails = (product: VendorProduct) => {
                                         <span class="text-sm text-gray-600 ml-2">(Qty: {{ item.quantity }})</span>
                                     </div>
                                     <div>
-                                        <span class="text-sm mr-2">${{ (item.price * item.quantity).toFixed(2) }}</span>
-                                        <button @click="removeFromCart(item)" class="text-red-500 text-sm hover:text-red-700">
-                                            <svg class="h-4 w-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                            </svg>
-                                        </button>
+                                        <span class="text-sm mr-2">{{ formatCurrency(item.price * item.quantity) }}</span>
+                                        <Button
+                                            @click="removeFromCart(item)"
+                                            icon="pi pi-trash"
+                                            class="p-button-text p-button-rounded p-button-danger"
+                                            aria-label="Remove item"
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -140,7 +145,7 @@ const showProductDetails = (product: VendorProduct) => {
                                     <span class="text-sm">Total Items: {{ cart.reduce((sum, item) => sum + item.quantity, 0) }}</span>
                                 </div>
                                 <div>
-                                    <span class="font-bold text-lg">Total: ${{ cartTotal }}</span>
+                                    <span class="font-bold text-lg">Total: {{ formatCurrency(cartTotal) }}</span>
                                     <Button
                                         @click="checkout"
                                         label="Create Purchase Order"
@@ -195,7 +200,7 @@ const showProductDetails = (product: VendorProduct) => {
                             <Column field="sku" header="SKU" sortable></Column>
                             <Column field="price" header="Price" sortable>
                                 <template #body="slotProps">
-                                    ${{ slotProps.data.price.toFixed(2) }}
+                                    {{ formatCurrency(slotProps.data.price) }}
                                 </template>
                             </Column>
                             <Column field="stock" header="Stock" sortable>
