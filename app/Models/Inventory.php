@@ -19,7 +19,8 @@ class Inventory extends Model
         'price',
         'category_id',
         'low_stock_threshold',
-        'supplier_id',
+        'vendor_id',
+        'image_url',
     ];
 
     protected $casts = [
@@ -32,6 +33,11 @@ class Inventory extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function vendor()
+    {
+        return $this->belongsTo(Vendor::class);
     }
 
     public function stockMovements()
@@ -71,20 +77,5 @@ class Inventory extends Model
     public function getTotalValue()
     {
         return $this->stock * $this->price;
-    }
-
-    public function images()
-    {
-        return $this->hasMany(InventoryImage::class);
-    }
-
-    public function primaryImage()
-    {
-        return $this->hasOne(InventoryImage::class)->where('is_primary', true);
-    }
-
-    public function supplier()
-    {
-        return $this->belongsTo(Vendor::class);
     }
 }

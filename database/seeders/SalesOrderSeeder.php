@@ -7,9 +7,7 @@ use App\Models\SalesOrder;
 use App\Models\SalesOrderItem;
 use App\Models\Customer;
 use App\Models\Inventory;
-use App\Models\Category;
 use Faker\Factory as Faker;
-use Illuminate\Support\Str;
 
 class SalesOrderSeeder extends Seeder
 {
@@ -17,49 +15,23 @@ class SalesOrderSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        // Ensure we have categories
-        if (Category::count() == 0) {
-            Category::create([
-                'name' => 'Default Category',
-                'slug' => Str::slug('Default Category'),
-            ]);
-        }
-
-        // Get all category IDs
-        $categoryIds = Category::pluck('id')->toArray();
-
         // Ensure we have customers
         if (Customer::count() == 0) {
-            // Create some sample customers if none exist
-            for ($i = 0; $i < 10; $i++) {
-                Customer::create([
-                    'name' => $faker->name,
-                    'email' => $faker->unique()->safeEmail,
-                    'phone' => $faker->phoneNumber,
-                    'address' => $faker->address,
-                ]);
-            }
+            Customer::factory()->count(10)->create();
         }
 
         // Get all customer IDs
         $customerIds = Customer::pluck('id')->toArray();
 
-        // Ensure we have inventory items
-        if (Inventory::count() == 0) {
-            // Create a few sample items
-            for ($i = 0; $i < 5; $i++) {
-                Inventory::create([
-                    'name' => $faker->word,
-                    'sku' => $faker->unique()->ean8,
-                    'stock' => $faker->numberBetween(10, 100),
-                    'price' => $faker->randomFloat(2, 10, 1000),
-                    'category_id' => $faker->randomElement($categoryIds),
-                ]);
-            }
-        }
+        // Get all inventory items with stock > 0, selecting only necessary fields
+        $inventoryItems = Inventory::where('stock', '>', 0)
+            ->select('id', 'stock', 'price')
+            ->get();
 
-        // Get all inventory item IDs
-        $inventoryIds = Inventory::pluck('id')->toArray();
+        if ($inventoryItems->isEmpty()) {
+            $this->command->info('No inventory items with stock available. Skipping sales order creation.');
+            return;
+        }
 
         // Create 20 sample sales orders
         for ($i = 0; $i < 20; $i++) {
@@ -76,14 +48,14 @@ class SalesOrderSeeder extends Seeder
             $totalAmount = 0;
 
             for ($j = 0; $j < $itemCount; $j++) {
-                $inventory = Inventory::find($faker->randomElement($inventoryIds));
-                $quantity = $faker->numberBetween(1, 10);
-                $unitPrice = $inventory->price;
+                $inventoryItem = $inventoryItems->random();
+                $quantity = $faker->numberBetween(1, min($inventoryItem->stock, 10));
+                $unitPrice = $inventoryItem->price;
                 $subtotal = $quantity * $unitPrice;
 
                 SalesOrderItem::create([
                     'sales_order_id' => $order->id,
-                    'inventory_id' => $inventory->id,
+                    'inventory_id' => $inventoryItem->id,
                     'quantity' => $quantity,
                     'unit_price' => $unitPrice,
                     'subtotal' => $subtotal,
@@ -92,11 +64,15 @@ class SalesOrderSeeder extends Seeder
                 $totalAmount += $subtotal;
 
                 // Update inventory stock
-                $inventory->decrement('stock', $quantity);
+                $inventoryItem->decrement('stock', $quantity);
             }
 
             // Update the total amount of the sales order
             $order->update(['total_amount' => $totalAmount]);
+
+            $this->command->info("Created sales order: {$order->order_number}");
         }
+
+        $this->command->info('Sales orders created successfully.');
     }
 }

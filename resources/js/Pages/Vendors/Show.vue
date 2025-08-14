@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import { Head, useForm } from '@inertiajs/vue3';
 import VendorLayout from '@/Layouts/VendorLayout.vue';
+import { FilterMatchMode } from '@primevue/core/api';
 
 interface VendorProduct {
     id: number;
@@ -11,6 +12,7 @@ interface VendorProduct {
     stock: number;
     description: string | null;
     inventory_stock: number;
+    image_url?: string;
 }
 
 interface Vendor {
@@ -32,6 +34,10 @@ const quantities = ref<{ [key: number]: number }>({});
 
 props.products.forEach(product => {
     quantities.value[product.id] = 1;
+});
+
+const filters = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 
 const form = useForm({
@@ -108,112 +114,125 @@ const showProductDetails = (product: VendorProduct) => {
 
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 flex">
-                        <!-- Product Table -->
-                        <div class="flex-grow mr-6">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor Stock</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Inventory Stock</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-                                </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-for="product in products" :key="product.id">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900 cursor-pointer hover:text-indigo-600" @click="showProductDetails(product)">
-                                                    {{ product.name }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ product.sku }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${{ product.price.toFixed(2) }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ product.stock }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ product.inventory_stock }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <input
-                                            type="number"
-                                            v-model="quantities[product.id]"
-                                            min="1"
-                                            :max="product.stock"
-                                            class="w-20 px-2 py-1 border rounded"
-                                        >
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button
-                                            @click="addToCart(product)"
-                                            class="text-indigo-600 hover:text-indigo-900"
-                                            :disabled="!quantities[product.id] || quantities[product.id] < 1"
-                                        >
-                                            Add to Cart
+                <!-- Cart Summary at the top -->
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                    <div class="p-6 bg-gray-50">
+                        <h2 class="text-xl font-bold mb-4">Purchase Order Summary</h2>
+                        <div v-if="cart.length > 0">
+                            <div class="mb-4 max-h-60 overflow-y-auto">
+                                <div v-for="item in cart" :key="item.id" class="flex justify-between items-center py-2 border-b">
+                                    <div>
+                                        <span class="font-medium">{{ item.name }}</span>
+                                        <span class="text-sm text-gray-600 ml-2">(Qty: {{ item.quantity }})</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-sm mr-2">${{ (item.price * item.quantity).toFixed(2) }}</span>
+                                        <button @click="removeFromCart(item)" class="text-red-500 text-sm hover:text-red-700">
+                                            <svg class="h-4 w-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            </svg>
                                         </button>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Purchase Cart -->
-                        <div class="w-1/3 bg-gray-50 p-6 rounded-lg">
-                            <h2 class="text-xl font-bold mb-4">Purchase Order</h2>
-                            <div v-for="item in cart" :key="item.id" class="mb-2 flex justify-between items-center">
-                                <span class="text-sm">{{ item.name }} ({{ item.quantity }})</span>
-                                <div>
-                                    <span class="text-sm mr-2">${{ (item.price * item.quantity).toFixed(2) }}</span>
-                                    <button @click="removeFromCart(item)" class="text-red-500 text-sm">Remove</button>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="mt-4 pt-4 border-t">
-                                <p class="font-bold">Total: ${{ cartTotal }}</p>
+                            <div class="flex justify-between items-center mt-4 pt-4 border-t">
+                                <div>
+                                    <span class="text-sm">Total Items: {{ cart.reduce((sum, item) => sum + item.quantity, 0) }}</span>
+                                </div>
+                                <div>
+                                    <span class="font-bold text-lg">Total: ${{ cartTotal }}</span>
+                                    <Button
+                                        @click="checkout"
+                                        label="Create Purchase Order"
+                                        icon="pi pi-shopping-cart"
+                                        class="ml-4 p-button-primary"
+                                        :disabled="cart.length === 0"
+                                    />
+                                </div>
                             </div>
-                            <button @click="checkout" class="mt-4 w-full px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors duration-300" :disabled="cart.length === 0">
-                                Create Purchase Order
-                            </button>
+                        </div>
+                        <div v-else class="text-gray-500">
+                            Your cart is empty. Add some products to create a purchase order.
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Product Details Modal -->
-        <div v-if="selectedProduct" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
-            <div class="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xl font-bold">{{ selectedProduct.name }}</h3>
-                    <button @click="selectedProduct = null" class="text-gray-500 hover:text-gray-700">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                <p class="mb-2"><strong>SKU:</strong> {{ selectedProduct.sku }}</p>
-                <p class="mb-2"><strong>Price:</strong> ${{ selectedProduct.price.toFixed(2) }}</p>
-                <p class="mb-2"><strong>Stock:</strong> {{ selectedProduct.stock }}</p>
-                <p class="mb-2"><strong>Description:</strong> {{ selectedProduct.description || 'N/A' }}</p>
-                <div class="mt-4 flex justify-between items-center">
-                    <input
-                        type="number"
-                        v-model="quantities[selectedProduct.id]"
-                        min="1"
-                        :max="selectedProduct.stock"
-                        class="w-20 px-2 py-1 border rounded"
-                    >
-                    <button
-                        @click="addToCart(selectedProduct); selectedProduct = null;"
-                        class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-colors duration-300"
-                        :disabled="!quantities[selectedProduct.id] || quantities[selectedProduct.id] < 1"
-                    >
-                        Add to Cart
-                    </button>
+                <!-- Product Table -->
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6 bg-white border-b border-gray-200">
+                        <DataTable
+                            :value="products"
+                            :paginator="true"
+                            :rows="10"
+                            :filters="filters"
+                            filterDisplay="menu"
+                            :globalFilterFields="['name', 'sku', 'price', 'stock']"
+                            responsiveLayout="scroll"
+                            class="p-datatable-sm"
+                        >
+                            <template #header>
+                                <div class="flex flex-wrap gap-2 items-center justify-between">
+                                    <h4 class="m-0">Inventory Items</h4>
+                                    <IconField>
+                                        <InputIcon>
+                                            <i class="pi pi-search" />
+                                        </InputIcon>
+                                        <InputText v-model="filters['global'].value" placeholder="Search..." />
+                                    </IconField>
+                                </div>
+                            </template>
+
+                            <Column field="name" header="Product" sortable>
+                                <template #body="slotProps">
+                                    <div class="flex items-center">
+                                        <img :src="slotProps.data.image_url" :alt="slotProps.data.name" class="w-12 h-12 mr-2 object-cover" />
+                                        <span class="text-sm font-medium text-gray-900 cursor-pointer hover:text-indigo-600" @click="showProductDetails(slotProps.data)">
+                                            {{ slotProps.data.name }}
+                                        </span>
+                                    </div>
+                                </template>
+                            </Column>
+                            <Column field="sku" header="SKU" sortable></Column>
+                            <Column field="price" header="Price" sortable>
+                                <template #body="slotProps">
+                                    ${{ slotProps.data.price.toFixed(2) }}
+                                </template>
+                            </Column>
+                            <Column field="stock" header="Stock" sortable>
+                                <template #body="slotProps">
+                                    <span>
+                                        {{ slotProps.data.stock }}
+                                    </span>
+                                </template>
+                            </Column>
+                            <Column header="Quantity">
+                                <template #body="slotProps">
+                                    <InputNumber
+                                        v-model="quantities[slotProps.data.id]"
+                                        :min="1"
+                                        :max="slotProps.data.stock"
+                                        showButtons
+                                        class="w-20"
+                                        size="small"
+                                        :inputStyle="{ width: '2rem' }"
+                                    />
+                                </template>
+                            </Column>
+                            <Column header="Actions">
+                                <template #body="slotProps">
+                                    <Button
+                                        @click="addToCart(slotProps.data)"
+                                        label="Add"
+                                        icon="pi pi-plus"
+                                        variant="text"
+                                        severity="success"
+                                        :disabled="!quantities[slotProps.data.id] || quantities[slotProps.data.id] < 1"
+                                    >
+                                    </Button>
+                                </template>
+                            </Column>
+                        </DataTable>
+                    </div>
                 </div>
             </div>
         </div>

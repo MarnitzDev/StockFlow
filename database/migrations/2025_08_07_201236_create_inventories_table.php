@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null');
             $table->integer('low_stock_threshold')->default(10);
             $table->foreignId('vendor_id')->nullable()->constrained('vendors')->onDelete('set null');
+            $table->string('image_url')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

@@ -15,7 +15,7 @@ class POSController extends Controller
 {
     public function index()
     {
-        $products = Inventory::with(['category', 'images', 'primaryImage'])
+        $products = Inventory::with('category')
             ->get()
             ->map(function ($product) {
                 return [
@@ -25,7 +25,7 @@ class POSController extends Controller
                     'sku' => $product->sku,
                     'stock' => $product->stock,
                     'category' => $product->category ? $product->category->name : null,
-                    'image' => $product->primaryImage ? $product->primaryImage->image_path : null,
+                    'image' => $product->image_url,
                 ];
             });
 

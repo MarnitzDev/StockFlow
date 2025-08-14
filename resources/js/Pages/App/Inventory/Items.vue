@@ -100,7 +100,7 @@ const deleteItem = (item) => {
                             <Column field="name" header="Name" sortable></Column>
                             <Column header="Image">
                                 <template #body="slotProps">
-                                    <img :src="slotProps.data.primary_image?.image_path" :alt="slotProps.data.name" class="w-12 shadow-2 rounded" />
+                                    <img :src="slotProps.data.image_url" :alt="slotProps.data.name" class="w-12 shadow-2 rounded" />
                                 </template>
                             </Column>
                             <Column field="sku" header="SKU" sortable></Column>

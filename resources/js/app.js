@@ -15,6 +15,7 @@ import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
 import Dropdown from 'primevue/dropdown';
 import DataTable from 'primevue/datatable';
+import DataView from 'primevue/dataview';
 import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup';
 import Row from 'primevue/row';
@@ -47,6 +48,7 @@ createInertiaApp({
         app.component('InputNumber', InputNumber);
         app.component('Dropdown', Dropdown);
         app.component('DataTable', DataTable);
+        app.component('DataView', DataView);
         app.component('Column', Column);
         app.component('ColumnGroup', ColumnGroup);
         app.component('Row', Row);

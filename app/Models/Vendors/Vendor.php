@@ -16,9 +16,4 @@ class Vendor extends Model
     {
         return $this->hasMany(VendorProduct::class);
     }
-
-    public function image()
-    {
-        return $this->hasOne(VendorImage::class);
-    }
 }

@@ -10,8 +10,16 @@ class VendorProduct extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['vendor_id', 'name', 'sku', 'price', 'stock', 'description'];
-
+    protected $fillable = [
+        'vendor_id',
+        'name',
+        'sku',
+        'description',
+        'price',
+        'stock',
+        'category_id',
+        'image_url'
+    ];
     protected $casts = [
         'price' => PriceCast::class.':vendor',
     ];

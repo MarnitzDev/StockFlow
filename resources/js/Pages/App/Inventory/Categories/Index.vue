@@ -66,7 +66,7 @@ const onRowCollapse = (event) => {
                                             No items found in this category.
                                         </div>
                                     </template>
-                                    <Column field="name" header="Name"></Column>
+                                    <Column field="name" header="Item Name"></Column>
                                     <Column field="sku" header="SKU"></Column>
                                     <Column field="stock" header="Stock"></Column>
                                     <Column field="price" header="Price">

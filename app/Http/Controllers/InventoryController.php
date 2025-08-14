@@ -13,7 +13,7 @@ class InventoryController extends Controller
 {
     public function items()
     {
-        $inventoryItems = Inventory::with(['category', 'images', 'primaryImage'])->get();
+        $inventoryItems = Inventory::with(['category'])->get();
         return Inertia::render('App/Inventory/Items', ['items' => $inventoryItems]);
     }
 
@@ -128,15 +128,5 @@ class InventoryController extends Controller
     {
         $lowStockItems = Inventory::where('stock', '<=', DB::raw('low_stock_threshold'))->get();
         return Inertia::render('App/Inventory/LowStock', ['items' => $lowStockItems]);
-    }
-
-    public function images()
-    {
-        return $this->hasMany(InventoryImage::class);
-    }
-
-    public function primaryImage()
-    {
-        return $this->hasOne(InventoryImage::class)->where('is_primary', true);
     }
 }

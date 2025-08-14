@@ -17,11 +17,13 @@ class VendorController extends Controller
 {
     public function index(): Response
     {
-        $vendors = Vendor::with('image')->get()->map(function ($vendor) {
+        $vendors = Vendor::all()->map(function ($vendor) {
             return [
                 'id' => $vendor->id,
                 'name' => $vendor->name,
-                'image' => $vendor->image ? $vendor->image->image_path : null,
+                'email' => $vendor->email,
+                'phone' => $vendor->phone,
+                'address' => $vendor->address,
             ];
         });
 
@@ -44,11 +46,15 @@ class VendorController extends Controller
                     'stock' => $product->stock,
                     'description' => $product->description,
                     'inventory_stock' => $inventory ? $inventory->stock : 0,
+                    'image_url' => $product->image_url ?? null,
                 ];
             });
 
         return Inertia::render('Vendors/Show', [
-            'vendor' => $vendor,
+            'vendor' => [
+                'id' => $vendor->id,
+                'name' => $vendor->name
+            ],
             'products' => $products,
         ]);
     }
