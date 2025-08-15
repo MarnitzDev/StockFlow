@@ -11,6 +11,7 @@ import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
 import Button from 'primevue/button';
+import Calendar from 'primevue/calendar';
 import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
 import Dropdown from 'primevue/dropdown';
@@ -22,6 +23,14 @@ import Row from 'primevue/row';
 import Menu from 'primevue/menu';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
+import Stepper from 'primevue/stepper';
+import StepList from 'primevue/steplist';
+import StepPanels from 'primevue/steppanels';
+import StepItem from 'primevue/stepitem';
+import StepPanel from 'primevue/steppanel';
+import Step from 'primevue/step';
+import Textarea from 'primevue/textarea';
+import SelectButton from 'primevue/selectbutton';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -44,6 +53,7 @@ createInertiaApp({
             });
 
         app.component('Button', Button);
+        app.component('Calendar', Calendar);
         app.component('InputText', InputText);
         app.component('InputNumber', InputNumber);
         app.component('Dropdown', Dropdown);
@@ -55,6 +65,14 @@ createInertiaApp({
         app.component('Menu', Menu);
         app.component('IconField', IconField);
         app.component('InputIcon', InputIcon);
+        app.component('Stepper', Stepper);
+        app.component('StepPanel', StepPanel);
+        app.component('StepList', StepList);
+        app.component('StepPanels', StepPanels);
+        app.component('StepItem', StepItem);
+        app.component('Step', Step);
+        app.component('Textarea', Textarea);
+        app.component('SelectButton', SelectButton);
 
         return app.mount(el);
     },

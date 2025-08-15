@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\POS;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\Inventory;
-use App\Models\Vendors\Vendor;
-use App\Models\SalesOrder;
 use App\Models\Customer;
+use App\Models\Inventory;
+use App\Models\SalesOrder;
+use App\Models\Vendor;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class POSController extends Controller
 {

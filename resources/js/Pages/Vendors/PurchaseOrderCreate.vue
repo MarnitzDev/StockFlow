@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { ref, computed, onMounted } from 'vue';
+import { useForm } from '@inertiajs/vue3';
 import VendorLayout from '@/Layouts/VendorLayout.vue';
 import { FilterMatchMode } from '@primevue/core/api';
 
@@ -34,14 +34,23 @@ interface CalculatedTotals {
 
 const props = defineProps<{
     vendor: Vendor;
-    calculatedTotals: CalculatedTotals;
+    calculatedTotals: Object,
 }>();
 
+const activeStep = ref('1');
+const purchaseOrder = ref(null);
 const cart = ref<CartItem[]>([]);
 const quantities = ref<{ [key: number]: number }>({});
 
+const cartTotal = computed(() => {
+    return props.calculatedTotals.items.reduce((sum, item) => {
+        const quantity = quantities.value[item.id] || 0;
+        return sum + item.unit_price * quantity;
+    }, 0);
+});
+
 props.calculatedTotals.items.forEach(product => {
-    quantities.value[product.id] = 1;
+    quantities.value[product.id] = 0;
 });
 
 const filters = ref({
@@ -49,223 +58,374 @@ const filters = ref({
 });
 
 const form = useForm({
+    purchase_order_id: null,
     items: [] as { product_id: number; quantity: number; price: number }[],
     total: 0,
     vendor_id: props.vendor.id,
+    payment_method: '',
+    payment_amount: 0,
+    reference_number: '',
+    payment_date: null,
+    payment_notes: '',
 });
 
-const addToCart = (product: VendorProduct) => {
-    const quantity = quantities.value[product.id];
-    if (!quantity || quantity < 1) return;
-
-    const existingItem = cart.value.find(item => item.id === product.id);
-    if (existingItem) {
-        existingItem.quantity += quantity;
-    } else {
-        cart.value.push({ ...product, quantity });
-    }
-    quantities.value[product.id] = 1;
-    updateForm();
-};
-
-const removeFromCart = (product: VendorProduct) => {
-    const index = cart.value.findIndex(item => item.id === product.id);
-    if (index !== -1) {
-        if (cart.value[index].quantity > 1) {
-            cart.value[index].quantity -= 1;
-        } else {
-            cart.value.splice(index, 1);
-        }
-    }
-    updateForm();
-};
-
-const updateForm = () => {
-    form.items = cart.value.map(item => ({
-        product_id: item.id,
-        quantity: item.quantity,
-        price: item.unit_price,
-    }));
-    form.total = cart.value.reduce((sum, item) => sum + item.total * item.quantity, 0);
-};
-
-const checkout = () => {
-    form.post(route('vendor.purchases.checkout'), {
-        preserveScroll: true,
-        preserveState: true,
-        onSuccess: () => {
-            cart.value = [];
-            updateForm();
-        },
-        onError: (errors) => {
-            console.error(errors);
+const createPurchaseOrder = (event: Event, activateCallback: (step: string) => void) => {
+    cart.value = [];
+    props.calculatedTotals.items.forEach(item => {
+        const quantity = quantities.value[item.id] || 0;
+        if (quantity > 0) {
+            cart.value.push({
+                ...item,
+                quantity: quantity
+            });
         }
     });
+
+    if (cart.value.length > 0) {
+        purchaseOrder.value = {
+            order_number: `PO-${Date.now()}`,
+            vendor: { name: props.vendor.name },
+            order_date: new Date().toISOString(),
+            status: 'Pending',
+            items: [...cart.value],
+            total: cartTotal.value
+        };
+        activateCallback('2');
+    } else {
+        console.error('No items selected for purchase order');
+    }
 };
 
-const cartSubtotal = computed(() => {
-    return cart.value.reduce((sum, item) => sum + item.unit_price * item.quantity, 0);
-});
+const calculateTotalItems = () => {
+    return Object.values(quantities.value).reduce((sum, quantity) => sum + quantity, 0);
+};
 
-const cartTax = computed(() => {
-    return cart.value.reduce((sum, item) => sum + item.tax * item.quantity, 0);
-});
-
-const cartTotal = computed(() => {
-    return cartSubtotal.value + cartTax.value;
-});
-
-const selectedProduct = ref<VendorProduct | null>(null);
-
-const showProductDetails = (product: VendorProduct) => {
-    selectedProduct.value = product;
+// Function to format date
+const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
 };
 
 const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR' }).format(value);
 };
 
+const paymentMethods = ref([
+    { name: 'Bank Transfer', code: 'BT' },
+    { name: 'Credit Card', code: 'CC' },
+    { name: 'Cash', code: 'CASH' },
+]);
 
+const paymentMethod = ref(null);
+const paymentAmount = computed(() => purchaseOrder.value ? purchaseOrder.value.total : 0);
+const referenceNumber = computed(() => {
+    return purchaseOrder.value ? purchaseOrder.value.order_number : '';
+});
+const paymentDate = ref(new Date());
+const paymentNotes = ref('');
+
+const isPaymentValid = computed(() => {
+    return paymentMethod.value && referenceNumber.value.trim() !== '' && paymentDate.value;
+});
+
+const generateFakeReferenceNumber = () => {
+    return 'FAKE-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+};
+
+const finalizePayment = () => {
+    if (!isPaymentValid.value || form.processing) return;
+
+    const items = cart.value.map(item => ({
+        product_id: item.id,
+        quantity: item.quantity,
+        price: item.unit_price,
+    }));
+
+    form.purchase_order_id = purchaseOrder.value.id;
+    form.items = items;
+    form.total = cartTotal.value;
+    form.vendor_id = props.vendor.id;
+    form.status = 'pending';
+    form.payment_method = paymentMethod.value.code;
+    form.payment_amount = paymentAmount.value;
+    form.reference_number = referenceNumber.value;
+    form.payment_date = paymentDate.value.toISOString().split('T')[0];
+    form.payment_notes = paymentNotes.value;
+
+    form.post(route('vendors.purchases.store', props.vendor.id), {
+        preserveScroll: true,
+        onSuccess: (response) => {
+            purchaseOrder.value = response.purchaseOrder;
+            cart.value = [];
+            quantities.value = {};
+            paymentMethod.value = null;
+            referenceNumber.value = '';
+            paymentDate.value = new Date();
+            paymentNotes.value = '';
+            activeStep.value = '1';
+        },
+        onError: (errors) => {
+            console.error('Error finalizing purchase order:', errors);
+        },
+    });
+};
+
+onMounted(() => {
+    paymentMethod.value = paymentMethods.value[0];
+    referenceNumber.value = generateFakeReferenceNumber();
+    paymentNotes.value = 'This is a simulated payment for demonstration purposes.';
+});
 </script>
-
 <template>
     <VendorLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Purchase from {{ vendor.name }}</h2>
+            <div class="flex justify-between items-center">
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">Purchase Order</h2>
+                <span class="text-lg font-medium text-gray-600">Vendor: {{ vendor.name }}</span>
+            </div>
         </template>
 
-        <div>
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <!-- Product Table -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 bg-white border-b border-gray-200">
-                        <DataTable
-                            :value="calculatedTotals.items"
-                            :paginator="true"
-                            :rows="10"
-                            :filters="filters"
-                            filterDisplay="menu"
-                            :globalFilterFields="['name', 'sku', 'unit_price', 'stock']"
-                            responsiveLayout="scroll"
-                            size="small"
-                        >
-                            <template #header>
-                                <div class="flex flex-wrap gap-2 items-center justify-between">
-                                    <h4 class="m-0">Inventory Items</h4>
-                                    <IconField>
-                                        <InputIcon>
-                                            <i class="pi pi-search" />
-                                        </InputIcon>
-                                        <InputText v-model="filters['global'].value" placeholder="Search..." />
-                                    </IconField>
-                                </div>
-                            </template>
+        <div class="py-12">
+            <div class="">
+                <div class="card">
+                    <Stepper v-model:activeStep="activeStep" value="1" class="">
+                        <StepList>
+                            <Step value="1">Create Order</Step>
+                            <Step value="2">Review Details</Step>
+                            <Step value="3">Payment</Step>
+                        </StepList>
+                        <StepItem value="1">
+                            <StepPanel v-slot="{ activateCallback }" class="h-full flex flex-col p-12">
+                                <div class="flex-grow overflow-auto">
+                                    <div class="bg-surface-50 dark:bg-surface-950">
+                                        <DataTable
+                                            :value="calculatedTotals.items"
+                                            :paginator="true"
+                                            :rows="10"
+                                            :filters="filters"
+                                            filterDisplay="menu"
+                                            :globalFilterFields="['name', 'sku', 'unit_price', 'quantity']"
+                                            responsiveLayout="scroll"
+                                            size="small"
+                                        >
+                                            <template #header>
+                                                <div class="flex flex-wrap gap-2 items-center justify-between">
+                                                    <h4 class="text-xl font-bold">Purchase Order Items</h4>
+                                                    <IconField>
+                                                        <InputIcon>
+                                                            <i class="pi pi-search" />
+                                                        </InputIcon>
+                                                        <InputText v-model="filters['global'].value" placeholder="Search..." />
+                                                    </IconField>
+                                                </div>
+                                            </template>
 
-                            <Column field="name" header="Product" sortable>
-                                <template #body="slotProps">
-                                    <div class="flex items-center">
-                                        <span class="text-sm font-medium text-gray-900 cursor-pointer hover:text-indigo-600" @click="showProductDetails(slotProps.data)">
-                                            {{ slotProps.data.name }}
-                                        </span>
+                                            <ColumnGroup type="header">
+                                                <Row>
+                                                    <Column header="Product" rowspan="2" style="width: 45%;" />
+                                                    <Column header="Stock" rowspan="2" style="width: 10%;" />
+                                                    <Column header="Unit Price" rowspan="2" style="width: 15%;" />
+                                                    <Column header="Total" rowspan="2" style="width: 15%;" />
+                                                    <Column header="Quantity" colspan="2" style="width: 15%;" />
+                                                </Row>
+                                            </ColumnGroup>
+
+                                            <Column field="name" header="Product">
+                                                <template #body="slotProps">
+                                                    <div class="flex items-center">
+                                                        <span :class="[
+                                                            'text-sm font-medium',
+                                                            slotProps.data.stock > 0 && quantities[slotProps.data.id] < slotProps.data.stock
+                                                                ? 'text-gray-900'
+                                                                : 'text-gray-400'
+                                                        ]">
+                                                            {{ slotProps.data.name }}
+                                                        </span>
+                                                        <span v-if="slotProps.data.stock === 0" class="ml-2 text-xs">
+                                                            (Out of Stock)
+                                                        </span>
+                                                        <span v-else-if="quantities[slotProps.data.id] >= slotProps.data.stock" class="ml-2 text-xs">
+                                                            (Max Quantity Added)
+                                                        </span>
+                                                        </div>
+                                                </template>
+                                            </Column>
+                                            <Column field="stock" header="Stock">
+                                                <template #body="slotProps">
+                                                    {{ slotProps.data.stock }}
+                                                </template>
+                                            </Column>
+                                            <Column field="unit_price" header="Unit Price">
+                                                <template #body="slotProps">
+                                                    {{ formatCurrency(slotProps.data.unit_price) }}
+                                                </template>
+                                            </Column>
+                                            <Column header="Total">
+                                                <template #body="slotProps">
+                                                    {{ (quantities[slotProps.data.id] || 0) > 0
+                                                    ? formatCurrency(slotProps.data.unit_price * quantities[slotProps.data.id])
+                                                    : '' }}
+                                                </template>
+                                            </Column>
+                                            <Column header="Buy">
+                                                <template #body="slotProps">
+                                                    <div class="flex items-center gap-2">
+                                                        <InputNumber
+                                                            v-model="quantities[slotProps.data.id]"
+                                                            :min="0"
+                                                            :max="slotProps.data.stock"
+                                                            :disabled="slotProps.data.stock === 0"
+                                                            showButtons
+                                                            class="w-20"
+                                                            size="small"
+                                                            :inputStyle="{ width: '2rem' }"
+                                                        />
+                                                    </div>
+                                                </template>
+                                            </Column>
+                                        </DataTable>
                                     </div>
-                                </template>
-                            </Column>
-                            <Column field="sku" header="SKU" sortable></Column>
-                            <Column field="total" header="Unit Price" sortable>
-                                <template #body="slotProps">
-                                    {{ formatCurrency(slotProps.data.total) }}
-                                </template>
-                            </Column>
-                            <Column field="stock" header="Stock" sortable>
-                                <template #body="slotProps">
-                                    <span>
-                                        {{ slotProps.data.stock }}
-                                    </span>
-                                </template>
-                            </Column>
-                            <Column header="Quantity">
-                                <template #body="slotProps">
-                                    <InputNumber
-                                        v-model="quantities[slotProps.data.id]"
-                                        :min="1"
-                                        :max="slotProps.data.stock"
-                                        showButtons
-                                        class="w-20"
-                                        size="small"
-                                        :inputStyle="{ width: '2rem' }"
-                                    />
-                                </template>
-                            </Column>
-                            <Column header="Actions">
-                                <template #body="slotProps">
-                                    <Button
-                                        @click="addToCart(slotProps.data)"
-                                        label="Add"
-                                        icon="pi pi-plus"
-                                        variant="text"
-                                        severity="success"
-                                        :disabled="!quantities[slotProps.data.id] || quantities[slotProps.data.id] < 1"
-                                    >
-                                    </Button>
-                                </template>
-                            </Column>
-                        </DataTable>
-                    </div>
-                </div>
-                <!-- Cart Summary at the top -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg my-6">
-                    <div class="p-6 bg-gray-50">
-                        <h2 class="text-xl font-bold mb-4">Purchase Order Summary</h2>
-                        <div v-if="cart.length > 0">
-                            <div class="mb-4 max-h-60 overflow-y-auto">
-                                <div v-for="item in cart" :key="item.id" class="flex justify-between items-center py-2 border-b">
-                                    <div>
-                                        <span class="font-medium">{{ item.name }}</span>
-                                        <span class="text-sm text-gray-600 ml-2">(Qty: {{ item.quantity }})</span>
+                                </div>
+                                <div class="pt-6 mt-auto border-t border-gray-200">
+                                    <div class="flex justify-between items-center">
+                                        <div class="text-lg font-semibold">
+                                            Total: {{ formatCurrency(cartTotal) }}
+                                            <div class="text-sm text-gray-600">
+                                                {{ calculateTotalItems() }} item{{ calculateTotalItems() !== 1 ? 's' : '' }} selected
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-4">
+                                            <Button
+                                                @click="(event) => createPurchaseOrder(event, activateCallback)"
+                                                label="Review Order"
+                                                icon="pi pi-arrow-right"
+                                                iconPos="right"
+                                                :disabled="!cartTotal"
+                                            />
+                                        </div>
                                     </div>
-                                    <div>
-                                        <span class="text-sm mr-2">{{ formatCurrency(item.unit_price * item.quantity) }}</span>
+                                </div>
+                            </StepPanel>
+                        </StepItem>
+
+                        <StepItem value="2">
+                            <StepPanel v-slot="{ activateCallback }" class="h-full flex flex-col p-12">
+                                <div v-if="purchaseOrder" class="flex-grow overflow-auto">
+                                    <DataTable :value="purchaseOrder.items" class="p-datatable-sm">
+                                        <template #header>
+                                            <h4 class="text-xl font-bold mb-2">Order Items</h4>
+                                        </template>
+                                        <Column field="name" header="Product"></Column>
+                                        <Column field="quantity" header="Quantity"></Column>
+                                        <Column field="unit_price" header="Unit Price">
+                                            <template #body="slotProps">
+                                                {{ formatCurrency(slotProps.data.unit_price) }}
+                                            </template>
+                                        </Column>
+                                        <Column header="Total">
+                                            <template #body="slotProps">
+                                                {{ formatCurrency(slotProps.data.unit_price * slotProps.data.quantity) }}
+                                            </template>
+                                        </Column>
+                                        <ColumnGroup type="footer">
+                                            <Row>
+                                                <Column footer="Total:" colspan="3"></Column>
+                                                <Column :footer="formatCurrency(purchaseOrder.total)"></Column>
+                                            </Row>
+                                        </ColumnGroup>
+                                    </DataTable>
+                                    <div class="bg-white overflow-hidden py-12">
+                                        <div class="grid grid-cols-3 gap-6 ml-2">
+                                            <div class="flex flex-col">
+                                                <span class="text-sm text-gray-600 mb-1">Order Number</span>
+                                                <span class="font-semibold">{{ purchaseOrder.order_number }}</span>
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <span class="text-sm text-gray-600 mb-1">Supplier</span>
+                                                <span class="font-semibold">{{ purchaseOrder.vendor.name }}</span>
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <span class="text-sm text-gray-600 mb-1">Date</span>
+                                                <span class="font-semibold">{{ formatDate(purchaseOrder.order_date) }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="pt-6 mt-auto border-t border-gray-200">
+                                        <div class="flex justify-between gap-4">
+                                            <Button label="Back"
+                                                    severity="secondary"
+                                                    icon="pi pi-arrow-left"
+                                                    @click="activateCallback('1')"
+                                            />
+                                            <Button
+                                                @click="activateCallback('3')"
+                                                label="Proceed to Payment"
+                                                icon="pi pi-arrow-right"
+                                                iconPos="right"
+                                            />
+                                        </div>
+                                </div>
+                            </StepPanel>
+                        </StepItem>
+
+                        <StepItem value="3">
+                            <StepPanel v-slot="{ activateCallback }" class="h-full flex flex-col p-12">
+                                <div class="bg-white overflow-hidden sm:rounded-lg">
+                                    <h4 class="text-xl font-bold mb-8">Finalise Payment</h4>
+                                    <div class="grid grid-cols-2 gap-6 mb-6">
+                                        <div class="flex flex-col">
+                                            <span class="text-sm text-gray-600 mb-1">Payment Method</span>
+                                            <Dropdown v-model="paymentMethod" :options="paymentMethods" optionLabel="name" placeholder="Select Payment Method" class="w-full" />
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <span class="text-sm text-gray-600 mb-1">Payment Amount</span>
+                                            <InputNumber v-model="paymentAmount" mode="currency" currency="ZAR" locale="en-ZA" :minFractionDigits="2" class="w-full" :disabled="true" />
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-6 mb-6">
+                                        <div class="flex flex-col">
+                                            <span class="text-sm text-gray-600 mb-1">Reference Number</span>
+                                            <InputText v-model="referenceNumber" placeholder="Enter reference number" class="w-full" />
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <span class="text-sm text-gray-600 mb-1">Payment Date</span>
+                                            <Calendar v-model="paymentDate" dateFormat="dd/mm/yy" class="w-full" />
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col mb-6">
+                                        <span class="text-sm text-gray-600 mb-1">Notes</span>
+                                        <Textarea v-model="paymentNotes" rows="3" placeholder="Add any additional notes" class="w-full" />
+                                    </div>
+                                </div>
+                                <div class="mt-auto border-t border-gray-200 pt-6">
+                                    <div class="flex justify-between gap-4">
+                                        <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="activateCallback('2')" />
                                         <Button
-                                            @click="removeFromCart(item)"
-                                            icon="pi pi-trash"
-                                            class="p-button-text p-button-rounded p-button-danger"
-                                            aria-label="Remove item"
-                                        />
+                                            :label="form.processing ? 'Processing' : 'Complete Order'"
+                                            :icon="form.processing ? 'pi pi-spin pi-spinner' : 'pi pi-shopping-cart'"
+                                            @click="finalizePayment"
+                                            :disabled="!isPaymentValid || form.processing"
+                                            :loading="form.processing"
+                                        >
+                                        </Button>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="mt-4 pt-4 border-t">
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="text-sm">Subtotal:</span>
-                                    <span>{{ formatCurrency(cartSubtotal) }}</span>
-                                </div>
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="text-sm">Tax:</span>
-                                    <span>{{ formatCurrency(cartTax) }}</span>
-                                </div>
-                                <div class="flex justify-between items-center mb-4">
-                                    <span class="font-bold">Total:</span>
-                                    <span class="font-bold text-lg">{{ formatCurrency(cartTotal) }}</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-sm">Total Items: {{ cart.reduce((sum, item) => sum + item.quantity, 0) }}</span>
-                                    <Button
-                                        @click="checkout"
-                                        label="Create Purchase Order"
-                                        icon="pi pi-shopping-cart"
-                                        class="p-button-primary"
-                                        :disabled="cart.length === 0"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                        <div v-else class="text-gray-500">
-                            Your cart is empty. Add some products to create a purchase order.
-                        </div>
-                    </div>
+                            </StepPanel>
+                        </StepItem>
+                    </Stepper>
                 </div>
-
             </div>
         </div>
     </VendorLayout>
 </template>
+
+<style>
+.p-stepitem .p-steppanel-content {
+    margin-inline-start: 0 !important;
+}
+</style>

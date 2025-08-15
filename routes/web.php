@@ -1,16 +1,15 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\POSController;
 use App\Http\Controllers\PurchasesController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StockAdjustmentController;
 use App\Http\Controllers\SuppliersController;
-use App\Http\Controllers\POS\POSController;
-use App\Http\Controllers\Vendors\VendorController;
+use App\Http\Controllers\VendorController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -97,15 +96,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // Vendors
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::prefix('vendors')->name('vendor.')->group(function () {
+    Route::prefix('vendors')->name('vendors.')->group(function () {
         Route::get('/', [VendorController::class, 'index'])->name('index');
+        Route::get('/purchases', [VendorController::class, 'purchaseHistory'])->name('purchases.index');
         Route::get('/{vendor}', [VendorController::class, 'show'])->name('show');
-        Route::get('/{vendor}/purchase', [VendorController::class, 'createPurchaseOrder'])->name('purchases.create');
-        Route::post('/{vendor}/purchase', [VendorController::class, 'storePurchaseOrder'])->name('purchases.store');
-        Route::post('/purchase-checkout', [VendorController::class, 'purchaseCheckout'])->name('purchases.checkout');
-        Route::get('/vendor/purchases', [VendorController::class, 'purchaseHistory'])->name('purchases.history');
-        Route::get('/purchases/{purchaseOrder}', [VendorController::class, 'purchaseShow'])->name('purchases.show');
-        Route::put('/purchases/{purchase}', [VendorController::class, 'updatePurchase'])->name('purchases.update');
+        Route::post('/{vendor}/purchases', [VendorController::class, 'storePurchaseOrder'])->name('purchases.store');
+        Route::get('/purchases/{purchaseOrder}', [VendorController::class, 'showPurchaseOrder'])->name('purchases.show');
     });
 });
 

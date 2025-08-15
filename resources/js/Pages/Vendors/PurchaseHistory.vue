@@ -51,7 +51,7 @@
                         <Column field="items_count" header="Items" sortable></Column>
                         <Column header="Actions" style="width: 100px">
                             <template #body="slotProps">
-                                <Link v-if="slotProps.data.id" :href="route('vendor.purchases.show', { purchaseOrder: slotProps.data.id })"
+                                <Link v-if="slotProps.data.id" :href="route('vendors.purchases.show', { purchaseOrder: slotProps.data.id })"
                                       class="text-indigo-600 hover:text-indigo-900">
                                     View
                                 </Link>
@@ -84,7 +84,7 @@ const filters = ref({
 });
 
 const onPage = (event) => {
-    form.get(route('vendor.purchases.history'), {
+    form.get(route('vendors.purchases.index'), {
         page: event.page + 1,
         perPage: event.rows,
     }, {

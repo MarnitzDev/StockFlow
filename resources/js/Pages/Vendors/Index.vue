@@ -7,16 +7,6 @@
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                     <DataView :value="vendors" :layout="layout">
-                        <template #header>
-                            <div class="flex justify-end">
-                                <SelectButton v-model="layout" :allowEmpty="false">
-                                    <template #option="{ option }">
-                                        <i :class="[option === 'list' ? 'pi pi-bars' : 'pi pi-table']" />
-                                    </template>
-                                </SelectButton>
-                            </div>
-                        </template>
-
                         <template #list="slotProps">
                             <div class="flex flex-col">
                                 <div v-for="(vendor, index) in slotProps.items" :key="vendor.id">
@@ -27,22 +17,32 @@
                                             </div>
                                         </div>
                                         <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
-                                            <div class="flex flex-row md:flex-col justify-between items-start gap-2">
-                                                <div>
-                                                    <div class="text-lg font-medium mt-2">{{ vendor.name }}</div>
-                                                    <div class="text-sm text-gray-600">{{ vendor.email }}</div>
-                                                    <div class="text-sm text-gray-600">{{ vendor.phone }}</div>
-                                                    <div class="text-sm text-gray-600">{{ vendor.address }}</div>
+                                            <div class="flex flex-col justify-between items-start gap-2">
+                                                <div class="text-lg font-semibold text-gray-800">{{ vendor.name }}</div>
+                                                <div class="flex flex-col text-sm text-gray-600 space-y-2">
+                                                    <div class="flex items-center gap-3">
+                                                        <i class="pi pi-envelope text-gray-400"></i>
+                                                        <span class="truncate">{{ vendor.email }}</span>
+                                                    </div>
+                                                    <div class="flex items-center gap-3">
+                                                        <i class="pi pi-phone text-gray-400"></i>
+                                                        <span>{{ vendor.phone }}</span>
+                                                    </div>
+                                                    <div class="flex items-center gap-3">
+                                                        <i class="pi pi-map-marker text-gray-400"></i>
+                                                        <span class="truncate">{{ vendor.address }}</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="flex flex-col md:items-end gap-8">
                                                 <div class="flex flex-row-reverse md:flex-row gap-2">
                                                     <Link
-                                                        :href="route('vendor.show', vendor.id)"
-                                                        class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-500 active:bg-blue-700 focus:outline-none focus:border-blue-700 focus:ring focus:ring-blue-200 transition ease-in-out duration-150"
-                                                    >
-                                                        <i class="pi pi-shopping-cart mr-2"></i>
-                                                        View Catalogue
+                                                        :href="route('vendors.show', vendor.id)" class="no-underline">
+                                                        <Button
+                                                            label="View Catalogue"
+                                                            icon="pi pi-book"
+                                                            severity="contrast"
+                                                        />
                                                     </Link>
                                                 </div>
                                             </div>
@@ -60,11 +60,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Head } from '@inertiajs/vue3';
 import VendorLayout from '@/Layouts/VendorLayout.vue';
 import { Link } from '@inertiajs/vue3';
-import DataView from 'primevue/dataview';
-import SelectButton from 'primevue/selectbutton';
 
 interface Vendor {
     id: number;

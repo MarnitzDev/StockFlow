@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Models\Vendors;
+namespace App\Models;
 
-use App\Services\PriceService;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class VendorProduct extends Model
 {
     use HasFactory;
+
+    protected $table = 'vendor_products';
 
     protected $fillable = [
         'vendor_id',

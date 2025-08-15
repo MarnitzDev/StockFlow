@@ -23,6 +23,6 @@ class PurchaseOrderItem extends Model
 
     public function product()
     {
-        return $this->belongsTo(Inventory::class, 'product_id');
+        return $this->belongsTo(VendorProduct::class, 'product_id');
     }
 }

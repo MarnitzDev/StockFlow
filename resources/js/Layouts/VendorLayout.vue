@@ -24,10 +24,10 @@ const isActive = (route: string) => {
                             <NavLink :href="route('home')" :active="isActive(route('home'))">
                                 Home
                             </NavLink>
-                            <NavLink :href="route('vendor.index')" :active="isActive(route('vendor.index'))">
+                            <NavLink :href="route('vendors.index')" :active="isActive(route('vendors.index'))">
                                 Vendors
                             </NavLink>
-                            <NavLink :href="route('vendor.purchases.history')" :active="isActive(route('vendor.purchases.history'))">
+                            <NavLink :href="route('vendors.purchases.index')" :active="isActive(route('vendors.purchases.index'))">
                                 Purchase History
                             </NavLink>
                         </div>

@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Models\Vendors;
+namespace App\Models;
 
-use App\Models\Vendors\VendorProduct;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,5 +14,10 @@ class Vendor extends Model
     public function products()
     {
         return $this->hasMany(VendorProduct::class);
+    }
+
+    public function purchaseOrders()
+    {
+        return $this->hasMany(PurchaseOrder::class);
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Vendor as Supplier;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\Vendors\Vendor as Supplier;
 
 class SuppliersController extends Controller
 {

@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Vendors\VendorProduct;
-use App\Models\Vendors\Vendor;
+use App\Models\Vendor;
+use App\Models\VendorProduct;
 use Database\Factories\ProductFactory;
 use Illuminate\Database\Seeder;
 
