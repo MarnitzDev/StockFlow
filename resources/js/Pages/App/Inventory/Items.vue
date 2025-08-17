@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Link } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useForm } from '@inertiajs/vue3';
 import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
@@ -56,7 +56,20 @@ const submitStockMovement = () => {
 // DATA TABLE
 const filters = ref({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    'category.name': { value: null, matchMode: FilterMatchMode.CONTAINS },
+    sku: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
+
+const loading = ref(true);
+
+onMounted(() => {
+    loading.value = false;
+});
+
+const getSeverity = (stock, threshold) => {
+    return stock > threshold ? 'success' : 'danger';
+};
 
 const editItem = (item) => {
     // Implement edit functionality
@@ -76,59 +89,76 @@ const deleteItem = (item) => {
         </template>
 
         <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="px-6">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 bg-white border-b border-gray-200">
                         <DataTable
+                            v-model:filters="filters"
                             :value="items"
-                            :paginator="true"
+                            paginator
                             :rows="10"
-                            :filters="filters"
-                            filterDisplay="menu"
+                            dataKey="id"
+                            filterDisplay="row"
+                            :loading="loading"
                             :globalFilterFields="['name', 'sku', 'category.name', 'stock', 'price']"
-                            responsiveLayout="scroll"
                         >
                             <template #header>
-                                <div class="flex flex-wrap gap-2 items-center justify-between">
-                                    <h4 class="m-0">Inventory Items</h4>
+                                <div class="flex justify-end">
                                     <IconField>
                                         <InputIcon>
                                             <i class="pi pi-search" />
                                         </InputIcon>
-                                        <InputText v-model="filters['global'].value" placeholder="Search..." />
+                                        <InputText v-model="filters['global'].value" placeholder="Keyword Search" />
                                     </IconField>
                                 </div>
                             </template>
-                            <Column field="name" header="Name" sortable style="width: 30%;"></Column>
-                            <Column header="Image">
-                                <template #body="slotProps">
-                                    <img
-                                        :src="slotProps.data.image_url || '/images/placeholder-item.svg'"
-                                        :alt="slotProps.data.name"
-                                        class="w-12 shadow-2 rounded"
-                                        @error="$event.target.src = '/images/placeholder-item.svg'"
-                                    />
+                            <template #empty> No inventory items found. </template>
+                            <template #loading> Loading inventory data. Please wait. </template>
+
+                            <Column field="name" header="Name" style="min-width: 12rem">
+                                <template #body="{ data }">
+                                    {{ data.name }}
+                                </template>
+                                <template #filter="{ filterModel, filterCallback }">
+                                    <InputText v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Search by name" class="p-column-filter w-full" />
                                 </template>
                             </Column>
-                            <Column field="sku" header="SKU" sortable style="width: 20%;"></Column>
-                            <Column field="category.name" header="Category" sortable style="width: 15%;"></Column>
-                            <Column field="stock" header="Stock" sortable style="width: 5%">
-                                <template #body="slotProps">
-                                    <span :class="{'text-green-500': slotProps.data.stock > slotProps.data.low_stock_threshold, 'text-red-500': slotProps.data.stock <= slotProps.data.low_stock_threshold}">
-                                        {{ slotProps.data.stock }}
-                                    </span>
+
+                            <Column field="sku" header="SKU" style="min-width: 12rem">
+                                <template #body="{ data }">
+                                    {{ data.sku }}
+                                </template>
+                                <template #filter="{ filterModel, filterCallback }">
+                                    <InputText v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Search by SKU" class="p-column-filter w-full" />
                                 </template>
                             </Column>
-                            <Column field="price" header="Price" sortable style="width: 10%;">
-                                <template #body="slotProps">
-                                    {{ formatCurrency(slotProps.data.price) }}
+
+                            <Column field="category.name" header="Category" style="min-width: 12rem">
+                                <template #body="{ data }">
+                                    {{ data.category.name }}
+                                </template>
+                                <template #filter="{ filterModel, filterCallback }">
+                                    <InputText v-model="filterModel.value" type="text" @input="filterCallback()" placeholder="Search by category" class="p-column-filter w-full" />
                                 </template>
                             </Column>
-                            <Column header="Actions" style="width: 20%;">
-                                <template #body="slotProps">
-                                    <Button icon="pi pi-plus" outlined rounded class="mr-2" @click="openStockMovementDialog(slotProps.data)" />
-                                    <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editItem(slotProps.data)" />
-                                    <Button icon="pi pi-trash" outlined rounded severity="danger" @click="deleteItem(slotProps.data)" />
+
+                            <Column field="stock" header="Stock" dataType="numeric" style="min-width: 8rem">
+                                <template #body="{ data }">
+                                    <Tag :value="data.stock" :severity="getSeverity(data.stock, data.low_stock_threshold)" />
+                                </template>
+                            </Column>
+
+                            <Column field="price" header="Price" dataType="numeric" style="min-width: 8rem">
+                                <template #body="{ data }">
+                                    {{ formatCurrency(data.price) }}
+                                </template>
+                            </Column>
+
+                            <Column header="Actions" :exportable="false" style="min-width: 8rem">
+                                <template #body="{ data }">
+                                    <Button icon="pi pi-plus" outlined rounded class="mr-2" @click="openStockMovementDialog(data)" />
+                                    <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editItem(data)" />
+                                    <Button icon="pi pi-trash" outlined rounded severity="danger" @click="deleteItem(data)" />
                                 </template>
                             </Column>
                         </DataTable>

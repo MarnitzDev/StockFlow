@@ -1,9 +1,17 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Link } from '@inertiajs/vue3';
+import { ref, onMounted } from 'vue';
 
-defineProps({
+const props = defineProps({
     stockAdjustments: Array,
+});
+
+const adjustments = ref([]);
+
+onMounted(() => {
+    console.log('Stock Adjustments:', props.stockAdjustments);
+    adjustments.value = props.stockAdjustments || [];
 });
 </script>
 
@@ -22,14 +30,20 @@ defineProps({
                                 Create Stock Adjustment
                             </Link>
                         </div>
-                        <table class="min-w-full">
+
+                        <!-- Debug information -->
+                        <div class="mb-4">
+                            <p>Total adjustments: {{ adjustments.length }}</p>
+                        </div>
+
+                        <table v-if="adjustments.length > 0" class="min-w-full">
                             <thead>
                             <tr>
                                 <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                                     Item
                                 </th>
                                 <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-                                    stock
+                                    Stock
                                 </th>
                                 <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
                                     Type
@@ -43,9 +57,9 @@ defineProps({
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-for="adjustment in stockAdjustments" :key="adjustment.id">
+                            <tr v-for="adjustment in adjustments" :key="adjustment.id">
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">
-                                    {{ adjustment.inventory.name }}
+                                    {{ adjustment.inventory?.name || 'N/A' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-500">
                                     {{ adjustment.stock }}
@@ -62,6 +76,7 @@ defineProps({
                             </tr>
                             </tbody>
                         </table>
+                        <p v-else class="text-center py-4">No stock adjustments found.</p>
                     </div>
                 </div>
             </div>
