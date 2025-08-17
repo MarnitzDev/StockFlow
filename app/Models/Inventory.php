@@ -10,6 +10,8 @@ class Inventory extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $table = 'inventory';
+
     protected $fillable = [
         'name',
         'sku',
@@ -20,12 +22,14 @@ class Inventory extends Model
         'low_stock_threshold',
         'vendor_id',
         'image_url',
+        'available_on_pos',
     ];
 
     protected $casts = [
         'stock' => 'integer',
         'price' => 'decimal:2',
         'low_stock_threshold' => 'integer',
+        'available_on_pos' => 'boolean',
     ];
 
     // Relationships
@@ -76,5 +80,11 @@ class Inventory extends Model
     public function getTotalValue()
     {
         return $this->stock * $this->price;
+    }
+
+    public function togglePOSAvailability()
+    {
+        $this->available_on_pos = !$this->available_on_pos;
+        $this->save();
     }
 }

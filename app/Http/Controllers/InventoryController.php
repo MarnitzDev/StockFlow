@@ -13,7 +13,10 @@ class InventoryController extends Controller
 {
     public function items()
     {
-        $inventoryItems = Inventory::with(['category'])->get();
+        $inventoryItems = Inventory::with(['category'])->select([
+            'id', 'name', 'sku', 'description', 'stock', 'price', 'category_id',
+            'low_stock_threshold', 'vendor_id', 'image_url', 'available_on_pos'
+        ])->get();
         return Inertia::render('App/Inventory/Items', ['items' => $inventoryItems]);
     }
 
@@ -26,7 +29,7 @@ class InventoryController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'sku' => 'required|string|unique:inventories',
+            'sku' => 'required|string|unique:inventory',
             'stock' => 'required|integer|min:0',
             'price' => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
@@ -57,7 +60,7 @@ class InventoryController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'sku' => 'required|string|unique:inventories,sku,' . $inventory->id,
+            'sku' => 'required|string|unique:inventory,sku,' . $inventory->id,
             'stock' => 'required|integer|min:0',
             'price' => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
@@ -128,5 +131,15 @@ class InventoryController extends Controller
     {
         $lowStockItems = Inventory::where('stock', '<=', DB::raw('low_stock_threshold'))->get();
         return Inertia::render('App/Inventory/LowStock', ['items' => $lowStockItems]);
+    }
+
+    public function updatePOSAvailability(Request $request, $id)
+    {
+        $item = Inventory::findOrFail($id);
+        $item->update([
+            'available_on_pos' => $request->available_on_pos
+        ]);
+
+        return back()->with('success', 'POS availability updated successfully');
     }
 }

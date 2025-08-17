@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('inventories', function (Blueprint $table) {
+        Schema::create('inventory', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('sku')->unique();
@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('low_stock_threshold')->default(10);
             $table->foreignId('vendor_id')->nullable()->constrained('vendors')->onDelete('set null');
             $table->string('image_url')->nullable();
+            $table->boolean('available_on_pos')->default(true);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -26,6 +27,6 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('inventories');
+        Schema::dropIfExists('inventory');
     }
 };

@@ -35,6 +35,13 @@ import TreeTable from 'primevue/treetable';
 import Chart from 'primevue/chart';
 import Card from 'primevue/card';
 import Tag from 'primevue/tag';
+import InputSwitch from 'primevue/inputswitch';
+import ConfirmDialog from 'primevue/confirmdialog';
+import Toast from 'primevue/toast';
+import Tooltip from 'primevue/tooltip';
+
+import ConfirmationService from 'primevue/confirmationservice';
+import ToastService from 'primevue/toastservice';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -54,7 +61,9 @@ createInertiaApp({
                 theme: {
                     preset: Aura
                 }
-            });
+            })
+            .use(ConfirmationService)
+            .use(ToastService);
 
         app.component('Button', Button);
         app.component('Calendar', Calendar);
@@ -81,6 +90,10 @@ createInertiaApp({
         app.component('Chart', Chart);
         app.component('Card', Card);
         app.component('Tag', Tag);
+        app.component('InputSwitch', InputSwitch);
+        app.component('ConfirmDialog', ConfirmDialog);
+        app.component('Toast', Toast);
+        app.directive('tooltip', Tooltip);
 
         return app.mount(el);
     },

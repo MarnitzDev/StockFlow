@@ -25,6 +25,7 @@ class POSController extends Controller
                     'stock' => $product->stock,
                     'category' => $product->category ? $product->category->name : null,
                     'image' => $product->image_url,
+                    'available_on_pos' => $product->available_on_pos,
                 ];
             });
 
@@ -46,7 +47,7 @@ class POSController extends Controller
     {
         $request->validate([
             'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|exists:inventories,id',
+            'items.*.product_id' => 'required|exists:inventory,id',
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.price' => 'required|numeric|min:0',
             'customer_name' => 'nullable|string|max:255',
@@ -147,5 +148,11 @@ class POSController extends Controller
         return Inertia::render('POS/OrderDetails', [
             'order' => $order
         ]);
+    }
+
+    public function getInventoryForPOS()
+    {
+        $items = Inventory::where('available_on_pos', true)->get();
+        return response()->json($items);
     }
 }

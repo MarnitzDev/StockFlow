@@ -10,7 +10,7 @@ class CreateStockAdjustmentsTable extends Migration
     {
         Schema::create('stock_adjustments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('inventory_id')->constrained()->onDelete('cascade');
+            $table->foreignId('inventory_id')->constrained('inventory')->onDelete('cascade');
             $table->integer('stock');
             $table->enum('type', ['increase', 'decrease']);
             $table->string('reason');

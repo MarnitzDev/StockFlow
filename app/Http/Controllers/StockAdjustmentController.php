@@ -24,7 +24,7 @@ class StockAdjustmentController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'inventory_id' => 'required|exists:inventories,id',
+            'inventory_id' => 'required|exists:inventory,id',
             'stock' => 'required|integer',
             'type' => 'required|in:increase,decrease',
             'reason' => 'required|string',

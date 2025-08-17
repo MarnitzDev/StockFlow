@@ -7,6 +7,10 @@ const props = defineProps({
     products: Array,
 });
 
+const availableProducts = computed(() => {
+    return props.products.filter(product => product.available_on_pos);
+});
+
 const cart = ref([]);
 const form = useForm({
     items: [],
@@ -16,8 +20,13 @@ const form = useForm({
 const isCartEmpty = computed(() => cart.value.length === 0);
 
 const addToCart = (product) => {
+    if (!product.available_on_pos) {
+        alert('This product is not available for POS sales.');
+        return;
+    }
+
     const quantity = product.quantity || 1;
-    const availableQuantity = product.available_quantity;
+    const availableQuantity = product.stock;
 
     if (quantity > availableQuantity) {
         alert(`Sorry, only ${availableQuantity} item(s) available.`);
@@ -36,7 +45,7 @@ const addToCart = (product) => {
         cart.value.push({ ...product, quantity });
     }
 
-    product.available_quantity -= quantity;
+    product.stock -= quantity;
     product.quantity = 1;
     updateForm();
 };
@@ -65,20 +74,6 @@ const updateForm = () => {
     form.total = cart.value.reduce((sum, item) => sum + item.price * item.quantity, 0);
 };
 
-const checkout = () => {
-    form.post(route('pos.checkout'), {
-        preserveScroll: true,
-        preserveState: true,
-        onSuccess: () => {
-            cart.value = [];
-            updateForm();
-        },
-    });
-};
-
-const cartTotal = computed(() => {
-    return cart.value.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2);
-});
 </script>
 
 <template>
@@ -95,12 +90,12 @@ const cartTotal = computed(() => {
                     <div class="grid grid-cols-3 gap-4">
                         <!-- Product Grid -->
                         <div class="col-span-2 grid grid-cols-3 gap-4">
-                            <div v-for="product in products" :key="product.id" class="border p-4 rounded relative">
+                            <div v-for="product in availableProducts" :key="product.id" class="border p-4 rounded relative">
                                 <img :src="product.image" :alt="product.name" class="w-full h-32 object-cover mb-2">
                                 <h3 class="font-bold">{{ product.name }}</h3>
                                 <p>${{ Number(product.price).toFixed(2) }}</p>
                                 <p class="text-sm text-gray-600">Available: {{ product.stock }}</p>
-                                <div class="flex items-center mt-2 space-x-2" v-if="product.stock !== 0">
+                                <div class="flex items-center mt-2 space-x-2" v-if="product.stock > 0">
                                     <InputNumber
                                         v-model="product.quantity"
                                         :min="1"
@@ -120,7 +115,7 @@ const cartTotal = computed(() => {
                                         Add
                                     </Button>
                                 </div>
-                                <div v-if="product.stock === 0" class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-80 flex items-center justify-center">
+                                <div v-else class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-80 flex items-center justify-center">
                                     <span class="text-white font-bold text-lg">Sold Out</span>
                                 </div>
                             </div>

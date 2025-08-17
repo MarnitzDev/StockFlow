@@ -33,7 +33,7 @@ class SalesOrderController extends Controller
         $validated = $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'items' => 'required|array|min:1',
-            'items.*.inventory_id' => 'required|exists:inventories,id',
+            'items.*.inventory_id' => 'required|exists:inventory,id',
             'items.*.quantity' => 'required|integer|min:1',
             'notes' => 'nullable|string',
         ]);

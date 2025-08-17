@@ -21,7 +21,7 @@ class CreateSalesOrdersTable extends Migration
         Schema::create('sales_order_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('sales_order_id')->constrained()->onDelete('cascade');
-            $table->foreignId('inventory_id')->constrained();
+            $table->foreignId('inventory_id')->constrained('inventory');
             $table->integer('quantity');
             $table->decimal('unit_price', 10, 2);
             $table->decimal('subtotal', 10, 2);
