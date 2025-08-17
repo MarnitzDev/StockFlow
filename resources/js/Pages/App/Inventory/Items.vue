@@ -280,7 +280,8 @@ const deleteItem = (item) => {
                                     <ToggleButton
                                         v-model="tempStates[data.id]"
                                         @click.prevent="confirmPOSAvailabilityChange(data)"
-                                        onLabel="Shown" offLabel="Hidden"
+                                        onLabel="On"
+                                        offLabel="Off"
                                         onIcon="pi pi-check"
                                         offIcon="pi pi-times"
                                         :disabled="data.isUpdating"
