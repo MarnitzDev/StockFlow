@@ -1,6 +1,7 @@
 import '../css/app.css';
 import './bootstrap';
 import 'primeicons/primeicons.css';
+import '../css/theme.css';
 
 import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
@@ -10,6 +11,7 @@ import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 // Import PrimeVue
 import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
+import { definePreset } from '@primeuix/themes';
 import Button from 'primevue/button';
 import Calendar from 'primevue/calendar';
 import InputText from 'primevue/inputtext';
@@ -43,6 +45,24 @@ import Tooltip from 'primevue/tooltip';
 import ConfirmationService from 'primevue/confirmationservice';
 import ToastService from 'primevue/toastservice';
 
+const MyPreset = definePreset(Aura, {
+    semantic: {
+        primary: {
+            50: '{blue.50}',
+            100: '{blue.100}',
+            200: '{blue.200}',
+            300: '{blue.300}',
+            400: '{blue.400}',
+            500: '{blue.500}',
+            600: '{blue.600}',
+            700: '{blue.700}',
+            800: '{blue.800}',
+            900: '{blue.900}',
+            950: '{blue.950}'
+        }
+    }
+});
+
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
@@ -59,11 +79,12 @@ createInertiaApp({
             .use(ZiggyVue)
             .use(PrimeVue, {
                 theme: {
-                    preset: Aura
+                    preset: MyPreset
                 }
             })
             .use(ConfirmationService)
             .use(ToastService);
+
 
         app.component('Button', Button);
         app.component('Calendar', Calendar);

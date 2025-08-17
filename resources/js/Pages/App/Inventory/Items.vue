@@ -171,23 +171,6 @@ const deleteItem = (item) => {
                             <template #empty> No inventory items found. </template>
                             <template #loading> Loading inventory data. Please wait. </template>
 
-                            <Column field="available_on_pos" sortable style="width: 5%;">
-                                <template #header>
-                                    <div class="flex items-center">
-                                        <i class="pi pi-info-circle text-sm text-gray-500"
-                                           v-tooltip.bottom="'Toggle item visibility on Point of Sale'"
-                                        ></i>
-                                        <span class="font-bold ml-2">POS</span>
-                                    </div>
-                                </template>
-                                <template #body="{ data }">
-                                    <InputSwitch
-                                        :modelValue="data.available_on_pos"
-                                        @click.prevent="updatePOSAvailability(data)"
-                                    />
-                                </template>
-                            </Column>
-
                             <Column field="name" header="Name" sortable style="width: 30%;">
                                 <template #body="{ data }">
                                     {{ data.name }}
@@ -219,7 +202,7 @@ const deleteItem = (item) => {
                                 <template #header>
                                     <div class="flex items-center">
                                         <i class="pi pi-info-circle text-sm text-gray-500"
-                                           v-tooltip.bottom="'Current stock level. Green indicates sufficient stock, red indicates low stock.'"
+                                           v-tooltip.bottom="'Current stock level. Green indicates stock above the set threshold, red indicates stock at or below the threshold.'"
                                         ></i>
                                         <span class="font-bold ml-2">Stock</span>
                                     </div>
@@ -232,6 +215,23 @@ const deleteItem = (item) => {
                             <Column field="price" header="Price" dataType="numeric" sortable style="width: 9%;">
                                 <template #body="{ data }">
                                     {{ formatCurrency(data.price) }}
+                                </template>
+                            </Column>
+
+                            <Column field="available_on_pos" sortable style="width: 5%;">
+                                <template #header>
+                                    <div class="flex items-center">
+                                        <i class="pi pi-info-circle text-sm text-gray-500"
+                                           v-tooltip.bottom="'Toggle item visibility on Point of Sale'"
+                                        ></i>
+                                        <span class="font-bold ml-2">POS</span>
+                                    </div>
+                                </template>
+                                <template #body="{ data }">
+                                    <InputSwitch
+                                        :modelValue="data.available_on_pos"
+                                        @click.prevent="updatePOSAvailability(data)"
+                                    />
                                 </template>
                             </Column>
 

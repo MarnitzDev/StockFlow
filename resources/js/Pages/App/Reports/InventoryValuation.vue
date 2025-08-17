@@ -18,7 +18,7 @@ defineProps({
         </template>
 
         <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="px-6">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
                     <h3 class="text-lg font-semibold mb-4">Current Stock Levels</h3>
                     <table class="min-w-full divide-y divide-gray-200">
