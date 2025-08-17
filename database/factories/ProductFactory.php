@@ -58,6 +58,6 @@ class ProductFactory extends Factory
 
     private function getRandomImageUrl()
     {
-        return "https://picsum.photos/400/300?random=" . Str::random(10);
+        return "https://picsum.photos/200/200?random=" . Str::random(10);
     }
 }

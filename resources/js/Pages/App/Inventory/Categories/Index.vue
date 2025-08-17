@@ -1,28 +1,58 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Link } from '@inertiajs/vue3';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
+
+const { formatCurrency } = useCurrencyFormatter();
 
 const props = defineProps({
     categories: Array
 });
 
-const expandedRows = ref({});
+const expandedKeys = ref({});
 
-const formatCurrency = (value) => {
-    return new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR' }).format(value);
+const treeTableData = computed(() => {
+    return props.categories.filter(category => !category.parent_id).map(category => ({
+        key: category.id,
+        data: {
+            ...category,
+            totalItems: getCategoryItemCount(category) + getChildrenItemCount(category),
+            totalStock: getCategoryStock(category) + getChildrenStock(category)
+        },
+        children: getChildrenNodes(category.id)
+    }));
+});
+
+const getChildrenNodes = (parentId) => {
+    return props.categories
+        .filter(category => category.parent_id === parentId)
+        .map(child => ({
+            key: child.id,
+            data: {
+                ...child,
+                totalItems: getCategoryItemCount(child),
+                totalStock: getCategoryStock(child)
+            }
+        }));
 };
 
-const onRowExpand = (event) => {
-    // You can add any logic here that needs to run when a row is expanded
-    console.log('Row expanded:', event.data);
+const getCategoryStock = (category) => {
+    return category.inventory_items?.reduce((total, item) => total + item.stock, 0) || 0;
 };
 
-const onRowCollapse = (event) => {
-    // You can add any logic here that needs to run when a row is collapsed
-    console.log('Row collapsed:', event.data);
+const getCategoryItemCount = (category) => {
+    return category.inventory_items?.length || 0;
+};
+
+const getChildrenItemCount = (category) => {
+    const children = props.categories.filter(c => c.parent_id === category.id);
+    return children.reduce((total, child) => total + getCategoryItemCount(child), 0);
+};
+
+const getChildrenStock = (category) => {
+    const children = props.categories.filter(c => c.parent_id === category.id);
+    return children.reduce((total, child) => total + getCategoryStock(child), 0);
 };
 </script>
 
@@ -41,43 +71,34 @@ const onRowCollapse = (event) => {
                             Add New Category
                         </Link>
                     </div>
-                    <DataTable
-                        :value="categories"
-                        v-model:expandedRows="expandedRows"
-                        @row-expand="onRowExpand"
-                        @row-collapse="onRowCollapse"
-                        dataKey="id"
-                        class="p-datatable-sm"
-                    >
-                        <Column :expander="true" headerStyle="width: 3rem" />
-                        <Column field="name" header="Category Name" sortable></Column>
-                        <Column field="slug" header="Slug" sortable></Column>
+                    <TreeTable :value="treeTableData" :expandedKeys="expandedKeys" @toggle="expandedKeys = $event">
+                        <Column field="name" header="Category Name" expander>
+                            <template #body="{ node }">
+                                {{ node.data.name }}
+                            </template>
+                        </Column>
+                        <Column field="slug" header="Slug">
+                            <template #body="{ node }">
+                                {{ node.data.slug }}
+                            </template>
+                        </Column>
+                        <Column field="totalItems" header="Total Items">
+                            <template #body="{ node }">
+                                {{ node.data.totalItems }}
+                            </template>
+                        </Column>
+                        <Column field="totalStock" header="Total Stock">
+                            <template #body="{ node }">
+                                {{ node.data.totalStock }}
+                            </template>
+                        </Column>
                         <Column header="Actions">
-                            <template #body="slotProps">
-                                <Link :href="route('inventory.categories.edit', slotProps.data.id)" class="text-indigo-600 hover:text-indigo-900 mr-2">Edit</Link>
+                            <template #body="{ node }">
+                                <Link :href="route('inventory.categories.edit', node.data.id)" class="text-indigo-600 hover:text-indigo-900 mr-2">Edit</Link>
                                 <!-- Add delete functionality here -->
                             </template>
                         </Column>
-                        <template #expansion="slotProps">
-                            <div class="p-3">
-                                <DataTable :value="slotProps.data.inventory_items" class="p-datatable-sm" :showHeaders="slotProps.data.inventory_items.length > 0">
-                                    <template #empty>
-                                        <div class="p-4">
-                                            No items found in this category.
-                                        </div>
-                                    </template>
-                                    <Column field="name" header="Item Name"></Column>
-                                    <Column field="sku" header="SKU"></Column>
-                                    <Column field="stock" header="Stock"></Column>
-                                    <Column field="price" header="Price">
-                                        <template #body="itemProps">
-                                            {{ formatCurrency(itemProps.data.price) }}
-                                        </template>
-                                    </Column>
-                                </DataTable>
-                            </div>
-                        </template>
-                    </DataTable>
+                    </TreeTable>
                 </div>
             </div>
         </div>

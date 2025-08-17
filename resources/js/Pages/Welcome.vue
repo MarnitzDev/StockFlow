@@ -17,7 +17,7 @@
                     </div>
                     <div class="hidden md:block">
                         <div class="flex justify-center items-center">
-                            <img src="/images/business_report.svg" alt="StockFlow Dashboard" class="w-2/3 h-auto" />
+                            <img src="/images/business_report.svg" alt="StockFlow Dashboard" class="w-2/3 h-auto p-4" />
                         </div>
                     </div>
                 </div>

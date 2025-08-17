@@ -4,6 +4,9 @@ import { Link } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useForm } from '@inertiajs/vue3';
+import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
+
+const { formatCurrency } = useCurrencyFormatter();
 
 const props = defineProps({
     items: {
@@ -96,28 +99,32 @@ const deleteItem = (item) => {
                                     </IconField>
                                 </div>
                             </template>
-
-                            <Column field="name" header="Name" sortable></Column>
+                            <Column field="name" header="Name" sortable style="width: 30%;"></Column>
                             <Column header="Image">
                                 <template #body="slotProps">
-                                    <img :src="slotProps.data.image_url" :alt="slotProps.data.name" class="w-12 shadow-2 rounded" />
+                                    <img
+                                        :src="slotProps.data.image_url || '/images/placeholder-item.svg'"
+                                        :alt="slotProps.data.name"
+                                        class="w-12 shadow-2 rounded"
+                                        @error="$event.target.src = '/images/placeholder-item.svg'"
+                                    />
                                 </template>
                             </Column>
-                            <Column field="sku" header="SKU" sortable></Column>
-                            <Column field="category.name" header="Category" sortable></Column>
-                            <Column field="stock" header="Stock" sortable>
+                            <Column field="sku" header="SKU" sortable style="width: 20%;"></Column>
+                            <Column field="category.name" header="Category" sortable style="width: 15%;"></Column>
+                            <Column field="stock" header="Stock" sortable style="width: 5%">
                                 <template #body="slotProps">
                                     <span :class="{'text-green-500': slotProps.data.stock > slotProps.data.low_stock_threshold, 'text-red-500': slotProps.data.stock <= slotProps.data.low_stock_threshold}">
                                         {{ slotProps.data.stock }}
                                     </span>
                                 </template>
                             </Column>
-                            <Column field="price" header="Price" sortable>
+                            <Column field="price" header="Price" sortable style="width: 10%;">
                                 <template #body="slotProps">
-<!--                                    {{ formatCurrency(slotProps.data.price) }}-->
+                                    {{ formatCurrency(slotProps.data.price) }}
                                 </template>
                             </Column>
-                            <Column header="Actions">
+                            <Column header="Actions" style="width: 20%;">
                                 <template #body="slotProps">
                                     <Button icon="pi pi-plus" outlined rounded class="mr-2" @click="openStockMovementDialog(slotProps.data)" />
                                     <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editItem(slotProps.data)" />

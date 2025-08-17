@@ -31,6 +31,7 @@ import StepPanel from 'primevue/steppanel';
 import Step from 'primevue/step';
 import Textarea from 'primevue/textarea';
 import SelectButton from 'primevue/selectbutton';
+import TreeTable from 'primevue/treetable';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -73,6 +74,7 @@ createInertiaApp({
         app.component('Step', Step);
         app.component('Textarea', Textarea);
         app.component('SelectButton', SelectButton);
+        app.component('TreeTable', TreeTable);
 
         return app.mount(el);
     },
