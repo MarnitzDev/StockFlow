@@ -5,91 +5,31 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
-import Button from 'primevue/button';
 
 interface Props {
-    suppliers: {
-        data: Array<{
-            id: number;
-            name: string;
-            email: string;
-            phone: string;
-            address: string;
-        }>;
-        total: number;
-    };
+    suppliers: Array<{
+        id: number;
+        name: string;
+        email: string;
+        phone: string;
+        address: string;
+    }>;
 }
 
 const props = defineProps<Props>();
 
-const suppliers = ref(props.suppliers.data);
-const totalRecords = ref(props.suppliers.total);
-const loading = ref(false);
+const suppliers = ref(props.suppliers);
 const filters = ref({});
-const lazyParams = ref({
-    first: 0,
-    rows: 10,
-    page: 1,
-    sortField: null,
-    sortOrder: null,
-});
 
-const loadLazyData = () => {
-    loading.value = true;
+// Remove lazyParams, loadLazyData, onPage, onSort, and onFilter functions
 
-    router.get(
-        route('suppliers.index'),
-        {
-            page: lazyParams.value.page,
-            perPage: lazyParams.value.rows,
-            sortField: lazyParams.value.sortField,
-            sortOrder: lazyParams.value.sortOrder,
-            filters: filters.value
-        },
-        {
-            preserveState: true,
-            preserveScroll: true,
-            only: ['suppliers'],
-            onSuccess: (page) => {
-                suppliers.value = page.props.suppliers.data;
-                totalRecords.value = page.props.suppliers.total;
-                loading.value = false;
-            },
-        }
-    );
-};
-
-onMounted(() => {
-    loadLazyData();
-});
-
-const onPage = (event) => {
-    lazyParams.value.page = event.page + 1;
-    lazyParams.value.rows = event.rows;
-    loadLazyData();
-};
-
-const onSort = (event) => {
-    lazyParams.value.sortField = event.sortField;
-    lazyParams.value.sortOrder = event.sortOrder;
-    loadLazyData();
-};
-
-const onFilter = () => {
-    lazyParams.value.page = 1;
-    loadLazyData();
-};
 </script>
 
 <template>
     <Head title="Suppliers" />
 
     <AuthenticatedLayout>
-        <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Suppliers</h2>
-        </template>
-
-        <div class="py-12">
+        <div class="pb-12">
             <div class="px-6">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 bg-white border-b border-gray-200">
@@ -100,19 +40,13 @@ const onFilter = () => {
                         </div>
                         <DataTable
                             :value="suppliers"
-                            :lazy="true"
                             :paginator="true"
-                            :rows="lazyParams.rows"
-                            :totalRecords="totalRecords"
-                            :loading="loading"
+                            :rows="10"
                             :filters="filters"
                             :rowsPerPageOptions="[5, 10, 20, 50]"
                             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                             responsiveLayout="scroll"
-                            @page="onPage($event)"
-                            @sort="onSort($event)"
-                            @filter="onFilter($event)"
                             dataKey="id"
                         >
                             <Column field="name" header="Name" sortable>

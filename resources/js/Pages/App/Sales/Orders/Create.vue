@@ -32,11 +32,7 @@ const submit = () => {
 
 <template>
     <AuthenticatedLayout>
-        <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Create Sales Order</h2>
-        </template>
-
-        <div class="py-12">
+        <div class="pb-12">
             <div class="px-6">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
                     <form @submit.prevent="submit">

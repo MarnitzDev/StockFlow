@@ -73,11 +73,7 @@ onMounted(() => {
     <Head title="Dashboard" />
 
     <AuthenticatedLayout>
-        <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">Dashboard</h2>
-        </template>
-
-        <div class="py-12">
+        <div class="pb-12">
             <div class="px-6">
                 <!-- KPI Cards -->
                 <div class="grid grid-cols-1 gap-4 mb-8 sm:grid-cols-2 lg:grid-cols-5">

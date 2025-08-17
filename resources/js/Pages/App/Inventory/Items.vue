@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Link } from '@inertiajs/vue3';
-import { ref, computed, onMounted, nextTick } from 'vue';
+import { ref, computed, onMounted, nextTick, reactive } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useForm } from '@inertiajs/vue3';
 import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
@@ -11,6 +11,16 @@ import { useToast } from 'primevue/usetoast';
 const { formatCurrency } = useCurrencyFormatter();
 const confirm = useConfirm();
 const toast = useToast();
+
+const tempStates = reactive({});
+const loading = ref(true);
+
+onMounted(() => {
+    loading.value = false;
+    props.items.forEach(item => {
+        tempStates[item.id] = item.available_on_pos;
+    });
+});
 
 const props = defineProps({
     items: {
@@ -44,7 +54,7 @@ const openStockMovementDialog = (item) => {
 };
 
 const submitStockMovement = () => {
-    stockMovementForm.post(route('inventory.updateStock', selectedItem.value.id), {
+    stockMovementForm.post(route('inventory.updatePOSAvailability', selectedItem.value.id), {
         preserveScroll: true,
         onSuccess: () => {
             console.log('Stock movement submitted successfully');
@@ -65,59 +75,64 @@ const filters = ref({
     sku: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
 
-const loading = ref(true);
 
-onMounted(() => {
-    loading.value = false;
-});
 
 const getSeverity = (stock, threshold) => {
     return stock > threshold ? 'success' : 'danger';
 };
 
-const updatePOSAvailability = (item) => {
-    const newValue = !item.available_on_pos;
-    const action = newValue ? 'show' : 'hide';
+const confirmPOSAvailabilityChange = (item) => {
+    const newValue = !tempStates[item.id];
+    const action = !newValue ? 'show' : 'hide';
+
     confirm.require({
         message: `Are you sure you want to ${action} this item on POS?`,
         header: 'Confirm Action',
         icon: 'pi pi-exclamation-triangle',
         accept: () => {
-            useForm({
-                available_on_pos: newValue
-            }).put(route('inventory.updatePOSAvailability', item.id), {
-                preserveState: true,
-                preserveScroll: true,
-                onSuccess: () => {
-                    console.log('POS availability updated successfully');
-                    // Update the item's value and trigger a re-render
-                    item.available_on_pos = newValue;
-                    nextTick(() => {
-                        // Force a re-render of the component
-                        props.items.splice(props.items.indexOf(item), 1, {...item});
-                    });
-                    // Show success toast
-                    toast.add({
-                        severity: 'success',
-                        summary: 'POS Availability Updated',
-                        detail: `"${item.name}" is now ${newValue ? 'visible' : 'hidden'} on POS`,
-                        life: 5000
-                    });
-                },
-                onError: (errors) => {
-                    console.error('Error updating POS availability:', errors);
-                    // Show error toast
-                    toast.add({
-                        severity: 'error',
-                        summary: 'Update Failed',
-                        detail: 'Failed to update POS availability',
-                        life: 3000
-                    });
-                }
-            });
+            updatePOSAvailability(item, newValue);
         },
         reject: () => {
-            // Do nothing, the switch will remain in its original state
+            tempStates[item.id] = item.available_on_pos;
+        },
+        onHide: () => {
+            tempStates[item.id] = item.available_on_pos;
+        }
+    });
+};
+
+const updatePOSAvailability = (item, newValue) => {
+    item.isUpdating = true;
+
+    useForm({
+        available_on_pos: newValue
+    }).put(route('inventory.updatePOSAvailability', item.id), {
+        preserveState: true,
+        preserveScroll: true,
+        onSuccess: () => {
+            console.log('POS availability updated successfully');
+            item.available_on_pos = newValue;
+            tempStates[item.id] = newValue;
+            item.isUpdating = false;
+
+            toast.add({
+                severity: 'success',
+                summary: 'POS Availability Updated',
+                detail: `"${item.name}" is now ${newValue ? 'visible' : 'hidden'} on POS`,
+                life: 5000
+            });
+        },
+        onError: (errors) => {
+            console.error('Error updating POS availability:', errors);
+            item.isUpdating = false;
+            tempStates[item.id] = item.available_on_pos; // Revert temp state on error
+
+            toast.add({
+                severity: 'error',
+                summary: 'Update Failed',
+                detail: 'Failed to update POS availability',
+                life: 3000
+            });
         }
     });
 };
@@ -135,13 +150,47 @@ const deleteItem = (item) => {
 
 <template>
     <AuthenticatedLayout>
+        <template #summary>
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold text-gray-900">Inventory Management</h1>
+                <p class="mt-2 text-sm text-gray-600">Manage your inventory items, track stock levels, and control POS availability.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-3 sm:p-4">
+                        <dt class="text-xs font-medium text-gray-500 truncate">
+                            Total Items
+                        </dt>
+                        <dd class="mt-1 text-2xl font-semibold text-gray-900">
+                            {{ items.length }}
+                        </dd>
+                    </div>
+                </div>
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-3 sm:p-4">
+                        <dt class="text-xs font-medium text-gray-500 truncate">
+                            Total Stock
+                        </dt>
+                        <dd class="mt-1 text-2xl font-semibold text-gray-900">
+                            {{ calculateTotalstock }}
+                        </dd>
+                    </div>
+                </div>
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-3 sm:p-4">
+                        <dt class="text-xs font-medium text-gray-500 truncate">
+                            Total Inventory Value
+                        </dt>
+                        <dd class="mt-1 text-2xl font-semibold text-gray-900">
+                            {{ formatCurrency(calculateTotalValue) }}
+                        </dd>
+                    </div>
+                </div>
+            </div>
+        </template>
         <ConfirmDialog />
         <Toast />
-        <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Inventory Items</h2>
-        </template>
-
-        <div class="py-12">
+        <div class="pb-12">
             <div class="px-6">
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 bg-white border-b border-gray-200">
@@ -180,7 +229,7 @@ const deleteItem = (item) => {
                                 </template>
                             </Column>
 
-                            <Column field="sku" header="SKU" sortable style="width: 20%;">
+                            <Column field="sku" header="SKU" sortable style="width: 18%;">
                                 <template #body="{ data }">
                                     {{ data.sku }}
                                 </template>
@@ -189,7 +238,7 @@ const deleteItem = (item) => {
                                 </template>
                             </Column>
 
-                            <Column field="category.name" header="Category" sortable style="width: 20%;">
+                            <Column field="category.name" header="Category" sortable style="width: 17%;">
                                 <template #body="{ data }">
                                     {{ data.category.name }}
                                 </template>
@@ -218,7 +267,7 @@ const deleteItem = (item) => {
                                 </template>
                             </Column>
 
-                            <Column field="available_on_pos" sortable style="width: 5%;">
+                            <Column field="available_on_pos" sortable style="width: 10%;">
                                 <template #header>
                                     <div class="flex items-center">
                                         <i class="pi pi-info-circle text-sm text-gray-500"
@@ -228,9 +277,13 @@ const deleteItem = (item) => {
                                     </div>
                                 </template>
                                 <template #body="{ data }">
-                                    <InputSwitch
-                                        :modelValue="data.available_on_pos"
-                                        @click.prevent="updatePOSAvailability(data)"
+                                    <ToggleButton
+                                        v-model="tempStates[data.id]"
+                                        @click.prevent="confirmPOSAvailabilityChange(data)"
+                                        onLabel="Shown" offLabel="Hidden"
+                                        onIcon="pi pi-check"
+                                        offIcon="pi pi-times"
+                                        :disabled="data.isUpdating"
                                     />
                                 </template>
                             </Column>

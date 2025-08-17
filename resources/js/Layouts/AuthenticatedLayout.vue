@@ -32,9 +32,9 @@
         <!-- Main Content -->
         <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Top Navigation -->
-            <header class="bg-white shadow h-20">
-                <div class="py-4 px-4 sm:px-6 lg:px-8">
-                    <div class="flex justify-between items-center">
+            <header class="bg-white bg-opacity-90 backdrop-filter backdrop-blur-sm h-20 border-b border-gray-200 shadow-sm sticky top-0 z-10">
+                <div class="h-full px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between items-center h-full">
                         <div class="flex-1 flex items-center">
                             <IconField class="w-full max-w-3xl mr-4">
                                 <InputIcon class="pi pi-search" />
@@ -70,7 +70,7 @@
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
                 <!-- Summary section -->
                 <div class="py-6 bg-gray-100 border-b border-gray-200">
-                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="mx-auto px-12 py-8">
                         <slot name="summary"></slot>
                     </div>
                 </div>
@@ -135,7 +135,7 @@ const menuItems = ref([
         icon: 'pi pi-truck',
         submenu: [
             { label: 'List All', route: 'suppliers.index' },
-            // { label: 'Add New', route: 'contacts.suppliers.create' },
+            { label: 'Add New', route: 'suppliers.create' },
         ]
     },
     // Uncomment and add routes as needed

@@ -10,16 +10,22 @@ class SuppliersController extends Controller
 {
     public function index(Request $request)
     {
-        $perPage = $request->input('rows', 10);
-        $sortField = $request->input('sortField', 'created_at');
-        $sortOrder = $request->input('sortOrder', 'desc');
-        $page = $request->input('page', 1);
+//        $perPage = $request->input('rows', 10);
+//        $sortField = $request->input('sortField', 'created_at');
+//        $sortOrder = $request->input('sortOrder', 'desc');
+//        $page = $request->input('page', 1);
+//
+//        $suppliers = Supplier::query()
+//            ->when($sortField, function ($query, $sortField) use ($sortOrder) {
+//                $query->orderBy($sortField, $sortOrder === '1' ? 'asc' : 'desc');
+//            })
+//            ->paginate($perPage, ['*'], 'page', $page);
+//
+//        return Inertia::render('App/Suppliers/Index', [
+//            'suppliers' => $suppliers
+//        ]);
 
-        $suppliers = Supplier::query()
-            ->when($sortField, function ($query, $sortField) use ($sortOrder) {
-                $query->orderBy($sortField, $sortOrder === '1' ? 'asc' : 'desc');
-            })
-            ->paginate($perPage, ['*'], 'page', $page);
+        $suppliers = Supplier::all();
 
         return Inertia::render('App/Suppliers/Index', [
             'suppliers' => $suppliers

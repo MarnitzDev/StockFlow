@@ -40,6 +40,7 @@ import Tag from 'primevue/tag';
 import InputSwitch from 'primevue/inputswitch';
 import ConfirmDialog from 'primevue/confirmdialog';
 import Toast from 'primevue/toast';
+import ToggleButton from 'primevue/togglebutton';
 import Tooltip from 'primevue/tooltip';
 
 import ConfirmationService from 'primevue/confirmationservice';
@@ -114,6 +115,7 @@ createInertiaApp({
         app.component('InputSwitch', InputSwitch);
         app.component('ConfirmDialog', ConfirmDialog);
         app.component('Toast', Toast);
+        app.component('ToggleButton', ToggleButton);
         app.directive('tooltip', Tooltip);
 
         return app.mount(el);
