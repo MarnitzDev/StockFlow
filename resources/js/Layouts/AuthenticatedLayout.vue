@@ -109,7 +109,7 @@ const menuItems = ref([
         icon: 'pi pi-shopping-cart',
         submenu: [
             { label: 'Orders', route: 'sales.orders.index' },
-            { label: 'Create Order', route: 'sales.orders.create' },
+            // { label: 'Create Order', route: 'sales.orders.create' },
             // Add more sales-related submenu items as needed
         ]
     },
@@ -126,7 +126,7 @@ const menuItems = ref([
         label: 'Customers',
         icon: 'pi pi-users',
         submenu: [
-            // { label: 'List All', route: 'customers.index' },
+            { label: 'List All', route: 'customers.index' },
             // { label: 'Add New', route: 'customers.create' },
         ]
     },

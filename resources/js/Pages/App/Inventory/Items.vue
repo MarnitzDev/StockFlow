@@ -247,7 +247,7 @@ const deleteItem = (item) => {
                                 </template>
                             </Column>
 
-                            <Column field="stock" dataType="numeric" sortable style="width: 6%;">
+                            <Column field="stock" dataType="numeric" sortable style="width: 5%;">
                                 <template #header>
                                     <div class="flex items-center">
                                         <i class="pi pi-info-circle text-sm text-gray-500"
@@ -267,7 +267,7 @@ const deleteItem = (item) => {
                                 </template>
                             </Column>
 
-                            <Column field="available_on_pos" sortable style="width: 10%;">
+                            <Column field="available_on_pos" sortable style="width: 11%;">
                                 <template #header>
                                     <div class="flex items-center">
                                         <i class="pi pi-info-circle text-sm text-gray-500"
@@ -280,8 +280,8 @@ const deleteItem = (item) => {
                                     <ToggleButton
                                         v-model="tempStates[data.id]"
                                         @click.prevent="confirmPOSAvailabilityChange(data)"
-                                        onLabel="On"
-                                        offLabel="Off"
+                                        onLabel="Active"
+                                        offLabel="Disabled"
                                         onIcon="pi pi-check"
                                         offIcon="pi pi-times"
                                         :disabled="data.isUpdating"

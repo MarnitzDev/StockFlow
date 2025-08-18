@@ -58,6 +58,44 @@ const getChildrenStock = (category) => {
 
 <template>
     <AuthenticatedLayout>
+        <template #summary>
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold text-gray-900">Category Management</h1>
+                <p class="mt-2 text-sm text-gray-600">Manage your inventory categories, organize items, and track category-specific metrics.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-3 sm:p-4">
+                        <dt class="text-xs font-medium text-gray-500 truncate">
+                            Total Categories
+                        </dt>
+                        <dd class="mt-1 text-2xl font-semibold text-gray-900">
+                            {{ categories.length }}
+                        </dd>
+                    </div>
+                </div>
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-3 sm:p-4">
+                        <dt class="text-xs font-medium text-gray-500 truncate">
+                            Total Items in Categories
+                        </dt>
+                        <dd class="mt-1 text-2xl font-semibold text-gray-900">
+                            {{ calculateTotalItems }}
+                        </dd>
+                    </div>
+                </div>
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-3 sm:p-4">
+                        <dt class="text-xs font-medium text-gray-500 truncate">
+                            Total Stock in Categories
+                        </dt>
+                        <dd class="mt-1 text-2xl font-semibold text-gray-900">
+                            {{ calculateTotalStock }}
+                        </dd>
+                    </div>
+                </div>
+            </div>
+        </template>
         <div class="pb-12">
             <div class="px-6">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
