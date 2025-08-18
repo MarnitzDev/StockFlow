@@ -116,43 +116,51 @@ const checkout = () => {
 
     <POSLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Point of Sale</h2>
+            <h1 class="text-3xl font-bold text-gray-900">
+                Point of Sale
+            </h1>
+            <p class="mt-2 text-sm text-gray-700">
+                Manage your sales and transactions efficiently.
+            </p>
         </template>
 
         <div class="py-12">
-            <div class="px-6">
+            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 <div class="surface-ground">
                     <div class="grid grid-cols-12 gap-4">
                         <!-- Product Grid -->
                         <div class="col-span-12 lg:col-span-8">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div v-for="product in availableProducts" :key="product.id" class="surface-card bg-white shadow-lg border-round p-4 flex flex-column">
-                                    <div class="relative mb-3 w-3/4">
-                                        <img :src="product.image || '/images/placeholder-item.svg'"
-                                             :alt="product.name"
-                                             class="w-full h-40 object-cover border-round"
-                                             @error="$event.target.src = '/images/placeholder-item.svg'"
-                                        />
-                                        <Tag :value="product.category" severity="info" class="absolute top-0 left-0 m-2" />
-                                    </div>
-                                    <div class="ml-4">
-                                        <span class="text-lg font-medium mb-2 line-clamp-1">{{ product.name }}</span>
-                                        <span class="text-sm text-500 mb-3 flex-grow-1 line-clamp-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span>
-                                        <div class="flex items-center justify-between mb-2">
-                                            <span class="text-xl font-semibold">{{ formatCurrency(product.price) }}</span>
-                                            <span class="text-sm text-gray-600">Available: {{ getRemainingStock(product) }}</span>
+                            <div class="grid grid-cols-1 gap-4">
+                                <div v-for="product in availableProducts" :key="product.id" class="surface-card bg-white shadow-lg border-round p-4">
+                                    <div class="flex items-start">
+                                        <div class="w-28 h-28 flex-shrink-0 rounded overflow-hidden">
+                                            <img :src="product.image || '/images/placeholder-item.svg'"
+                                                 :alt="product.name"
+                                                 class="w-full h-full object-cover"
+                                                 @error="$event.target.src = '/images/placeholder-item.svg'"
+                                            />
                                         </div>
-                                        <div class="flex items-center justify-between">
-                                            <Button @click="addToCart(product)"
-                                                    label="Add to Cart"
-                                                    icon="pi pi-plus"
-                                                    size="small"
-                                                    :disabled="getRemainingStock(product) === 0">
-                                            </Button>
-                                            <Tag v-if="isInCart(product)"
-                                                 :value="`In Cart (${getCartQuantity(product)})`"
-                                                 severity="success"
-                                                 class="ml-2" />
+                                        <div class="ml-4 flex-grow">
+                                            <div class="flex justify-between items-start">
+                                                <span class="text-lg font-medium line-clamp-1">{{ product.name }}</span>
+                                                <Tag :value="product.category" severity="info" class="text-xs" />
+                                            </div>
+                                            <div class="flex items-center justify-between mt-2">
+                                                <span class="text-xl font-semibold">{{ formatCurrency(product.price) }}</span>
+                                                <span class="text-sm text-gray-600">Available: {{ getRemainingStock(product) }}</span>
+                                            </div>
+                                            <div class="flex items-center justify-between mt-3">
+                                                <Button @click="addToCart(product)"
+                                                        label="Add to Cart"
+                                                        icon="pi pi-plus"
+                                                        size="small"
+                                                        :disabled="getRemainingStock(product) === 0">
+                                                </Button>
+                                                <Tag v-if="isInCart(product)"
+                                                     :value="`In Cart (${getCartQuantity(product)})`"
+                                                     severity="success"
+                                                     class="ml-2" />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -161,59 +169,58 @@ const checkout = () => {
 
                         <!-- Cart -->
                         <div class="col-span-12 lg:col-span-4">
-                            <div class="border p-4 rounded bg-white shadow-lg sticky top-4">
-                                <h2 class="text-xl font-bold mb-4">Order Summary</h2>
-                                <div class="mb-4">
-                                    <div v-for="item in cart" :key="item.id" class="flex justify-between items-center py-2 border-b">
-                                        <div class="flex items-center">
-                                            <img :src="item.image || '/images/placeholder-item.svg'"
-                                                 :alt="item.name"
-                                                 class="w-12 h-12 object-cover rounded mr-3" />
-                                            <div>
-                                                <span class="font-medium">{{ item.name }}</span>
-                                                <div class="text-sm text-gray-500 flex items-center mt-1">
-                                                    <span class="mr-2">Quantity:</span>
-                                                    <InputNumber v-model="item.quantity"
-                                                                 :min="1"
-                                                                 :max="getRemainingStock(item) + item.quantity"
-                                                                 @input="updateCartItemQuantity(item, $event)"
-                                                                 showButtons
-                                                                 size="small"
-                                                                 class="w-20 mr-2"
-                                                                 :inputStyle="{ width: '2rem' }" />
-                                                    <Button @click="removeFromCart(item)"
-                                                            icon="pi pi-trash"
-                                                            severity="danger"
-                                                            variant="outlined" />
-                                                </div>
+                            <div class="border rounded bg-white shadow-lg sticky top-20 flex flex-col h-[calc(100vh-6rem)]">
+                                <h2 class="text-xl font-bold p-4 border-b">Order Summary</h2>
+                                <div class="overflow-y-auto flex-grow">
+                                    <div v-for="item in cart" :key="item.id" class="flex justify-between items-start py-3 px-4 border-b">
+                                        <div class="flex-grow pr-4">
+                                            <span class="font-medium text-sm block mb-1">{{ item.name }}</span>
+                                            <div class="text-sm text-gray-500 flex items-center mt-2">
+                                                <span class="mr-2">Quantity:</span>
+                                                <InputNumber v-model="item.quantity"
+                                                             :min="1"
+                                                             :max="getRemainingStock(item) + item.quantity"
+                                                             @input="updateCartItemQuantity(item, $event)"
+                                                             showButtons
+                                                             size="small"
+                                                             class="w-20"
+                                                             :inputStyle="{ width: '2rem' }" />
+                                                <Button @click="removeFromCart(item)"
+                                                        icon="pi pi-trash"
+                                                        severity="danger"
+                                                        text
+                                                        size="small"
+                                                        class="ml-2" />
                                             </div>
                                         </div>
-                                        <div class="text-right">
+                                        <div class="w-32 flex flex-col items-end">
                                             <div class="font-medium">{{ formatCurrency(item.price * item.quantity) }}</div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="mb-4">
-                                    <div class="flex justify-between py-2">
-                                        <span class="font-medium">Subtotal</span>
-                                        <span class="font-medium">{{ formatCurrency(cartTotal) }}</span>
+                                <div class="border-t p-4">
+                                    <div class="mb-4">
+                                        <div class="flex justify-between py-2">
+                                            <span class="font-medium">Subtotal</span>
+                                            <span class="font-medium">{{ formatCurrency(cartTotal) }}</span>
+                                        </div>
+                                        <div class="flex justify-between py-2">
+                                            <span class="font-medium">Shipping</span>
+                                            <span class="font-medium">Free</span>
+                                        </div>
+                                        <div class="flex justify-between py-2 border-t border-b">
+                                            <span class="font-bold">Total</span>
+                                            <span class="font-bold">{{ formatCurrency(cartTotal) }}</span>
+                                        </div>
                                     </div>
-                                    <div class="flex justify-between py-2">
-                                        <span class="font-medium">Shipping</span>
-                                        <span class="font-medium">Free</span>
-                                    </div>
-                                    <div class="flex justify-between py-2 border-t border-b">
-                                        <span class="font-bold">Total</span>
-                                        <span class="font-bold">{{ formatCurrency(cartTotal) }}</span>
-                                    </div>
+                                    <Button
+                                        @click="checkout"
+                                        label="Proceed to Checkout"
+                                        icon="pi pi-shopping-cart"
+                                        class="w-full"
+                                        :disabled="isCartEmpty"
+                                    />
                                 </div>
-                                <Button
-                                    @click="checkout"
-                                    label="Proceed to Checkout"
-                                    icon="pi pi-shopping-cart"
-                                    class="w-full"
-                                    :disabled="isCartEmpty"
-                                />
                             </div>
                         </div>
                     </div>
