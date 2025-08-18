@@ -22,6 +22,10 @@ const form = useForm({
     total: 0,
 });
 
+const loremIpsumText = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.`;
+
 const isCartEmpty = computed(() => cart.value.length === 0);
 
 const cartTotal = computed(() => {
@@ -124,7 +128,7 @@ const checkout = () => {
             </p>
         </template>
 
-        <div class="py-12">
+        <div class="pb-12">
             <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 <div class="surface-ground">
                     <div class="grid grid-cols-12 gap-4">
@@ -143,23 +147,36 @@ const checkout = () => {
                                         <div class="ml-4 flex-grow">
                                             <div class="flex justify-between items-start">
                                                 <span class="text-lg font-medium line-clamp-1">{{ product.name }}</span>
-                                                <Tag :value="product.category" severity="info" class="text-xs" />
+                                                <Rating :modelValue="product.rating" :readonly="true" :cancel="false" />
+                                            </div>
+                                            <div class="max-w-md">
+                                                <p class="text-sm text-gray-600 mt-2 line-clamp-3">
+                                                    {{ product.description || loremIpsumText }}
+                                                </p>
                                             </div>
                                             <div class="flex items-center justify-between mt-2">
                                                 <span class="text-xl font-semibold">{{ formatCurrency(product.price) }}</span>
-                                                <span class="text-sm text-gray-600">Available: {{ getRemainingStock(product) }}</span>
                                             </div>
                                             <div class="flex items-center justify-between mt-3">
-                                                <Button @click="addToCart(product)"
-                                                        label="Add to Cart"
-                                                        icon="pi pi-plus"
-                                                        size="small"
-                                                        :disabled="getRemainingStock(product) === 0">
-                                                </Button>
-                                                <Tag v-if="isInCart(product)"
-                                                     :value="`In Cart (${getCartQuantity(product)})`"
-                                                     severity="success"
-                                                     class="ml-2" />
+                                                <div class="flex items-center">
+                                                    <Button @click="addToCart(product)"
+                                                            label="Add to Cart"
+                                                            icon="pi pi-plus"
+                                                            size="small"
+                                                            :disabled="getRemainingStock(product) === 0">
+                                                    </Button>
+                                                    <Tag :value="isInCart(product) ? `In Cart (${getCartQuantity(product)}) | Available: ${getRemainingStock(product)}` : `Available: ${getRemainingStock(product)}`"
+                                                         :severity="isInCart(product) ? 'info' : 'secondary'"
+                                                         class="ml-2 text-xs" />
+                                                </div>
+                                                <div class="flex flex-col items-end">
+                                                    <Button @click="viewProduct(product)"
+                                                            label="View Product"
+                                                            icon="pi pi-eye"
+                                                            size="small"
+                                                            text>
+                                                    </Button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -169,7 +186,7 @@ const checkout = () => {
 
                         <!-- Cart -->
                         <div class="col-span-12 lg:col-span-4">
-                            <div class="border rounded bg-white shadow-lg sticky top-20 flex flex-col h-[calc(100vh-6rem)]">
+                            <div class="border rounded bg-white shadow-lg sticky top-20 flex flex-col h-[calc(100vh-15rem)]">
                                 <h2 class="text-xl font-bold p-4 border-b">Order Summary</h2>
                                 <div class="overflow-y-auto flex-grow">
                                     <div v-for="item in cart" :key="item.id" class="flex justify-between items-start py-3 px-4 border-b">
