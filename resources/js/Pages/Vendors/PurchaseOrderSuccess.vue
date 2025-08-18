@@ -1,7 +1,18 @@
 <template>
     <VendorLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Purchase Order Success</h2>
+            <div class="flex justify-between items-center">
+                <Breadcrumb :model="breadcrumbItems" class="p-0">
+                    <template #item="{ item }">
+                        <span class="flex items-center">
+                            <span v-if="item.icon" :class="[item.icon, 'mr-2 text-gray-500']"></span>
+                            <span :class="{'font-semibold text-gray-700': !item.icon, 'text-gray-500': item.icon}">
+                                {{ item.label }}
+                            </span>
+                        </span>
+                    </template>
+                </Breadcrumb>
+            </div>
         </template>
 
         <div class="py-12">
@@ -50,12 +61,18 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
 import VendorLayout from '@/Layouts/VendorLayout.vue';
+import {ref} from "vue";
 
 const props = defineProps({
     message: String,
     purchaseOrder: Object,
     vendorId: Number,
 });
+
+const breadcrumbItems = ref([
+    { icon: 'pi pi-truck', label: 'Vendor' },
+    { label: 'Purchase Order Success' }
+]);
 
 const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR' }).format(amount);

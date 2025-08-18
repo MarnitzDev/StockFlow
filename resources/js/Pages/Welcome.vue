@@ -2,7 +2,7 @@
     <Head title="Welcome to StockFlow" />
     <div class="bg-gray-100 min-h-screen">
         <!-- Full-width header section -->
-        <div class="bg-gradient-to-br from-indigo-600 via-blue-700 to-purple-800 text-white">
+        <div class="bg-gradient-to-br from-indigo-500 via-blue-700 to-indigo-800 text-white">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                     <div>

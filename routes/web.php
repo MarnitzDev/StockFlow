@@ -26,10 +26,11 @@ Route::get('/', function () {
 // POS
 Route::prefix('pos')->name('pos.')->group(function () {
     Route::get('/', [POSController::class, 'index'])->name('index');
+    Route::get('/checkout', [POSController::class, 'checkoutPage'])->name('checkout.page');
     Route::post('/checkout', [POSController::class, 'checkout'])->name('checkout');
     Route::post('/confirm/{id}', [POSController::class, 'confirmOrder'])->name('confirm');
     Route::get('/history', [POSController::class, 'orderHistory'])->name('history');
-    Route::get('/order/{id}', [POSController::class, 'show'])->name('show');
+    Route::get('/order/{id}', [POSController::class, 'show'])->name('order.details');
 });
 
 // Inventory Management

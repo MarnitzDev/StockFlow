@@ -43,6 +43,11 @@ class POSController extends Controller
     }
 
 
+    public function checkoutPage()
+    {
+        return Inertia::render('POS/Index');
+    }
+
     public function checkout(Request $request)
     {
         $request->validate([
@@ -82,9 +87,8 @@ class POSController extends Controller
             ]);
         }
 
-        return Inertia::render('POS/OrderDetails', [
-            'order' => $salesOrder->load('items.inventory', 'customer'),
-        ]);
+        return redirect()->route('pos.order.details', ['id' => $salesOrder->id]);
+
     }
 
     public function confirmOrder(Request $request, $id)
@@ -119,7 +123,7 @@ class POSController extends Controller
 
             \DB::commit();
 
-            return Inertia::render('POS/OrderConfirmation', [
+            return Inertia::render('POS/OrderSuccess', [
                 'order' => $salesOrder->fresh()->load('items.inventory', 'customer'),
             ]);
         } catch (\Exception $e) {

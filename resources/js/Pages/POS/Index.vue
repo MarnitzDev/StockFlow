@@ -4,7 +4,6 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 import POSLayout from '@/Layouts/POSLayout.vue';
 import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
 import { useDialog } from 'primevue/usedialog';
-import Button from "primevue/button";
 
 const dialog = useDialog();
 const visible = ref(false);
@@ -138,8 +137,57 @@ const updateForm = () => {
 };
 
 const checkout = () => {
-    // Implement checkout logic here
-    console.log('Checkout', form);
+    form.post(route('pos.checkout'), {
+        preserveScroll: true,
+        preserveState: true,
+        onSuccess: (response) => {
+            // Clear the cart
+            cart.value = [];
+            availableProducts.value.forEach(product => {
+                product.stock = product.originalStock;
+            });
+            updateForm();
+
+            // Show success message
+            dialog.open({
+                message: 'Order placed successfully!',
+                header: 'Checkout Complete',
+                icon: 'pi pi-check-circle',
+                style: { width: '30vw' },
+                contentStyle: { "max-height": "300px", "overflow": "auto" },
+                position: 'top',
+                modal: true,
+                closeOnEscape: true,
+                draggable: false,
+                closable: true,
+                acceptLabel: 'View Order',
+                rejectLabel: 'Continue Shopping',
+                accept: () => {
+                    // Navigate to the order details page
+                    window.location.href = route('pos.show', response.order_id);
+                },
+                reject: () => {
+                    // Stay on the current page
+                }
+            });
+        },
+        onError: (errors) => {
+            // Show error message
+            dialog.open({
+                message: 'An error occurred while processing your order. Please try again.',
+                header: 'Checkout Error',
+                icon: 'pi pi-exclamation-triangle',
+                style: { width: '30vw' },
+                contentStyle: { "max-height": "300px", "overflow": "auto" },
+                position: 'top',
+                modal: true,
+                closeOnEscape: true,
+                draggable: false,
+                closable: true
+            });
+            console.error('Checkout errors:', errors);
+        }
+    });
 };
 
 // Pagination
@@ -181,7 +229,7 @@ const onRowsChange = (event) => {
                 <Button
                     icon="pi pi-question-circle"
                     iconPos="right"
-                    label="How to Use"
+                    label="Guide"
                     @click="showHelp"
                     class="p-button-text p-button-rounded"
                     aria-label="Help Guide"
@@ -319,7 +367,8 @@ const onRowsChange = (event) => {
                                         label="Proceed to Checkout"
                                         icon="pi pi-shopping-cart"
                                         class="w-full"
-                                        :disabled="isCartEmpty"
+                                        :disabled="isCartEmpty || form.processing"
+                                        :loading="form.processing"
                                         v-tooltip.bottom="isCartEmpty ? 'Your cart is empty' : ''"
                                     />
                                 </div>

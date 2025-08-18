@@ -23,7 +23,7 @@ defineProps({
 
 <style scoped>
 .feature-button {
-    background-color: #4f46e5 !important; /* indigo-600 */
+    background-color: #2563eb !important; /* blue-600 */
     color: white !important;
     font-weight: 600 !important;
     padding: 0.75rem 1.5rem !important;
@@ -35,7 +35,7 @@ defineProps({
 }
 
 .feature-button:hover {
-    background-color: #4338ca !important; /* indigo-700 for a slightly darker shade on hover */
+    background-color: #1d4ed8 !important; /* blue-700 */
     transform: translateY(-1px) scale(1.05) !important;
 }
 </style>

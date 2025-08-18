@@ -37,6 +37,11 @@ const props = defineProps<{
     calculatedTotals: Object,
 }>();
 
+const breadcrumbItems = ref([
+    { icon: 'pi pi-truck', label: 'Vendor' },
+    { label: 'Order Stock' }
+]);
+
 const activeStep = ref('1');
 const purchaseOrder = ref(null);
 const cart = ref<CartItem[]>([]);
@@ -183,13 +188,24 @@ onMounted(() => {
     <VendorLayout>
         <template #header>
             <div class="flex justify-between items-center">
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">Purchase Order</h2>
-                <span class="text-lg font-medium text-gray-600">Vendor: {{ vendor.name }}</span>
+                <Breadcrumb :model="breadcrumbItems" class="p-0">
+                    <template #item="{ item }">
+                        <span class="flex items-center">
+                            <span v-if="item.icon" :class="[item.icon, 'mr-2 text-gray-500']"></span>
+                            <span :class="{'font-semibold text-gray-700': !item.icon, 'text-gray-500': item.icon}">
+                                {{ item.label }}
+                            </span>
+                        </span>
+                    </template>
+                </Breadcrumb>
+                <span class="text-lg font-medium text-blue-600 bg-blue-100 px-3 py-1 rounded-full">
+                    Vendor: {{ vendor.name }}
+                </span>
             </div>
         </template>
 
-        <div class="py-12">
-            <div class="">
+        <div class="pb-12">
+            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 <div class="card">
                     <Stepper v-model:activeStep="activeStep" value="1" class="">
                         <StepList>
@@ -303,6 +319,7 @@ onMounted(() => {
                                                 label="Review Order"
                                                 icon="pi pi-arrow-right"
                                                 iconPos="right"
+                                                severity="success"
                                                 :disabled="!cartTotal"
                                             />
                                         </div>
@@ -367,6 +384,7 @@ onMounted(() => {
                                                 label="Proceed to Payment"
                                                 icon="pi pi-arrow-right"
                                                 iconPos="right"
+                                                severity="success"
                                             />
                                         </div>
                                 </div>
@@ -406,11 +424,12 @@ onMounted(() => {
                                     <div class="flex justify-between gap-4">
                                         <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="activateCallback('2')" />
                                         <Button
-                                            :label="form.processing ? 'Processing' : 'Complete Order'"
+                                            label="Complete Order"
                                             :icon="form.processing ? 'pi pi-spin pi-spinner' : 'pi pi-shopping-cart'"
                                             @click="finalizePayment"
                                             :disabled="!isPaymentValid || form.processing"
                                             :loading="form.processing"
+                                            severity="success"
                                         >
                                         </Button>
                                     </div>

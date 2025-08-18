@@ -47,6 +47,7 @@ import Divider from 'primevue/divider';
 import Select from 'primevue/select';
 import Breadcrumb from 'primevue/breadcrumb';
 import Paginator from 'primevue/paginator';
+import MegaMenu from 'primevue/megamenu';
 
 import Tooltip from 'primevue/tooltip';
 
@@ -131,11 +132,14 @@ createInertiaApp({
         app.component('Select', Select);
         app.component('Breadcrumb', Breadcrumb);
         app.component('Paginator', Paginator);
+        app.component('MegaMenu', MegaMenu);
         app.directive('tooltip', Tooltip);
 
         return app.mount(el);
     },
     progress: {
-        color: '#4B5563',
-    },
+        color: '#29d',
+        showSpinner: true,
+        includeCSS: false,
+    }
 });
