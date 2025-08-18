@@ -1,26 +1,37 @@
 <template>
     <div class="min-h-screen bg-gray-100">
         <nav class="bg-blue-700 border-b border-blue-600 sticky top-0 z-50">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="px-8">
                 <div class="flex justify-between h-16">
-                    <div class="flex">
+                    <div class="flex items-center">
                         <div class="shrink-0 flex items-center">
-                            <!-- You can add a logo here if needed -->
+                            <Link :href="route('home')" class="flex items-center">
+                                <span class="font-['Outfit'] text-white text-xl font-bold mr-2">StockFlow</span>
+                            </Link>
                         </div>
                         <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                            <NavLink :href="route('home')" :active="route().current('home')" class="text-white">
-                                Home
-                            </NavLink>
                             <NavLink :href="route('pos.index')" :active="route().current('pos.index')" class="text-white">
-                                POS
+                                Purchase Items
                             </NavLink>
                             <NavLink :href="route('pos.history')" :active="route().current('pos.history')" class="text-white">
-                                Order History
+                                Purchase History
                             </NavLink>
                         </div>
                     </div>
-                    <div class="hidden sm:flex sm:items-center sm:ml-6">
-                        <!-- Add any additional navigation items or user menu here -->
+                    <div class="flex items-center">
+                        <Select v-model="selectedSection" :options="sections" optionLabel="name"
+                                @change="changeSection">
+                            <template #value="slotProps">
+                                <div class="flex items-center">
+                                    <span>{{ slotProps.value.name }}</span>
+                                </div>
+                            </template>
+                            <template #option="slotProps">
+                                <div class="flex items-center">
+                                    <span>{{ slotProps.option.name }}</span>
+                                </div>
+                            </template>
+                        </Select>
                     </div>
                 </div>
             </div>
@@ -46,6 +57,24 @@
 
 <script setup>
 import NavLink from '@/Components/NavLink.vue';
+import { Link } from '@inertiajs/vue3';
+import { ref } from 'vue';
+
+const sections = ref([
+    { name: 'POS', route: 'pos.index' },
+    { name: 'Dashboard', route: 'dashboard' },
+    { name: 'Vendors', route: 'vendors.index' }
+]);
+
+const selectedSection = ref(sections.value[0]);
+
+const changeSection = () => {
+    navigateTo(route(selectedSection.value.route));
+};
+
+const navigateTo = (routePath) => {
+    window.location = routePath;
+};
 </script>
 
 <style scoped>

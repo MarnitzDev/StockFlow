@@ -38,15 +38,19 @@ import Chart from 'primevue/chart';
 import Card from 'primevue/card';
 import Tag from 'primevue/tag';
 import InputSwitch from 'primevue/inputswitch';
+import Dialog from 'primevue/dialog';
 import ConfirmDialog from 'primevue/confirmdialog';
 import Toast from 'primevue/toast';
 import ToggleButton from 'primevue/togglebutton';
 import Rating from 'primevue/rating';
 import Divider from 'primevue/divider';
 import Select from 'primevue/select';
+import Breadcrumb from 'primevue/breadcrumb';
+import Paginator from 'primevue/paginator';
 
 import Tooltip from 'primevue/tooltip';
 
+import DialogService from 'primevue/dialogservice';
 import ConfirmationService from 'primevue/confirmationservice';
 import ToastService from 'primevue/toastservice';
 
@@ -87,6 +91,7 @@ createInertiaApp({
                     preset: MyPreset
                 }
             })
+            .use(DialogService)
             .use(ConfirmationService)
             .use(ToastService);
 
@@ -117,12 +122,15 @@ createInertiaApp({
         app.component('Card', Card);
         app.component('Tag', Tag);
         app.component('InputSwitch', InputSwitch);
+        app.component('Dialog', Dialog);
         app.component('ConfirmDialog', ConfirmDialog);
         app.component('Toast', Toast);
         app.component('ToggleButton', ToggleButton);
         app.component('Rating', Rating);
         app.component('Divider', Divider);
         app.component('Select', Select);
+        app.component('Breadcrumb', Breadcrumb);
+        app.component('Paginator', Paginator);
         app.directive('tooltip', Tooltip);
 
         return app.mount(el);
