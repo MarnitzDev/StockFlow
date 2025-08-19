@@ -72,7 +72,7 @@ onMounted(() => {
 <template>
     <Head title="Dashboard" />
 
-    <AuthenticatedLayout>
+    <AuthenticatedLayout :show-header="false">
         <div class="pb-12">
             <div class="px-6">
                 <!-- KPI Cards -->

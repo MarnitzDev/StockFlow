@@ -6,6 +6,7 @@ use App\Models\Inventory;
 use App\Models\PurchaseOrder;
 use App\Models\Vendor;
 use App\Models\VendorProduct;
+use App\Models\StockMovement;
 use App\Services\PurchaseOrderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -93,6 +94,11 @@ class VendorController extends Controller
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.price' => 'required|numeric|min:0',
             'total' => 'required|numeric|min:0',
+            'payment_method' => 'required|string',
+            'payment_amount' => 'required|numeric|min:0',
+            'reference_number' => 'required|string',
+            'payment_date' => 'required|date',
+            'payment_notes' => 'nullable|string',
         ]);
 
         DB::beginTransaction();
@@ -102,12 +108,17 @@ class VendorController extends Controller
                 $purchaseOrder = PurchaseOrder::findOrFail($validated['purchase_order_id']);
 
                 if ($purchaseOrder->vendor_id !== $vendor->id) {
-                    return response()->json(['error' => 'Invalid purchase order'], 403);
+                    throw new \Exception('Invalid purchase order');
                 }
 
                 $purchaseOrder->update([
                     'total_amount' => $validated['total'],
                     'status' => 'pending',
+                    'payment_method' => $validated['payment_method'],
+                    'payment_amount' => $validated['payment_amount'],
+                    'reference_number' => $validated['reference_number'],
+                    'payment_date' => $validated['payment_date'],
+                    'payment_notes' => $validated['payment_notes'],
                 ]);
             } else {
                 $purchaseOrder = PurchaseOrder::create([
@@ -116,6 +127,11 @@ class VendorController extends Controller
                     'total_amount' => $validated['total'],
                     'status' => 'pending',
                     'order_number' => 'PO-' . uniqid(),
+                    'payment_method' => $validated['payment_method'],
+                    'payment_amount' => $validated['payment_amount'],
+                    'reference_number' => $validated['reference_number'],
+                    'payment_date' => $validated['payment_date'],
+                    'payment_notes' => $validated['payment_notes'],
                 ]);
             }
 
@@ -138,24 +154,39 @@ class VendorController extends Controller
                         'description' => $vendorProduct->description,
                         'price' => $vendorProduct->price,
                         'category_id' => $vendorProduct->category_id,
+                        'stock' => 0, // Set initial stock if it's a new item
                     ]
                 );
 
-                $inventory->increment('stock', $item['quantity']);
+                StockMovement::recordMovement(
+                    $inventory->id,
+                    $item['quantity'],
+                    StockMovement::TYPE_IN,
+                    'Purchase Order',
+                    auth()->id(),
+                    $item['price'],
+                    "PO-{$purchaseOrder->id}"
+                );
             }
 
             DB::commit();
 
             return Inertia::render('Vendors/PurchaseOrderSuccess', [
+                'success' => true,
                 'message' => 'Purchase order finalized successfully',
                 'purchaseOrder' => $purchaseOrder->fresh()->load('items'),
                 'vendorId' => $vendor->id,
             ]);
+
         } catch (\Exception $e) {
             DB::rollBack();
             return Inertia::render('Vendors/PurchaseOrderCreate', [
+                'success' => false,
                 'error' => 'Failed to finalize purchase order: ' . $e->getMessage(),
-            ]);
+                'vendor' => $vendor,
+                'calculatedTotals' => $request->input('calculatedTotals', []),
+                'products' => $request->input('products', []),
+            ])->withViewData(['status' => 422]);
         }
     }
 

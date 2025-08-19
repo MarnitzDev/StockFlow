@@ -11,6 +11,7 @@ class StockMovement extends Model
 
     protected $fillable = [
         'inventory_id',
+        'quantity',
         'stock',
         'type',
         'reason',
@@ -20,9 +21,13 @@ class StockMovement extends Model
     ];
 
     protected $casts = [
-        'stock' => 'integer',
+        'quantity' => 'integer',
         'unit_price' => 'decimal:2',
+        'created_at' => 'datetime',
     ];
+
+    const TYPE_IN = 'in';
+    const TYPE_OUT = 'out';
 
     public function inventory()
     {
@@ -32,5 +37,27 @@ class StockMovement extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public static function recordMovement($inventoryId, $quantity, $type, $reason, $userId, $unitPrice, $reference = null)
+    {
+        $inventory = Inventory::findOrFail($inventoryId);
+
+        $newStock = $type === 'in' ? $inventory->stock + $quantity : $inventory->stock - $quantity;
+
+        $movement = self::create([
+            'inventory_id' => $inventoryId,
+            'quantity' => $quantity,
+            'stock' => $newStock,
+            'type' => $type,
+            'reason' => $reason,
+            'user_id' => $userId,
+            'unit_price' => $unitPrice,
+            'reference' => $reference,
+        ]);
+
+        $inventory->update(['stock' => $newStock]);
+
+        return $movement;
     }
 }

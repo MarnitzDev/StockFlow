@@ -31,7 +31,7 @@ import { computed } from 'vue';
 const navLinks = computed(() => [
     { href: route('home'), label: 'Home', active: route().current('home') },
     { href: route('pos.index'), label: 'Purchase Items', active: route().current('pos.index') },
-    { href: route('pos.history'), label: 'Purchase History', active: route().current('pos.history') },
+    // { href: route('pos.history'), label: 'Purchase History', active: route().current('pos.history') },
 ]);
 
 const iconLinks = [

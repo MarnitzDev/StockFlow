@@ -77,11 +77,18 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
-    resolve: (name) =>
-        resolvePageComponent(
-            `./Pages/${name}.vue`,
-            import.meta.glob('./Pages/**/*.vue'),
-        ),
+    resolve: name => {
+        const pages = import.meta.glob('./Pages/**/*.vue', { eager: true })
+        const page = pages[`./Pages/${name}.vue`]
+
+        // Add meta information for breadcrumbs
+        page.default.meta = {
+            ...page.default.meta,
+            breadcrumb: name.split('/').pop()
+        }
+
+        return page
+    },
     setup({ el, App, props, plugin }) {
         const app = createApp({ render: () => h(App, props) });
 

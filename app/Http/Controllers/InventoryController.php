@@ -25,6 +25,14 @@ class InventoryController extends Controller
         return Inertia::render('App/Inventory/Create');
     }
 
+    public function show($id)
+    {
+        $item = Inventory::with(['category', 'vendor'])->findOrFail($id);
+        return Inertia::render('App/Inventory/Show', [
+            'item' => $item
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -98,29 +106,25 @@ class InventoryController extends Controller
         \Log::info('Inventory Item:', $inventory->toArray());
 
         $validated = $request->validate([
-            'stock' => 'required|integer',
+            'quantity' => 'required|integer',
             'type' => 'required|in:in,out',
-            'reason' => 'nullable|string|max:255',
+            'reason' => 'required|string|max:255',
+            'unit_price' => 'required|numeric|min:0',
         ]);
 
         \Log::info('Validated Data:', $validated);
 
         DB::transaction(function () use ($inventory, $validated) {
-            $stockMovement = StockMovement::create([
-                'inventory_id' => $inventory->id,
-                'stock' => abs($validated['stock']),
-                'type' => $validated['type'],
-                'reason' => $validated['reason'] ?? 'Stock update',
-            ]);
+            $stockMovement = StockMovement::recordMovement(
+                $inventory->id,
+                $validated['quantity'],
+                $validated['type'],
+                $validated['reason'],
+                auth()->id(),
+                $validated['unit_price']
+            );
 
             \Log::info('Stock Movement Created:', $stockMovement->toArray());
-
-            if ($validated['type'] === 'in') {
-                $inventory->increment('stock', $validated['stock']);
-            } else {
-                $inventory->decrement('stock', $validated['stock']);
-            }
-
             \Log::info('Inventory Item After Update:', $inventory->fresh()->toArray());
         });
 
@@ -141,5 +145,16 @@ class InventoryController extends Controller
         ]);
 
         return back()->with('success', 'POS availability updated successfully');
+    }
+
+    public function stockMovements()
+    {
+        $stockMovements = StockMovement::with('inventory')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return Inertia::render('App/Inventory/StockMovements', [
+            'stockMovements' => $stockMovements
+        ]);
     }
 }

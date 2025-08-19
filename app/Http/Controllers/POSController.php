@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\Inventory;
 use App\Models\SalesOrder;
 use App\Models\Vendor;
+use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -113,6 +114,18 @@ class POSController extends Controller
                 if ($inventory->stock < $item->quantity) {
                     throw new \Exception("Insufficient stock for {$inventory->name}");
                 }
+
+                // Create stock movement
+                StockMovement::recordMovement(
+                    $inventory->id,
+                    $item->quantity,
+                    StockMovement::TYPE_OUT,
+                    'POS Sale',
+                    auth()->id(),
+                    $item->unit_price,
+                    "POS-{$salesOrder->id}"
+                );
+
                 $inventory->decrement('stock', $item->quantity);
             }
 

@@ -1,33 +1,28 @@
-<script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { ref } from 'vue';
-import { FilterMatchMode } from '@primevue/core/api';
-import { Link } from '@inertiajs/vue3';
-
-const props = defineProps({
-    salesOrders: Array,
-});
-
-const filters = ref({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-});
-
-const formatDate = (value) => {
-    if (value) {
-        return new Date(value).toLocaleDateString('en-GB', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric'
-        });
-    }
-    return '';
-};
-</script>
-
 <template>
     <AuthenticatedLayout>
         <div class="pb-12">
             <div class="px-6">
+                <!-- Overview Section -->
+                <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold text-gray-700">Total Orders</h3>
+                            <p class="text-3xl font-bold text-indigo-600">{{ totalOrders }}</p>
+                        </div>
+                    </div>
+                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold text-gray-700">Total Revenue</h3>
+                            <p class="text-3xl font-bold text-green-600">{{ formatCurrency(totalRevenue) }}</p>
+                        </div>
+                    </div>
+                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold text-gray-700">Average Order Value</h3>
+                            <p class="text-3xl font-bold text-blue-600">{{ formatCurrency(averageOrderValue) }}</p>
+                        </div>
+                    </div>
+                </div>
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 bg-white border-b border-gray-200">
                         <DataTable
@@ -82,3 +77,39 @@ const formatDate = (value) => {
         </div>
     </AuthenticatedLayout>
 </template>
+
+<script setup>
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { ref, computed } from 'vue';
+import { FilterMatchMode } from '@primevue/core/api';
+import { Link } from '@inertiajs/vue3';
+import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
+import BreadcrumbNav from '@/Components/BreadcrumbNav.vue';
+
+const { formatCurrency } = useCurrencyFormatter();
+
+
+const props = defineProps({
+    salesOrders: Array,
+});
+
+const filters = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+});
+
+const formatDate = (value) => {
+    if (value) {
+        return new Date(value).toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        });
+    }
+    return '';
+};
+
+// Computed properties for overview data
+const totalOrders = computed(() => props.salesOrders.length);
+const totalRevenue = computed(() => props.salesOrders.reduce((sum, order) => sum + parseFloat(order.total_amount), 0));
+const averageOrderValue = computed(() => totalOrders.value ? totalRevenue.value / totalOrders.value : 0);
+</script>

@@ -1,7 +1,72 @@
+<template>
+    <AuthenticatedLayout>
+        <div class="pb-12">
+            <div class="px-6">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6 bg-white border-b border-gray-200">
+                        <DataTable
+                            :value="orders.data"
+                            :lazy="true"
+                            :paginator="true"
+                            :rows="10"
+                            :totalRecords="totalRecords"
+                            :loading="loading"
+                            :filters="filters"
+                            :rowsPerPageOptions="[5, 10, 20, 50]"
+                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                            responsiveLayout="scroll"
+                            @page="onPage($event)"
+                            @sort="onSort($event)"
+                            @filter="onFilter($event)"
+                        >
+                            <Column field="order_number" header="Order Number" sortable>
+                                <template #filter="{ filterModel, filterCallback }">
+                                    <InputText v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" placeholder="Search by order number" />
+                                </template>
+                            </Column>
+                            <Column field="vendor.name" header="Supplier" sortable>
+                                <template #filter="{ filterModel, filterCallback }">
+                                    <InputText v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" placeholder="Search by supplier" />
+                                </template>
+                            </Column>
+                            <Column field="order_date" header="Date" sortable :body="(data) => formatDate(data.order_date)">
+                                <template #filter="{ filterModel, filterCallback }">
+                                    <InputText v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" placeholder="Search by date" />
+                                </template>
+                            </Column>
+                            <Column field="total_amount" header="Total Amount" sortable :body="(data) => formatCurrency(data.total_amount)">
+                                <template #filter="{ filterModel, filterCallback }">
+                                    <InputText v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" placeholder="Search by amount" />
+                                </template>
+                            </Column>
+                            <Column field="status" header="Status" sortable>
+                                <template #body="{ data }">
+                                    <span :class="'status-badge status-' + data.status.toLowerCase()">{{ data.status }}</span>
+                                </template>
+                                <template #filter="{ filterModel, filterCallback }">
+                                    <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="statusOptions" optionLabel="label" optionValue="value" placeholder="Select a Status" class="p-column-filter" />
+                                </template>
+                            </Column>
+                            <Column header="Actions">
+                                <template #body="{ data }">
+                                    <Button icon="pi pi-eye" class="p-button-rounded p-button-text" @click="viewOrder(data)" />
+                                    <Button icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="editOrder(data)" />
+                                </template>
+                            </Column>
+                        </DataTable>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </AuthenticatedLayout>
+</template>
+
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import BreadcrumbNav from '@/Components/BreadcrumbNav.vue';
 import { PurchaseOrder } from '@/types';
 
 interface Props {
@@ -84,72 +149,6 @@ const editOrder = (data: PurchaseOrder) => {
 };
 </script>
 
-<template>
-    <Head title="Purchase Orders" />
-
-    <AuthenticatedLayout>
-        <div class="pb-12">
-            <div class="px-6">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 bg-white border-b border-gray-200">
-                        <DataTable
-                            :value="orders.data"
-                            :lazy="true"
-                            :paginator="true"
-                            :rows="10"
-                            :totalRecords="totalRecords"
-                            :loading="loading"
-                            :filters="filters"
-                            :rowsPerPageOptions="[5, 10, 20, 50]"
-                            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                            responsiveLayout="scroll"
-                            @page="onPage($event)"
-                            @sort="onSort($event)"
-                            @filter="onFilter($event)"
-                        >
-                            <Column field="order_number" header="Order Number" sortable>
-                                <template #filter="{ filterModel, filterCallback }">
-                                    <InputText v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" placeholder="Search by order number" />
-                                </template>
-                            </Column>
-                            <Column field="vendor.name" header="Supplier" sortable>
-                                <template #filter="{ filterModel, filterCallback }">
-                                    <InputText v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" placeholder="Search by supplier" />
-                                </template>
-                            </Column>
-                            <Column field="order_date" header="Date" sortable :body="(data) => formatDate(data.order_date)">
-                                <template #filter="{ filterModel, filterCallback }">
-                                    <InputText v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" placeholder="Search by date" />
-                                </template>
-                            </Column>
-                            <Column field="total_amount" header="Total Amount" sortable :body="(data) => formatCurrency(data.total_amount)">
-                                <template #filter="{ filterModel, filterCallback }">
-                                    <InputText v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" placeholder="Search by amount" />
-                                </template>
-                            </Column>
-                            <Column field="status" header="Status" sortable>
-                                <template #body="{ data }">
-                                    <span :class="'status-badge status-' + data.status.toLowerCase()">{{ data.status }}</span>
-                                </template>
-                                <template #filter="{ filterModel, filterCallback }">
-                                    <Dropdown v-model="filterModel.value" @change="filterCallback()" :options="statusOptions" optionLabel="label" optionValue="value" placeholder="Select a Status" class="p-column-filter" />
-                                </template>
-                            </Column>
-                            <Column header="Actions">
-                                <template #body="{ data }">
-                                    <Button icon="pi pi-eye" class="p-button-rounded p-button-text" @click="viewOrder(data)" />
-                                    <Button icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="editOrder(data)" />
-                                </template>
-                            </Column>
-                        </DataTable>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </AuthenticatedLayout>
-</template>
-
 <style scoped>
 .status-badge {
     border-radius: 2px;
@@ -172,3 +171,4 @@ const editOrder = (data: PurchaseOrder) => {
     color: #C63737;
 }
 </style>
+

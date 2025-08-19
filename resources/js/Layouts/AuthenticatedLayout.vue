@@ -8,7 +8,6 @@
                         <div class="shrink-0 flex items-center">
                             <div class="flex items-center">
                                 <span class="font-['Outfit'] text-white text-xl font-bold mr-1">StockFlow</span>
-                                <span class="bg-white text-blue-700 text-xs font-semibold px-2 py-1 rounded">Hub</span>
                             </div>
                         </div>
                         <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
@@ -29,7 +28,7 @@
         </header>
 
         <!-- Content area (below fixed header) -->
-        <div class="flex flex-grow pt-16"> <!-- Add padding-top to account for fixed header -->
+        <div class="flex flex-grow pt-16">
             <!-- Sidebar -->
             <div class="w-64 bg-slate-800 shadow-xl z-10 transition-all duration-300 ease-in-out flex-shrink-0 overflow-y-auto h-[calc(100vh-4rem)]">
                 <nav class="mt-5">
@@ -59,20 +58,14 @@
             <!-- Main Content -->
             <div class="flex-grow flex flex-col overflow-y-auto h-[calc(100vh-4rem)]">
                 <!-- Page Header -->
-                <div class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        <slot name="header">
-                            <!-- Default content if no header is provided -->
-                            <h1 class="text-3xl font-bold text-gray-900">
-                                Page Title
-                            </h1>
-                        </slot>
+                <div v-if="showHeader" class="bg-white shadow">
+                    <div class="py-4 px-10">
+                        <BreadcrumbNav />
                     </div>
                 </div>
-
                 <!-- Page Content -->
-                <main class="flex-grow bg-gray-100">
-                    <div class="py-6">
+                <main :class="['flex-grow bg-gray-100', { 'pt-6': !showHeader }]">
+                    <div class="py-12">
                         <div class="mx-6">
                             <slot />
                         </div>
@@ -85,8 +78,16 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import NavLink from '@/Components/NavLink.vue';
+import BreadcrumbNav from '@/Components/BreadcrumbNav.vue';
+
+const props = defineProps({
+    showHeader: {
+        type: Boolean,
+        default: true
+    }
+});
 
 const menuItems = ref([
     { label: 'Dashboard', icon: 'pi pi-home', route: 'dashboard' },
@@ -96,7 +97,7 @@ const menuItems = ref([
         submenu: [
             { label: 'Items', route: 'inventory.items' },
             { label: 'Categories', route: 'inventory.categories.index' },
-            { label: 'Stock Adjustments', route: 'inventory.stockAdjustments' },
+            { label: 'Stock Movements', route: 'inventory.stockMovements' },
         ]
     },
     {
@@ -125,19 +126,16 @@ const menuItems = ref([
     },
 ]);
 
-// const navLinks = computed(() => [
-//     { href: route('dashboard'), label: 'Dashboard', active: route().current('dashboard') },
-//     { href: route('inventory.items'), label: 'Inventory', active: route().current('inventory.*') },
-//     { href: route('sales.orders.index'), label: 'Sales', active: route().current('sales.*') },
-//     { href: route('purchases.orders'), label: 'Purchases', active: route().current('purchases.*') },
-// ]);
+const navLinks = computed(() => [
+    // Add your nav links here if needed
+]);
 
-// const iconLinks = [
-//     { href: route('pos.index'), icon: 'pi-shopping-cart', text: 'POS' },
-//     { href: route('suppliers.index'), icon: 'pi-truck', text: 'Suppliers' },
-// ];
+const iconLinks = [
+    // Add your icon links here if needed
+];
 
 const toggleSubmenu = (item) => {
     item.isOpen = !item.isOpen;
 };
+
 </script>

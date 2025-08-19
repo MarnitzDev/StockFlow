@@ -1,3 +1,82 @@
+<template>
+    <AuthenticatedLayout>
+        <div class="pb-12">
+            <div class="px-6">
+<!--                -->
+<!--                <div class="pb-6 grid grid-cols-1 md:grid-cols-3 gap-4">-->
+<!--                    <div class="bg-white overflow-hidden shadow rounded-lg">-->
+<!--                        <div class="px-4 py-3 sm:p-4">-->
+<!--                            <dt class="text-xs font-medium text-gray-500 truncate">-->
+<!--                                Total Categories-->
+<!--                            </dt>-->
+<!--                            <dd class="mt-1 text-2xl font-semibold text-gray-900">-->
+<!--                                {{ categories.length }}-->
+<!--                            </dd>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="bg-white overflow-hidden shadow rounded-lg">-->
+<!--                        <div class="px-4 py-3 sm:p-4">-->
+<!--                            <dt class="text-xs font-medium text-gray-500 truncate">-->
+<!--                                Total Items in Categories-->
+<!--                            </dt>-->
+<!--                            <dd class="mt-1 text-2xl font-semibold text-gray-900">-->
+<!--                                {{ calculateTotalItems }}-->
+<!--                            </dd>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="bg-white overflow-hidden shadow rounded-lg">-->
+<!--                        <div class="px-4 py-3 sm:p-4">-->
+<!--                            <dt class="text-xs font-medium text-gray-500 truncate">-->
+<!--                                Total Stock in Categories-->
+<!--                            </dt>-->
+<!--                            <dd class="mt-1 text-2xl font-semibold text-gray-900">-->
+<!--                                {{ calculateTotalStock }}-->
+<!--                            </dd>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-semibold">Inventory Categories</h3>
+                        <Link :href="route('inventory.categories.create')" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            Add New Category
+                        </Link>
+                    </div>
+                    <TreeTable :value="treeTableData" :expandedKeys="expandedKeys" @toggle="expandedKeys = $event">
+                        <Column field="name" header="Category Name" expander>
+                            <template #body="{ node }">
+                                {{ node.data.name }}
+                            </template>
+                        </Column>
+                        <Column field="slug" header="Slug">
+                            <template #body="{ node }">
+                                {{ node.data.slug }}
+                            </template>
+                        </Column>
+                        <Column field="totalItems" header="Total Items">
+                            <template #body="{ node }">
+                                {{ node.data.totalItems }}
+                            </template>
+                        </Column>
+                        <Column field="totalStock" header="Total Stock">
+                            <template #body="{ node }">
+                                {{ node.data.totalStock }}
+                            </template>
+                        </Column>
+                        <Column header="Actions">
+                            <template #body="{ node }">
+                                <Link :href="route('inventory.categories.edit', node.data.id)" class="text-indigo-600 hover:text-indigo-900 mr-2">Edit</Link>
+                                <!-- Add delete functionality here -->
+                            </template>
+                        </Column>
+                    </TreeTable>
+                </div>
+            </div>
+        </div>
+    </AuthenticatedLayout>
+</template>
+
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Link } from '@inertiajs/vue3';
@@ -55,86 +134,3 @@ const getChildrenStock = (category) => {
     return children.reduce((total, child) => total + getCategoryStock(child), 0);
 };
 </script>
-
-<template>
-    <AuthenticatedLayout>
-        <template #summary>
-            <div class="mb-6">
-                <h1 class="text-3xl font-bold text-gray-900">Category Management</h1>
-                <p class="mt-2 text-sm text-gray-600">Manage your inventory categories, organize items, and track category-specific metrics.</p>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="px-4 py-3 sm:p-4">
-                        <dt class="text-xs font-medium text-gray-500 truncate">
-                            Total Categories
-                        </dt>
-                        <dd class="mt-1 text-2xl font-semibold text-gray-900">
-                            {{ categories.length }}
-                        </dd>
-                    </div>
-                </div>
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="px-4 py-3 sm:p-4">
-                        <dt class="text-xs font-medium text-gray-500 truncate">
-                            Total Items in Categories
-                        </dt>
-                        <dd class="mt-1 text-2xl font-semibold text-gray-900">
-                            {{ calculateTotalItems }}
-                        </dd>
-                    </div>
-                </div>
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="px-4 py-3 sm:p-4">
-                        <dt class="text-xs font-medium text-gray-500 truncate">
-                            Total Stock in Categories
-                        </dt>
-                        <dd class="mt-1 text-2xl font-semibold text-gray-900">
-                            {{ calculateTotalStock }}
-                        </dd>
-                    </div>
-                </div>
-            </div>
-        </template>
-        <div class="pb-12">
-            <div class="px-6">
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-semibold">Inventory Categories</h3>
-                        <Link :href="route('inventory.categories.create')" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            Add New Category
-                        </Link>
-                    </div>
-                    <TreeTable :value="treeTableData" :expandedKeys="expandedKeys" @toggle="expandedKeys = $event">
-                        <Column field="name" header="Category Name" expander>
-                            <template #body="{ node }">
-                                {{ node.data.name }}
-                            </template>
-                        </Column>
-                        <Column field="slug" header="Slug">
-                            <template #body="{ node }">
-                                {{ node.data.slug }}
-                            </template>
-                        </Column>
-                        <Column field="totalItems" header="Total Items">
-                            <template #body="{ node }">
-                                {{ node.data.totalItems }}
-                            </template>
-                        </Column>
-                        <Column field="totalStock" header="Total Stock">
-                            <template #body="{ node }">
-                                {{ node.data.totalStock }}
-                            </template>
-                        </Column>
-                        <Column header="Actions">
-                            <template #body="{ node }">
-                                <Link :href="route('inventory.categories.edit', node.data.id)" class="text-indigo-600 hover:text-indigo-900 mr-2">Edit</Link>
-                                <!-- Add delete functionality here -->
-                            </template>
-                        </Column>
-                    </TreeTable>
-                </div>
-            </div>
-        </div>
-    </AuthenticatedLayout>
-</template>

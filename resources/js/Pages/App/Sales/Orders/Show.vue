@@ -1,12 +1,3 @@
-<script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Link } from '@inertiajs/vue3';
-
-const props = defineProps({
-    salesOrder: Object,
-});
-</script>
-
 <template>
     <AuthenticatedLayout>
         <div class="pb-12">
@@ -18,29 +9,29 @@ const props = defineProps({
                         <div class="mb-4">
                             <p><strong>Customer:</strong> {{ salesOrder.customer?.name || 'N/A' }}</p>
                             <p><strong>Status:</strong> {{ salesOrder.status || 'N/A' }}</p>
-                            <p><strong>Total Amount:</strong> ${{ salesOrder.total_amount || '0.00' }}</p>
+                            <p><strong>Total Amount:</strong> {{ formatCurrency(salesOrder.total_amount) }}</p>
                             <p><strong>Date:</strong> {{ salesOrder.created_at ? new Date(salesOrder.created_at).toLocaleDateString() : 'N/A' }}</p>
                         </div>
 
                         <h4 class="text-md font-semibold mb-2">Order Items</h4>
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead>
-                            <tr>
-                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
-                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Price</th>
-                                <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subtotal</th>
-                            </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                            <tr v-for="item in salesOrder.items" :key="item.id">
-                                <td class="px-6 py-4 whitespace-nowrap">{{ item.inventory?.name || 'N/A' }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">{{ item.quantity || '0' }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">${{ item.unit_price || '0.00' }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">${{ item.subtotal || '0.00' }}</td>
-                            </tr>
-                            </tbody>
-                        </table>
+                        <DataTable :value="salesOrder.items" class="p-datatable-sm" responsiveLayout="scroll">
+                            <Column field="inventory.name" header="Item">
+                                <template #body="slotProps">
+                                    {{ formatItemName(slotProps.data) }}
+                                </template>
+                            </Column>
+                            <Column field="quantity" header="Quantity"></Column>
+                            <Column field="unit_price" header="Unit Price">
+                                <template #body="slotProps">
+                                    {{ formatCurrency(slotProps.data.unit_price) }}
+                                </template>
+                            </Column>
+                            <Column field="subtotal" header="Subtotal">
+                                <template #body="slotProps">
+                                    {{ formatCurrency(slotProps.data.subtotal) }}
+                                </template>
+                            </Column>
+                        </DataTable>
 
                         <div class="mt-4">
                             <h4 class="text-md font-semibold mb-2">Notes</h4>
@@ -62,3 +53,20 @@ const props = defineProps({
         </div>
     </AuthenticatedLayout>
 </template>
+
+<script setup>
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { Link } from '@inertiajs/vue3';
+import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
+import { ref, computed} from "vue";
+
+const { formatCurrency } = useCurrencyFormatter();
+
+const props = defineProps({
+    salesOrder: Object,
+});
+
+const formatItemName = (item) => {
+    return item.inventory?.name || 'N/A';
+};
+</script>

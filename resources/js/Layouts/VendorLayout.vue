@@ -33,7 +33,7 @@ const isActive = (route) => currentRoute.value.startsWith(route);
 const navLinks = computed(() => [
     { href: route('home'), label: 'Home', active: route().current('home') },
     { href: route('vendors.index'), label: 'Vendors', active: isActive(route('vendors.index')) },
-    { href: route('vendors.purchases.index'), label: 'Purchase History', active: isActive(route('vendors.purchases.index')) },
+    // { href: route('vendors.purchases.index'), label: 'Purchase History', active: isActive(route('vendors.purchases.index')) },
 ]);
 
 const iconLinks = [

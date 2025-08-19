@@ -1,153 +1,3 @@
-<script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Link } from '@inertiajs/vue3';
-import { ref, computed, onMounted, nextTick, reactive } from 'vue';
-import { FilterMatchMode } from '@primevue/core/api';
-import { useForm } from '@inertiajs/vue3';
-import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
-import { useConfirm } from 'primevue/useconfirm';
-import { useToast } from 'primevue/usetoast';
-
-const { formatCurrency } = useCurrencyFormatter();
-const confirm = useConfirm();
-const toast = useToast();
-
-const tempStates = reactive({});
-const loading = ref(true);
-
-onMounted(() => {
-    loading.value = false;
-    props.items.forEach(item => {
-        tempStates[item.id] = item.available_on_pos;
-    });
-});
-
-const props = defineProps({
-    items: {
-        type: Array,
-        default: () => []
-    }
-});
-
-const calculateTotalstock = computed(() => {
-    return props.items.reduce((total, item) => total + item.stock, 0);
-});
-
-const calculateTotalValue = computed(() => {
-    return props.items.reduce((total, item) => {
-        return total + (item.stock * parseFloat(item.price));
-    }, 0).toFixed(2);
-});
-
-// STOCK
-const stockMovementDialog = ref(false);
-const selectedItem = ref(null);
-const stockMovementForm = useForm({
-    stock: 0,
-    type: 'in',
-    reason: '',
-});
-
-const openStockMovementDialog = (item) => {
-    selectedItem.value = item;
-    stockMovementDialog.value = true;
-};
-
-const submitStockMovement = () => {
-    stockMovementForm.post(route('inventory.updatePOSAvailability', selectedItem.value.id), {
-        preserveScroll: true,
-        onSuccess: () => {
-            console.log('Stock movement submitted successfully');
-            stockMovementDialog.value = false;
-            stockMovementForm.reset();
-        },
-        onError: (errors) => {
-            console.error('Error submitting stock movement:', errors);
-        }
-    });
-};
-
-// DATA TABLE
-const filters = ref({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    name: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    'category.name': { value: null, matchMode: FilterMatchMode.CONTAINS },
-    sku: { value: null, matchMode: FilterMatchMode.CONTAINS }
-});
-
-
-
-const getSeverity = (stock, threshold) => {
-    return stock > threshold ? 'success' : 'danger';
-};
-
-const confirmPOSAvailabilityChange = (item) => {
-    const newValue = !tempStates[item.id];
-    const action = !newValue ? 'show' : 'hide';
-
-    confirm.require({
-        message: `Are you sure you want to ${action} this item on POS?`,
-        header: 'Confirm Action',
-        icon: 'pi pi-exclamation-triangle',
-        accept: () => {
-            updatePOSAvailability(item, newValue);
-        },
-        reject: () => {
-            tempStates[item.id] = item.available_on_pos;
-        },
-        onHide: () => {
-            tempStates[item.id] = item.available_on_pos;
-        }
-    });
-};
-
-const updatePOSAvailability = (item, newValue) => {
-    item.isUpdating = true;
-
-    useForm({
-        available_on_pos: newValue
-    }).put(route('inventory.updatePOSAvailability', item.id), {
-        preserveState: true,
-        preserveScroll: true,
-        onSuccess: () => {
-            console.log('POS availability updated successfully');
-            item.available_on_pos = newValue;
-            tempStates[item.id] = newValue;
-            item.isUpdating = false;
-
-            toast.add({
-                severity: 'success',
-                summary: 'POS Availability Updated',
-                detail: `"${item.name}" is now ${newValue ? 'visible' : 'hidden'} on POS`,
-                life: 5000
-            });
-        },
-        onError: (errors) => {
-            console.error('Error updating POS availability:', errors);
-            item.isUpdating = false;
-            tempStates[item.id] = item.available_on_pos; // Revert temp state on error
-
-            toast.add({
-                severity: 'error',
-                summary: 'Update Failed',
-                detail: 'Failed to update POS availability',
-                life: 3000
-            });
-        }
-    });
-};
-
-const editItem = (item) => {
-    // Implement edit functionality
-    console.log('Edit item:', item);
-};
-
-const deleteItem = (item) => {
-    // Implement delete functionality
-    console.log('Delete item:', item);
-};
-</script>
-
 <template>
     <AuthenticatedLayout>
         <template #summary>
@@ -291,6 +141,7 @@ const deleteItem = (item) => {
 
                             <Column header="Actions" :exportable="false" style="width: 10%;">
                                 <template #body="{ data }">
+                                    <Button icon="pi pi-eye" outlined rounded class="mr-2" @click="viewItem(data)" />
                                     <Button icon="pi pi-plus" outlined rounded class="mr-2" @click="openStockMovementDialog(data)" />
                                     <!--                                    <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editItem(data)" />-->
                                     <!--                                    <Button icon="pi pi-trash" outlined rounded severity="danger" @click="deleteItem(data)" />-->
@@ -303,3 +154,159 @@ const deleteItem = (item) => {
         </div>
     </AuthenticatedLayout>
 </template>
+
+<script setup>
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { Link } from '@inertiajs/vue3';
+import { ref, computed, onMounted, nextTick, reactive } from 'vue';
+import { FilterMatchMode } from '@primevue/core/api';
+import { useForm, router } from '@inertiajs/vue3';
+import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
+import { useConfirm } from 'primevue/useconfirm';
+import { useToast } from 'primevue/usetoast';
+
+const { formatCurrency } = useCurrencyFormatter();
+const confirm = useConfirm();
+const toast = useToast();
+
+const tempStates = reactive({});
+const loading = ref(true);
+
+onMounted(() => {
+    loading.value = false;
+    props.items.forEach(item => {
+        tempStates[item.id] = item.available_on_pos;
+    });
+});
+
+const props = defineProps({
+    items: {
+        type: Array,
+        default: () => []
+    }
+});
+
+const calculateTotalstock = computed(() => {
+    return props.items.reduce((total, item) => total + item.stock, 0);
+});
+
+const calculateTotalValue = computed(() => {
+    return props.items.reduce((total, item) => {
+        return total + (item.stock * parseFloat(item.price));
+    }, 0).toFixed(2);
+});
+
+// STOCK
+const stockMovementDialog = ref(false);
+const selectedItem = ref(null);
+const stockMovementForm = useForm({
+    stock: 0,
+    type: 'in',
+    reason: '',
+});
+
+const openStockMovementDialog = (item) => {
+    selectedItem.value = item;
+    stockMovementDialog.value = true;
+};
+
+const submitStockMovement = () => {
+    stockMovementForm.post(route('inventory.updatePOSAvailability', selectedItem.value.id), {
+        preserveScroll: true,
+        onSuccess: () => {
+            console.log('Stock movement submitted successfully');
+            stockMovementDialog.value = false;
+            stockMovementForm.reset();
+        },
+        onError: (errors) => {
+            console.error('Error submitting stock movement:', errors);
+        }
+    });
+};
+
+// DATA TABLE
+const filters = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    'category.name': { value: null, matchMode: FilterMatchMode.CONTAINS },
+    sku: { value: null, matchMode: FilterMatchMode.CONTAINS }
+});
+
+
+
+const getSeverity = (stock, threshold) => {
+    return stock > threshold ? 'success' : 'danger';
+};
+
+const confirmPOSAvailabilityChange = (item) => {
+    const newValue = !tempStates[item.id];
+    const action = !newValue ? 'show' : 'hide';
+
+    confirm.require({
+        message: `Are you sure you want to ${action} this item on POS?`,
+        header: 'Confirm Action',
+        icon: 'pi pi-exclamation-triangle',
+        accept: () => {
+            updatePOSAvailability(item, newValue);
+        },
+        reject: () => {
+            tempStates[item.id] = item.available_on_pos;
+        },
+        onHide: () => {
+            tempStates[item.id] = item.available_on_pos;
+        }
+    });
+};
+
+const updatePOSAvailability = (item, newValue) => {
+    item.isUpdating = true;
+
+    useForm({
+        available_on_pos: newValue
+    }).put(route('inventory.updatePOSAvailability', item.id), {
+        preserveState: true,
+        preserveScroll: true,
+        onSuccess: () => {
+            console.log('POS availability updated successfully');
+            item.available_on_pos = newValue;
+            tempStates[item.id] = newValue;
+            item.isUpdating = false;
+
+            toast.add({
+                severity: 'success',
+                summary: 'POS Availability Updated',
+                detail: `"${item.name}" is now ${newValue ? 'visible' : 'hidden'} on POS`,
+                life: 5000
+            });
+        },
+        onError: (errors) => {
+            console.error('Error updating POS availability:', errors);
+            item.isUpdating = false;
+            tempStates[item.id] = item.available_on_pos; // Revert temp state on error
+
+            toast.add({
+                severity: 'error',
+                summary: 'Update Failed',
+                detail: 'Failed to update POS availability',
+                life: 3000
+            });
+        }
+    });
+};
+
+const viewItem = (item) => {
+    router.visit(route('inventory.show', item.id));
+};
+
+const editItem = (item) => {
+    // Implement edit functionality
+    console.log('Edit item:', item);
+};
+
+const deleteItem = (item) => {
+    // Implement delete functionality
+    console.log('Delete item:', item);
+};
+</script>
+
+

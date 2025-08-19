@@ -24,13 +24,44 @@ class PurchaseOrder extends Model
         'order_date' => 'datetime',
     ];
 
-    public function vendor(): BelongsTo
+    public function items()
+    {
+        return $this->hasMany(PurchaseOrderItem::class);
+    }
+
+    public function vendor()
     {
         return $this->belongsTo(Vendor::class);
     }
 
-    public function items(): HasMany
+    public function processOrder()
     {
-        return $this->hasMany(PurchaseOrderItem::class);
+        DB::transaction(function () {
+            foreach ($this->items as $item) {
+                $inventory = Inventory::findOrFail($item->inventory_id);
+
+                StockMovement::recordMovement(
+                    $inventory->id,
+                    $item->quantity,
+                    StockMovement::TYPE_IN,
+                    'Purchase Order',
+                    auth()->id(),
+                    $item->unit_price,
+                    "PO-{$this->id}"
+                );
+
+                $item->update(['received_quantity' => $item->quantity]);
+            }
+
+            $this->update(['status' => 'received']);
+
+            Bill::create([
+                'purchase_order_id' => $this->id,
+                'vendor_id' => $this->vendor_id,
+                'amount' => $this->total_amount,
+                'due_date' => now()->addDays(30), // Adjust as needed
+                'status' => 'pending'
+            ]);
+        });
     }
 }
