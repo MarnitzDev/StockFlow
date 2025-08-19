@@ -42,18 +42,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Inventory
     Route::prefix('inventory')->name('inventory.')->group(function () {
         Route::get('/items', [InventoryController::class, 'items'])->name('items');
-        Route::get('/{id}', [InventoryController::class, 'show'])->name('inventory.show');
-
         Route::get('/create', [InventoryController::class, 'create'])->name('create');
         Route::post('/store', [InventoryController::class, 'store'])->name('store');
         Route::put('/{id}/pos-availability', [InventoryController::class, 'updatePOSAvailability'])->name('updatePOSAvailability');
+
+        // Categories
         Route::resource('categories', CategoryController::class);
+
         // Stock Adjustments
         Route::get('/stock-adjustments', [StockAdjustmentController::class, 'index'])->name('stockAdjustments');
         Route::get('/stock-adjustments/create', [StockAdjustmentController::class, 'create'])->name('stockAdjustments.create');
         Route::post('/stock-adjustments', [StockAdjustmentController::class, 'store'])->name('stockAdjustments.store');
         Route::get('/stock-history', [InventoryController::class, 'stockHistory'])->name('stockHistory');
         Route::get('/stock-movements', [InventoryController::class, 'stockMovements'])->name('stockMovements');
+
+        // This should be the last route in this group
+        Route::get('/items/{id}', [InventoryController::class, 'show'])->name('show')->where('id', '[0-9]+');
     });
 
     // Sales
