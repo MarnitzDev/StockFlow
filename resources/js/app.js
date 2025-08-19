@@ -48,6 +48,8 @@ import Select from 'primevue/select';
 import Breadcrumb from 'primevue/breadcrumb';
 import Paginator from 'primevue/paginator';
 import MegaMenu from 'primevue/megamenu';
+import MultiSelect from 'primevue/multiselect';
+import OrganizationChart from 'primevue/organizationchart';
 
 import Tooltip from 'primevue/tooltip';
 
@@ -140,6 +142,9 @@ createInertiaApp({
         app.component('Breadcrumb', Breadcrumb);
         app.component('Paginator', Paginator);
         app.component('MegaMenu', MegaMenu);
+        app.component('MultiSelect', MultiSelect);
+        app.component('OrganizationChart', OrganizationChart);
+
         app.directive('tooltip', Tooltip);
 
         return app.mount(el);

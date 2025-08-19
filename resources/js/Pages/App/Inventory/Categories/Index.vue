@@ -66,8 +66,10 @@
                         </Column>
                         <Column header="Actions">
                             <template #body="{ node }">
-                                <Link :href="route('inventory.categories.edit', node.data.id)" class="text-indigo-600 hover:text-indigo-900 mr-2">Edit</Link>
+<!--                                <Link :href="route('inventory.categories.edit', node.data.id)" class="text-indigo-600 hover:text-indigo-900 mr-2">Edit</Link>-->
+                                <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editCategory(node.data)" />
                                 <!-- Add delete functionality here -->
+
                             </template>
                         </Column>
                     </TreeTable>
@@ -79,7 +81,7 @@
 
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
 
@@ -132,5 +134,9 @@ const getChildrenItemCount = (category) => {
 const getChildrenStock = (category) => {
     const children = props.categories.filter(c => c.parent_id === category.id);
     return children.reduce((total, child) => total + getCategoryStock(child), 0);
+};
+
+const editCategory = (category) => {
+    router.visit(route('inventory.categories.edit', category.id));
 };
 </script>

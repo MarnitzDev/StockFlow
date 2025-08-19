@@ -13,12 +13,12 @@
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-8">
                         <div class="flex flex-wrap -mx-4">
-                            <div class="w-full md:w-1/3 px-4 mb-8 md:mb-0">
-                                <div class="flex items-center justify-center bg-gray-100 rounded-lg p-4 h-full">
-                                    <img :src="item.image_url || '/placeholder-image.jpg'" :alt="item.name" class="max-w-full max-h-80 w-auto h-auto rounded-lg shadow-lg object-contain">
+                            <div class="w-full md:w-1/5 px-4 mb-8 md:mb-0">
+                                <div class="flex items-center justify-center rounded-lg">
+                                    <img :src="item.image_url || '/images/placeholder-item.svg'" :alt="item.name" class="max-w-full max-h-80 w-auto h-auto rounded-lg object-contain">
                                 </div>
                             </div>
-                            <div class="w-full md:w-2/3 px-4">
+                            <div class="w-full md:w-4/5 px-4">
                                 <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ item.name }}</h1>
                                 <p class="text-2xl font-semibold text-gray-700 mb-4">{{ formatCurrency(item.price) }}</p>
 
