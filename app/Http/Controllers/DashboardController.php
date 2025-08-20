@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Inventory;
 use App\Models\Vendor;
 use App\Models\SalesOrder;
+use App\Models\SalesOrderItem;
 use App\Models\PurchaseOrder;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -118,5 +119,24 @@ class DashboardController extends Controller
             \Log::error('Error in purchasesOverTime: ' . $e->getMessage());
             return response()->json(['error' => 'An error occurred while fetching purchase data: ' . $e->getMessage()], 500);
         }
+    }
+
+    public function topSellingProducts()
+    {
+        $topProducts = SalesOrderItem::select('inventory_id', DB::raw('SUM(quantity) as total_quantity'), DB::raw('SUM(subtotal) as total_sales'))
+            ->with('inventory:id,name')
+            ->groupBy('inventory_id')
+            ->orderByDesc('total_quantity')
+            ->limit(5)
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'name' => $item->inventory->name,
+                    'total_quantity' => $item->total_quantity,
+                    'total_sales' => $item->total_sales,
+                ];
+            });
+
+        return response()->json($topProducts);
     }
 }

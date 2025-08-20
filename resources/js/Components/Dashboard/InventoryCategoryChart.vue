@@ -26,7 +26,6 @@
 
 <script setup>
 import { ref, watch } from 'vue';
-
 const props = defineProps({
     inventoryData: Array,
     isLoading: Boolean,
@@ -44,7 +43,7 @@ const chartOptions = ref({
             callbacks: {
                 label: function(context) {
                     const categoryData = props.inventoryData[context.dataIndex];
-                    let lines = [];
+                    let lines = [`Total Products: ${context.formattedValue}`];
                     if (categoryData.children && categoryData.children.length > 0) {
                         lines.push(`Subcategories:`);
                         categoryData.children.forEach(child => {

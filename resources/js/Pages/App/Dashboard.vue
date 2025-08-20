@@ -69,12 +69,10 @@
                 </div>
 
                 <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                    <Card>
-                        <template #title>Top Selling Products</template>
-                        <template #content>
-                            <Chart type="bar" :data="topSellingProducts" />
-                        </template>
-                    </Card>
+                    <TopSellingProductsChart
+                        :topSellingProducts="topSellingProducts"
+                        :isLoading="isTopSellingProductsLoading"
+                    />
                     <Card>
                         <template #title>Low Stock Alerts</template>
                         <template #content>
@@ -100,6 +98,7 @@ import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
 import axios from 'axios';
 import SalesPurchasesChart from '@/Components/Dashboard/SalesPurchasesChart.vue';
 import InventoryCategoryChart from '@/Components/Dashboard/InventoryCategoryChart.vue';
+import TopSellingProductsChart from '@/Components/Dashboard/TopSellingProductsChart.vue';
 
 const { formatCurrency } = useCurrencyFormatter();
 
@@ -119,6 +118,8 @@ const kpis = ref({
 const salesData = ref([]);
 const purchasesData = ref([]);
 const inventoryData = ref([]);
+const topSellingProducts = ref([]);
+const isTopSellingProductsLoading = ref(true);
 
 const fetchKpiData = async () => {
     try {
@@ -163,10 +164,24 @@ const fetchSalesPurchasesData = async () => {
     }
 };
 
+const fetchTopSellingProductsData = async () => {
+    try {
+        const response = await axios.get(route('dashboard.top-selling-products'));
+        if (response.data) {
+            topSellingProducts.value = response.data;
+        }
+    } catch (error) {
+        console.error('Error fetching top selling products data:', error);
+    } finally {
+        isTopSellingProductsLoading.value = false;
+    }
+};
+
 const fetchDashboardData = () => {
     fetchKpiData();
     fetchInventoryData();
     fetchSalesPurchasesData();
+    fetchTopSellingProductsData();
 };
 
 onMounted(() => {

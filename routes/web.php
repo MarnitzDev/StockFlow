@@ -44,6 +44,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/inventory-by-category', [DashboardController::class, 'inventoryByCategory'])->name('dashboard.inventory-by-category');
         Route::get('/sales-over-time', [DashboardController::class, 'salesOverTime'])->name('dashboard.sales-over-time');
         Route::get('/purchases-over-time', [DashboardController::class, 'purchasesOverTime'])->name('dashboard.purchases-over-time');
+        Route::get('/top-selling-products', [DashboardController::class, 'topSellingProducts'])->name('dashboard.top-selling-products');
         Route::get('/low-stock-items', [DashboardController::class, 'lowStockItems'])->name('dashboard.low-stock-items');
     });
 
