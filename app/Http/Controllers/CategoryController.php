@@ -17,7 +17,13 @@ class CategoryController extends Controller
 
     public function create()
     {
-        return Inertia::render('App/Inventory/Categories/Create');
+        $categories = Category::all();
+        $items = Inventory::all();
+
+        return Inertia::render('App/Inventory/Categories/Create', [
+            'categories' => $categories,
+            'items' => $items,
+        ]);
     }
 
     public function store(Request $request)

@@ -50,6 +50,8 @@ import Paginator from 'primevue/paginator';
 import MegaMenu from 'primevue/megamenu';
 import MultiSelect from 'primevue/multiselect';
 import OrganizationChart from 'primevue/organizationchart';
+import Chip from 'primevue/chip';
+import Checkbox from 'primevue/checkbox';
 
 import Tooltip from 'primevue/tooltip';
 
@@ -144,6 +146,8 @@ createInertiaApp({
         app.component('MegaMenu', MegaMenu);
         app.component('MultiSelect', MultiSelect);
         app.component('OrganizationChart', OrganizationChart);
+        app.component('Chip', Chip);
+        app.component('Checkbox', Checkbox);
 
         app.directive('tooltip', Tooltip);
 
