@@ -14,7 +14,7 @@
                         </div>
                         <!-- Bar chart skeleton -->
                         <div class="flex-grow flex items-end space-x-2 mb-4">
-                            <div v-for="i in 12" :key="i" class="w-1/12 bg-gray-200 animate-pulse" :style="{ height: `${Math.random() * 100}%` }"></div>
+                            <div v-for="i in 12" :key="i" class="w-1/12 bg-gray-200 animate-pulse" :style="{ height: `${Math.random() * 90}%` }"></div>
                         </div>
                     </div>
                 </template>

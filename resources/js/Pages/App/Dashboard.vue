@@ -10,7 +10,7 @@
                         <template #title>Total Products</template>
                         <template #content>
                             <div class="text-3xl font-bold">
-                                <Skeleton v-if="isLoading" width="5rem" height="2rem" />
+                                <Skeleton v-if="isKpiLoading" width="5rem" height="2rem" />
                                 <template v-else>{{ kpis.totalProducts }}</template>
                             </div>
                         </template>
@@ -19,7 +19,7 @@
                         <template #title>Total Stock</template>
                         <template #content>
                             <div class="text-3xl font-bold">
-                                <Skeleton v-if="isLoading" width="5rem" height="2rem" />
+                                <Skeleton v-if="isKpiLoading" width="5rem" height="2rem" />
                                 <template v-else>{{ kpis.totalStock }}</template>
                             </div>
                         </template>
@@ -28,7 +28,7 @@
                         <template #title>Total Stock Value</template>
                         <template #content>
                             <div class="text-3xl font-bold">
-                                <Skeleton v-if="isLoading" width="8rem" height="2rem" />
+                                <Skeleton v-if="isKpiLoading" width="8rem" height="2rem" />
                                 <template v-else>{{ formatCurrency(kpis.totalStockValue) }}</template>
                             </div>
                         </template>
@@ -37,7 +37,7 @@
                         <template #title>Low Stock Alerts</template>
                         <template #content>
                             <div class="text-3xl font-bold">
-                                <Skeleton v-if="isLoading" width="5rem" height="2rem" />
+                                <Skeleton v-if="isKpiLoading" width="5rem" height="2rem" />
                                 <template v-else>{{ kpis.lowStockAlerts }}</template>
                             </div>
                         </template>
@@ -46,7 +46,7 @@
                         <template #title>Orders This Month</template>
                         <template #content>
                             <div class="text-3xl font-bold">
-                                <Skeleton v-if="isLoading" width="5rem" height="2rem" />
+                                <Skeleton v-if="isKpiLoading" width="5rem" height="2rem" />
                                 <template v-else>{{ kpis.ordersThisMonth }}</template>
                             </div>
                         </template>
@@ -55,7 +55,7 @@
                         <template #title>Sales This Month</template>
                         <template #content>
                             <div class="text-3xl font-bold">
-                                <Skeleton v-if="isLoading" width="8rem" height="2rem" />
+                                <Skeleton v-if="isKpiLoading" width="8rem" height="2rem" />
                                 <template v-else>{{ formatCurrency(kpis.salesThisMonth) }}</template>
                             </div>
                         </template>
@@ -64,8 +64,8 @@
 
                 <!-- Charts -->
                 <div class="grid grid-cols-1 gap-8 mb-8 lg:grid-cols-2">
-                    <SalesPurchasesChart :salesData="salesData" :purchasesData="purchasesData" :isLoading="isLoading" />
-                    <InventoryCategoryChart :inventoryData="inventoryData" :isLoading="isLoading" />
+                    <SalesPurchasesChart :salesData="salesData" :purchasesData="purchasesData" :isLoading="isSalesPurchasesLoading" />
+                    <InventoryCategoryChart :inventoryData="inventoryData" :isLoading="isInventoryLoading" />
                 </div>
 
                 <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
@@ -97,12 +97,16 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import { ref, onMounted } from 'vue';
 import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
+import axios from 'axios';
 import SalesPurchasesChart from '@/Components/Dashboard/SalesPurchasesChart.vue';
 import InventoryCategoryChart from '@/Components/Dashboard/InventoryCategoryChart.vue';
 
 const { formatCurrency } = useCurrencyFormatter();
 
-const isLoading = ref(true);
+const isKpiLoading = ref(true);
+const isInventoryLoading = ref(true);
+const isSalesPurchasesLoading = ref(true);
+
 const kpis = ref({
     totalProducts: 0,
     totalStock: 0,
@@ -116,37 +120,53 @@ const salesData = ref([]);
 const purchasesData = ref([]);
 const inventoryData = ref([]);
 
-const fetchDashboardData = async () => {
-    isLoading.value = true;
+const fetchKpiData = async () => {
     try {
-        const [kpiResponse, inventoryResponse, salesResponse, purchasesResponse] = await Promise.all([
-            axios.get(route('dashboard.kpis')),
-            axios.get(route('dashboard.inventory-by-category')),
+        const response = await axios.get(route('dashboard.kpis'));
+        if (response.data) {
+            kpis.value = response.data;
+        }
+    } catch (error) {
+        console.error('Error fetching KPI data:', error);
+    } finally {
+        isKpiLoading.value = false;
+    }
+};
+
+const fetchInventoryData = async () => {
+    try {
+        const response = await axios.get(route('dashboard.inventory-by-category'));
+        if (response.data) {
+            inventoryData.value = response.data;
+        }
+    } catch (error) {
+        console.error('Error fetching inventory data:', error);
+    } finally {
+        isInventoryLoading.value = false;
+    }
+};
+
+const fetchSalesPurchasesData = async () => {
+    try {
+        const [salesResponse, purchasesResponse] = await Promise.all([
             axios.get(route('dashboard.sales-over-time')),
             axios.get(route('dashboard.purchases-over-time')),
         ]);
-
-        // Process KPI data
-        if (kpiResponse.data) {
-            kpis.value = kpiResponse.data;
-        }
-
-        // Process inventory data
-        if (inventoryResponse.data) {
-            inventoryData.value = inventoryResponse.data;
-        }
-
-        // Process sales and purchases data
         if (salesResponse.data && purchasesResponse.data) {
             salesData.value = salesResponse.data;
             purchasesData.value = purchasesResponse.data;
         }
-
     } catch (error) {
-        console.error('Error fetching dashboard data:', error);
+        console.error('Error fetching sales and purchases data:', error);
     } finally {
-        isLoading.value = false;
+        isSalesPurchasesLoading.value = false;
     }
+};
+
+const fetchDashboardData = () => {
+    fetchKpiData();
+    fetchInventoryData();
+    fetchSalesPurchasesData();
 };
 
 onMounted(() => {
