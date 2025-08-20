@@ -42,7 +42,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/kpis', [DashboardController::class, 'getKpis'])->name('dashboard.kpis');
         Route::get('/inventory-by-category', [DashboardController::class, 'inventoryByCategory'])->name('dashboard.inventory-by-category');
-
+        Route::get('/sales-over-time', [DashboardController::class, 'salesOverTime'])->name('dashboard.sales-over-time');
+        Route::get('/purchases-over-time', [DashboardController::class, 'purchasesOverTime'])->name('dashboard.purchases-over-time');
+        Route::get('/low-stock-items', [DashboardController::class, 'lowStockItems'])->name('dashboard.low-stock-items');
     });
 
     // Inventory

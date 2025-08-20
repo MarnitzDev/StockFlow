@@ -18,8 +18,9 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             CategorySeeder::class,
             VendorProductSeeder::class,
+            InventorySeeder::class,
             SalesOrderSeeder::class,
-            InventorySeeder::class
+            PurchaseOrderSeeder::class
         ]);
     }
 }

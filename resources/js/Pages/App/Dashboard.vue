@@ -65,9 +65,9 @@
                 <!-- Charts -->
                 <div class="grid grid-cols-1 gap-8 mb-8 lg:grid-cols-2">
                     <Card>
-                        <template #title>Sales Over Time</template>
+                        <template #title>Sales and Purchases Over Time</template>
                         <template #content>
-                            <Chart type="line" :data="salesData" />
+                            <Chart type="bar" :data="salesPurchasesData" :options="barChartOptions" class="h-[30rem]" />
                         </template>
                     </Card>
                     <Card>
@@ -122,13 +122,14 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
+import axios from 'axios';
+import Chart from 'primevue/chart';
 
 const { formatCurrency } = useCurrencyFormatter();
 
 const isLoading = ref(true);
-
 const kpis = ref({
     totalProducts: 0,
     totalStock: 0,
@@ -138,11 +139,9 @@ const kpis = ref({
     lowStockAlerts: 0
 });
 
-const salesData = ref(null);
+const salesPurchasesData = ref(null);
 const inventoryData = ref(null);
-const topSellingProducts = ref(null);
-const lowStockItems = ref([]);
-
+const barChartOptions = ref(null);
 const pieChartOptions = ref({
     responsive: true,
     maintainAspectRatio: false,
@@ -154,7 +153,7 @@ const pieChartOptions = ref({
             callbacks: {
                 label: function(context) {
                     const categoryData = inventoryData.value.rawData[context.dataIndex];
-                    let lines = [];
+                    let lines = [`${context.label}: ${context.formattedValue}`];
                     if (categoryData.children && categoryData.children.length > 0) {
                         lines.push(`Subcategories:`);
                         categoryData.children.forEach(child => {
@@ -179,56 +178,134 @@ const pieChartOptions = ref({
 });
 
 const fetchDashboardData = async () => {
+    isLoading.value = true;
     try {
-        const [kpiResponse, inventoryResponse, salesResponse, topSellingResponse, lowStockResponse] = await Promise.all([
+        const [kpiResponse, inventoryResponse, salesResponse, purchasesResponse] = await Promise.all([
             axios.get(route('dashboard.kpis')),
             axios.get(route('dashboard.inventory-by-category')),
-            // axios.get(route('dashboard.sales-over-time')),
-            // axios.get(route('dashboard.top-selling-products')),
-            // axios.get(route('dashboard.low-stock-items'))
+            axios.get(route('dashboard.sales-over-time')),
+            axios.get(route('dashboard.purchases-over-time')),
         ]);
 
-        kpis.value = kpiResponse.data;
+        // Process KPI data
+        if (kpiResponse.data) {
+            kpis.value = kpiResponse.data;
+        }
 
-        inventoryData.value = {
-            labels: inventoryResponse.data.map(item => item.category),
-            datasets: [{
-                data: inventoryResponse.data.map(item => item.count),
-                backgroundColor: [
-                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
-                    '#FF9F40', '#FF6384', '#C9CBCF', '#7BC8A4', '#E7E9ED'
+        // Process inventory data
+        if (inventoryResponse.data) {
+            inventoryData.value = {
+                labels: inventoryResponse.data.map(item => item.category),
+                datasets: [{
+                    data: inventoryResponse.data.map(item => item.count),
+                    backgroundColor: [
+                        '#6C63FF', '#FF6584', '#F9A826', '#48CAE4', '#20C997',
+                        '#FFA07A', '#9D84B7', '#FF9AA2', '#B5EAD7', '#C7CEEA'
+                    ]
+                }],
+                rawData: inventoryResponse.data
+            };
+        }
+
+        // Process sales and purchases data
+        if (salesResponse.data && purchasesResponse.data) {
+            const allMonths = [...new Set([
+                ...salesResponse.data.map(item => item.month),
+                ...purchasesResponse.data.map(item => item.month)
+            ])].sort();
+
+            const salesDataMap = new Map(salesResponse.data.map(item => [item.month, parseFloat(item.total)]));
+            const purchasesDataMap = new Map(purchasesResponse.data.map(item => [item.month, parseFloat(item.total)]));
+
+            const salesDataArray = allMonths.map(month => salesDataMap.get(month) || 0);
+            const purchasesDataArray = allMonths.map(month => purchasesDataMap.get(month) || 0);
+
+            salesPurchasesData.value = {
+                labels: allMonths.map(month => {
+                    const date = new Date(month);
+                    return date.toLocaleString('default', { month: 'short', year: 'numeric' });
+                }),
+                datasets: [
+                    {
+                        label: 'Sales',
+                        backgroundColor: '#20C997',
+                        data: salesDataArray
+                    },
+                    {
+                        label: 'Purchases',
+                        backgroundColor: '#FF6584',
+                        data: purchasesDataArray
+                    }
                 ]
-            }],
-            rawData: inventoryResponse.data
-        };
+            };
 
-        salesData.value = {
-            labels: salesResponse.data.map(item => item.month),
-            datasets: [{
-                label: 'Sales',
-                data: salesResponse.data.map(item => item.total),
-                fill: false,
-                borderColor: '#4bc0c0'
-            }]
-        };
+            setBarChartOptions();
+        }
 
-        topSellingProducts.value = {
-            labels: topSellingResponse.data.map(item => item.name),
-            datasets: [{
-                label: 'Units Sold',
-                data: topSellingResponse.data.map(item => item.units_sold),
-                backgroundColor: '#36A2EB'
-            }]
-        };
-
-        lowStockItems.value = lowStockResponse.data;
-
-        isLoading.value = false;
     } catch (error) {
         console.error('Error fetching dashboard data:', error);
+    } finally {
         isLoading.value = false;
-        // Handle error (e.g., show an error message to the user)
     }
+};
+
+const setBarChartOptions = () => {
+    const documentStyle = getComputedStyle(document.documentElement);
+    const textColor = documentStyle.getPropertyValue('--p-text-color');
+    const textColorSecondary = documentStyle.getPropertyValue('--p-text-muted-color');
+    const surfaceBorder = documentStyle.getPropertyValue('--p-content-border-color');
+
+    barChartOptions.value = {
+        maintainAspectRatio: false,
+        aspectRatio: 0.8,
+        plugins: {
+            legend: {
+                labels: {
+                    color: textColor
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        let label = context.dataset.label || '';
+                        if (label) {
+                            label += ': ';
+                        }
+                        if (context.parsed.y !== null) {
+                            label += formatCurrency(context.parsed.y);
+                        }
+                        return label;
+                    }
+                }
+            }
+        },
+        scales: {
+            x: {
+                ticks: {
+                    color: textColorSecondary,
+                    font: {
+                        weight: 500
+                    }
+                },
+                grid: {
+                    display: false,
+                    drawBorder: false
+                }
+            },
+            y: {
+                ticks: {
+                    color: textColorSecondary,
+                    callback: function(value) {
+                        return formatCurrency(value);
+                    }
+                },
+                grid: {
+                    color: surfaceBorder,
+                    drawBorder: false
+                }
+            }
+        }
+    };
 };
 
 onMounted(() => {

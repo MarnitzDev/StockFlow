@@ -49,13 +49,16 @@ class PurchaseOrderService
         $items = $products->map(function ($product) {
             $unitPrice = $this->priceService->calculateVendorPurchasePrice($product['price'] ?? 0);
             $taxAmount = $this->priceService->calculateTaxAmount($unitPrice);
-            $total = $unitPrice + $taxAmount;
+            $subtotal = $unitPrice * ($product['quantity'] ?? 1);
+            $total = $subtotal + $taxAmount;
 
             return [
                 'id' => $product['id'] ?? null,
                 'name' => $product['name'] ?? '',
                 'sku' => $product['sku'] ?? '',
+                'quantity' => $product['quantity'] ?? 1,
                 'unit_price' => $unitPrice,
+                'subtotal' => $subtotal,
                 'tax' => $taxAmount,
                 'total' => $total,
                 'stock' => $product['stock'] ?? 0,
@@ -66,7 +69,7 @@ class PurchaseOrderService
 
         return [
             'items' => $items,
-            'subtotal' => $items->sum('unit_price'),
+            'subtotal' => $items->sum('subtotal'),
             'tax' => $items->sum('tax'),
             'total' => $items->sum('total'),
         ];

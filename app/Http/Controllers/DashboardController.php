@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Inventory;
 use App\Models\Vendor;
+use App\Models\SalesOrder;
 use App\Models\PurchaseOrder;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -66,6 +67,56 @@ class DashboardController extends Controller
         } catch (\Exception $e) {
             \Log::error('Error in inventoryByCategory: ' . $e->getMessage());
             return response()->json(['error' => 'An error occurred while fetching inventory data: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function salesOverTime()
+    {
+        try {
+            $salesData = SalesOrder::select(
+                DB::raw('TO_CHAR(created_at, \'YYYY-MM\') as month'),
+                DB::raw('SUM(total_amount) as total')
+            )
+                ->where('created_at', '>=', Carbon::now()->subMonths(12))
+                ->groupBy('month')
+                ->orderBy('month')
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'month' => $item->month,
+                        'total' => (float) $item->total
+                    ];
+                });
+
+            return response()->json($salesData);
+        } catch (\Exception $e) {
+            \Log::error('Error in salesOverTime: ' . $e->getMessage());
+            return response()->json(['error' => 'An error occurred while fetching sales data: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function purchasesOverTime()
+    {
+        try {
+            $purchaseData = PurchaseOrder::select(
+                DB::raw('TO_CHAR(created_at, \'YYYY-MM\') as month'),
+                DB::raw('SUM(total_amount) as total')
+            )
+                ->where('created_at', '>=', Carbon::now()->subMonths(12))
+                ->groupBy('month')
+                ->orderBy('month')
+                ->get()
+                ->map(function ($item) {
+                    return [
+                        'month' => $item->month,
+                        'total' => (float) $item->total
+                    ];
+                });
+
+            return response()->json($purchaseData);
+        } catch (\Exception $e) {
+            \Log::error('Error in purchasesOverTime: ' . $e->getMessage());
+            return response()->json(['error' => 'An error occurred while fetching purchase data: ' . $e->getMessage()], 500);
         }
     }
 }
