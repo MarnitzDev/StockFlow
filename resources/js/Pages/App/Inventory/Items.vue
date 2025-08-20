@@ -70,7 +70,20 @@
                             <template #empty> No inventory items found. </template>
                             <template #loading> Loading inventory data. Please wait. </template>
 
-                            <Column field="name" header="Name" sortable style="width: 30%;">
+                            <Column field="image" header="Image" style="width: 5%;">
+                                <template #body="{ data }">
+                                    <div class="w-12 h-12 bg-gray-200 rounded-md flex items-center justify-center">
+                                        <img
+                                            :src="data.image_url || '/images/placeholder-item.svg'"
+                                            :alt="data.name"
+                                            class="w-full h-full object-cover rounded-md"
+                                            @error="handleImageError"
+                                        />
+                                    </div>
+                                </template>
+                            </Column>
+
+                            <Column field="name" header="Name" sortable style="width: 25%;">
                                 <template #body="{ data }">
                                     {{ data.name }}
                                 </template>
@@ -305,6 +318,10 @@ const editItem = (item) => {
 const deleteItem = (item) => {
     // Implement delete functionality
     console.log('Delete item:', item);
+};
+
+const handleImageError = (event) => {
+    event.target.src = '/images/placeholder-item.svg';
 };
 </script>
 

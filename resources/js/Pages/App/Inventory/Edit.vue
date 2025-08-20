@@ -54,7 +54,12 @@
 
                                 <div class="col-span-1">
                                     <label for="sku" class="block text-sm font-medium text-gray-700">SKU</label>
-                                    <InputText id="sku" v-model="form.sku" :modelValue="props.item.sku" class="mt-1 block w-full" required />
+                                    <InputText
+                                        id="sku"
+                                        :modelValue="props.item.sku"
+                                        class="mt-1 block w-full bg-gray-100"
+                                        disabled
+                                    />
                                 </div>
 
                                 <div class="col-span-1">
@@ -119,7 +124,6 @@ const props = defineProps<{
 
 const originalValues = {
     name: props.item.name,
-    sku: props.item.sku,
     description: props.item.description,
     category_id: props.item.category_id,
     price: props.item.price,
@@ -148,7 +152,6 @@ const onImageUpload = (event) => {
 
 const form = useForm({
     name: props.item.name,
-    sku: props.item.sku,
     description: props.item.description,
     category_id: props.item.category_id,
     price: props.item.price,

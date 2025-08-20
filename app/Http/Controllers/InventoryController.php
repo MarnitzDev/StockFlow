@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class InventoryController extends Controller
@@ -37,12 +38,13 @@ class InventoryController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'sku' => 'required|string|unique:inventory',
+            'sku' => 'required|string|unique:inventory,sku',
             'stock' => 'required|integer|min:0',
             'price' => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
             'low_stock_threshold' => 'required|integer|min:0',
             'unit_of_measurement' => 'nullable|string|max:50',
+            'image' => 'nullable|image|max:1024',
         ]);
 
         DB::transaction(function () use ($validated) {
@@ -74,16 +76,28 @@ class InventoryController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'sku' => 'required|string|unique:inventory,sku,' . $inventory->id,
+            'description' => 'nullable|string',
             'stock' => 'required|integer|min:0',
             'price' => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
             'low_stock_threshold' => 'required|integer|min:0',
             'unit_of_measurement' => 'nullable|string|max:50',
+            'image' => 'nullable|image|max:1024', // 1MB Max
         ]);
 
-        DB::transaction(function () use ($inventory, $validated) {
+        DB::transaction(function () use ($inventory, $validated, $request) {
             $oldStock = $inventory->stock;
+
+            // Handle image upload
+            if ($request->hasFile('image')) {
+                // Delete old image if exists
+                if ($inventory->image_url) {
+                    Storage::disk('public')->delete($inventory->image_url);
+                }
+                $path = $request->file('image')->store('inventory_images', 'public');
+                $validated['image_url'] = $path;
+            }
+
             $inventory->update($validated);
 
             if ($oldStock != $validated['stock']) {
