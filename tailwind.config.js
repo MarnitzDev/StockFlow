@@ -15,6 +15,12 @@ export default {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            width: {
+                '200': '200px',
+            },
+            height: {
+                '200': '200px',
+            },
         },
     },
 

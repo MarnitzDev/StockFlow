@@ -14,8 +14,13 @@
                     <div class="p-8">
                         <div class="flex flex-wrap -mx-4">
                             <div class="w-full md:w-1/5 px-4 mb-8 md:mb-0">
-                                <div class="flex items-center justify-center rounded-lg">
-                                    <img :src="item.image_url || '/images/placeholder-item.svg'" :alt="item.name" class="max-w-full max-h-80 w-auto h-auto rounded-lg object-contain">
+                                <div class="flex items-center justify-center rounded-lg bg-gray-200 w-200 h-200">
+                                    <img
+                                        :src="item.image_url || '/images/placeholder-item.svg'"
+                                        :alt="item.name"
+                                        class="w-200 h-200 rounded-lg object-cover"
+                                        @error="handleImageError"
+                                    >
                                 </div>
                             </div>
                             <div class="w-full md:w-4/5 px-4">
@@ -55,6 +60,23 @@
                                         </div>
                                     </div>
                                 </div>
+                                <!-- Back and Edit buttons -->
+                                <div class="mt-8 flex justify-between">
+                                    <Link :href="route('inventory.items')" class="mr-4">
+                                        <Button
+                                            label="Back to Inventory"
+                                            icon="pi pi-arrow-left"
+                                            severity="secondary"
+                                        />
+                                    </Link>
+                                    <Link :href="route('inventory.edit', item.id)">
+                                        <Button
+                                            label="Edit Item"
+                                            icon="pi pi-pencil"
+                                            severity="primary"
+                                        />
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -66,7 +88,7 @@
 
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head } from '@inertiajs/vue3';
+import { Link, Head } from '@inertiajs/vue3';
 import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
 
 const { formatCurrency } = useCurrencyFormatter();
@@ -74,4 +96,8 @@ const { formatCurrency } = useCurrencyFormatter();
 defineProps({
     item: Object
 });
+
+const handleImageError = (event) => {
+    event.target.src = '/images/placeholder-item.svg';
+};
 </script>

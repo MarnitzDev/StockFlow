@@ -83,8 +83,14 @@
                                 </div>
                             </div>
 
-                            <div class="mt-6 flex items-center justify-end space-x-3">
-                                <Button type="button" label="Cancel" class="p-button-secondary mr-4" @click="cancel" />
+                            <div class="mt-6 flex items-center justify-between space-x-3">
+                                <Link :href="route('inventory.items')" class="mr-4">
+                                    <Button
+                                        label="Back to Inventory"
+                                        icon="pi pi-arrow-left"
+                                        severity="secondary"
+                                    />
+                                </Link>
                                 <Button
                                     type="submit"
                                     label="Save Changes"
@@ -104,7 +110,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useForm, usePage } from '@inertiajs/vue3';
+import {Link, useForm, usePage} from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 
 const props = defineProps<{
@@ -181,8 +187,4 @@ const hasChanges = computed(() => {
         return form[key] !== originalValues[key];
     });
 });
-
-const cancel = () => {
-    window.history.back();
-};
 </script>
