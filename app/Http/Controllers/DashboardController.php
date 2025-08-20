@@ -139,4 +139,13 @@ class DashboardController extends Controller
 
         return response()->json($topProducts);
     }
+
+    public function getLowStockItems()
+    {
+        $lowStockItems = Inventory::where('stock', '<=', DB::raw('low_stock_threshold'))
+            ->select('name', 'sku', 'stock', 'low_stock_threshold')
+            ->get();
+
+        return response()->json($lowStockItems);
+    }
 }

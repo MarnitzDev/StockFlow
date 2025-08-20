@@ -1,89 +1,16 @@
 <template>
     <Head title="Dashboard" />
-
     <AuthenticatedLayout :show-header="false">
         <div class="pb-12">
             <div class="px-6">
-                <!-- KPI Cards -->
-                <div class="grid grid-cols-1 gap-4 mb-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-                    <Card>
-                        <template #title>Total Products</template>
-                        <template #content>
-                            <div class="text-3xl font-bold">
-                                <Skeleton v-if="isKpiLoading" width="5rem" height="2rem" />
-                                <template v-else>{{ kpis.totalProducts }}</template>
-                            </div>
-                        </template>
-                    </Card>
-                    <Card>
-                        <template #title>Total Stock</template>
-                        <template #content>
-                            <div class="text-3xl font-bold">
-                                <Skeleton v-if="isKpiLoading" width="5rem" height="2rem" />
-                                <template v-else>{{ kpis.totalStock }}</template>
-                            </div>
-                        </template>
-                    </Card>
-                    <Card>
-                        <template #title>Total Stock Value</template>
-                        <template #content>
-                            <div class="text-3xl font-bold">
-                                <Skeleton v-if="isKpiLoading" width="8rem" height="2rem" />
-                                <template v-else>{{ formatCurrency(kpis.totalStockValue) }}</template>
-                            </div>
-                        </template>
-                    </Card>
-                    <Card>
-                        <template #title>Low Stock Alerts</template>
-                        <template #content>
-                            <div class="text-3xl font-bold">
-                                <Skeleton v-if="isKpiLoading" width="5rem" height="2rem" />
-                                <template v-else>{{ kpis.lowStockAlerts }}</template>
-                            </div>
-                        </template>
-                    </Card>
-                    <Card>
-                        <template #title>Orders This Month</template>
-                        <template #content>
-                            <div class="text-3xl font-bold">
-                                <Skeleton v-if="isKpiLoading" width="5rem" height="2rem" />
-                                <template v-else>{{ kpis.ordersThisMonth }}</template>
-                            </div>
-                        </template>
-                    </Card>
-                    <Card>
-                        <template #title>Sales This Month</template>
-                        <template #content>
-                            <div class="text-3xl font-bold">
-                                <Skeleton v-if="isKpiLoading" width="8rem" height="2rem" />
-                                <template v-else>{{ formatCurrency(kpis.salesThisMonth) }}</template>
-                            </div>
-                        </template>
-                    </Card>
-                </div>
-
-                <!-- Charts -->
+                <KpiCards :kpiData="kpiData" :isLoading="isKpiLoading" />
                 <div class="grid grid-cols-1 gap-8 mb-8 lg:grid-cols-2">
                     <SalesPurchasesChart :salesData="salesData" :purchasesData="purchasesData" :isLoading="isSalesPurchasesLoading" />
                     <InventoryCategoryChart :inventoryData="inventoryData" :isLoading="isInventoryLoading" />
                 </div>
-
                 <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                    <TopSellingProductsChart
-                        :topSellingProducts="topSellingProducts"
-                        :isLoading="isTopSellingProductsLoading"
-                    />
-                    <Card>
-                        <template #title>Low Stock Alerts</template>
-                        <template #content>
-                            <DataTable :value="lowStockItems" :paginator="true" :rows="5">
-                                <Column field="name" header="Product Name"></Column>
-                                <Column field="sku" header="SKU"></Column>
-                                <Column field="stock" header="Current Stock"></Column>
-                                <Column field="reorderLevel" header="Reorder Level"></Column>
-                            </DataTable>
-                        </template>
-                    </Card>
+                    <TopSellingProductsChart :topSellingProducts="topSellingProducts" :isLoading="isTopSellingProductsLoading" />
+                    <LowStockAlertsTable :lowStockItems="lowStockItems" :isLoading="isLowStockItemsLoading" />
                 </div>
             </div>
         </div>
@@ -91,20 +18,23 @@
 </template>
 
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { ref, computed, onMounted } from 'vue';
 import { Head } from '@inertiajs/vue3';
-import { ref, onMounted } from 'vue';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
-import axios from 'axios';
+import KpiCards from '@/Components/Dashboard/KpiCards.vue';
 import SalesPurchasesChart from '@/Components/Dashboard/SalesPurchasesChart.vue';
 import InventoryCategoryChart from '@/Components/Dashboard/InventoryCategoryChart.vue';
 import TopSellingProductsChart from '@/Components/Dashboard/TopSellingProductsChart.vue';
+import LowStockAlertsTable from '@/Components/Dashboard/LowStockAlertsTable.vue';
 
 const { formatCurrency } = useCurrencyFormatter();
 
 const isKpiLoading = ref(true);
 const isInventoryLoading = ref(true);
 const isSalesPurchasesLoading = ref(true);
+const isTopSellingProductsLoading = ref(true);
+const isLowStockItemsLoading = ref(true);
 
 const kpis = ref({
     totalProducts: 0,
@@ -119,7 +49,16 @@ const salesData = ref([]);
 const purchasesData = ref([]);
 const inventoryData = ref([]);
 const topSellingProducts = ref([]);
-const isTopSellingProductsLoading = ref(true);
+const lowStockItems = ref([]);
+
+const kpiData = computed(() => [
+    { title: 'Total Products', value: kpis.value.totalProducts, skeletonWidth: '5rem' },
+    { title: 'Total Stock', value: kpis.value.totalStock, skeletonWidth: '5rem' },
+    { title: 'Total Stock Value', value: kpis.value.totalStockValue, formatter: formatCurrency, skeletonWidth: '8rem' },
+    { title: 'Low Stock Alerts', value: kpis.value.lowStockAlerts, skeletonWidth: '5rem' },
+    { title: 'Orders This Month', value: kpis.value.ordersThisMonth, skeletonWidth: '5rem' },
+    { title: 'Sales This Month', value: kpis.value.salesThisMonth, formatter: formatCurrency, skeletonWidth: '8rem' }
+]);
 
 const fetchKpiData = async () => {
     try {
@@ -177,11 +116,25 @@ const fetchTopSellingProductsData = async () => {
     }
 };
 
+const fetchLowStockItems = async () => {
+    try {
+        const response = await axios.get(route('dashboard.low-stock-items'));
+        if (response.data) {
+            lowStockItems.value = response.data;
+        }
+    } catch (error) {
+        console.error('Error fetching low stock items:', error);
+    } finally {
+        isLowStockItemsLoading.value = false;
+    }
+};
+
 const fetchDashboardData = () => {
     fetchKpiData();
     fetchInventoryData();
     fetchSalesPurchasesData();
     fetchTopSellingProductsData();
+    fetchLowStockItems();
 };
 
 onMounted(() => {

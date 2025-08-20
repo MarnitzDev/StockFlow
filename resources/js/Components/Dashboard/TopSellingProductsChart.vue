@@ -21,8 +21,6 @@
 
 <script setup>
 import { ref, watch } from 'vue';
-import Chart from 'primevue/chart';
-import Card from 'primevue/card';
 import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
 
 const props = defineProps({

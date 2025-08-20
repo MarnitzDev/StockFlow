@@ -36,8 +36,6 @@ Route::prefix('pos')->name('pos.')->group(function () {
 
 // Inventory Management
 Route::middleware(['auth', 'verified'])->group(function () {
-
-
     Route::prefix('dashboard')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/kpis', [DashboardController::class, 'getKpis'])->name('dashboard.kpis');
@@ -45,7 +43,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/sales-over-time', [DashboardController::class, 'salesOverTime'])->name('dashboard.sales-over-time');
         Route::get('/purchases-over-time', [DashboardController::class, 'purchasesOverTime'])->name('dashboard.purchases-over-time');
         Route::get('/top-selling-products', [DashboardController::class, 'topSellingProducts'])->name('dashboard.top-selling-products');
-        Route::get('/low-stock-items', [DashboardController::class, 'lowStockItems'])->name('dashboard.low-stock-items');
+        Route::get('/low-stock-items', [DashboardController::class, 'getLowStockItems'])->name('dashboard.low-stock-items');
     });
 
     // Inventory
