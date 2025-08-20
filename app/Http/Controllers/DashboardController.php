@@ -24,28 +24,76 @@ class DashboardController extends Controller
     public function getKpis(): JsonResponse
     {
         try {
+            $now = now();
+            $lastMonth = $now->copy()->subMonth()->endOfMonth();
+            $twoMonthsAgo = $now->copy()->subMonths(2)->endOfMonth();
+
+            // Last month data (most recent complete month)
             $totalProducts = Inventory::count();
             $totalStock = Inventory::sum('stock');
             $totalStockValue = Inventory::sum(DB::raw('stock * price'));
-
-            // Assuming PurchaseOrder is used for sales
-            $salesThisMonth = PurchaseOrder::whereMonth('created_at', now()->month)->sum('total_amount');
-            $ordersThisMonth = PurchaseOrder::whereMonth('created_at', now()->month)->count();
-
+            $salesLastMonth = SalesOrder::whereBetween('created_at', [
+                $lastMonth->copy()->startOfMonth(),
+                $lastMonth
+            ])->sum('total_amount');
+            $ordersLastMonth = SalesOrder::whereBetween('created_at', [
+                $lastMonth->copy()->startOfMonth(),
+                $lastMonth
+            ])->count();
             $lowStockAlerts = Inventory::where('stock', '<=', DB::raw('low_stock_threshold'))->count();
 
+            // Two months ago data (for comparison)
+            $previousTotalProducts = Inventory::whereDate('created_at', '<=', $twoMonthsAgo)->count();
+            $previousTotalStock = Inventory::whereDate('updated_at', '<=', $twoMonthsAgo)->sum('stock');
+            $previousTotalStockValue = Inventory::whereDate('updated_at', '<=', $twoMonthsAgo)->sum(DB::raw('stock * price'));
+            $salesTwoMonthsAgo = SalesOrder::whereBetween('created_at', [
+                $twoMonthsAgo->copy()->startOfMonth(),
+                $twoMonthsAgo
+            ])->sum('total_amount');
+            $ordersTwoMonthsAgo = SalesOrder::whereBetween('created_at', [
+                $twoMonthsAgo->copy()->startOfMonth(),
+                $twoMonthsAgo
+            ])->count();
+            $previousLowStockAlerts = Inventory::whereDate('updated_at', '<=', $twoMonthsAgo)
+                ->where('stock', '<=', DB::raw('low_stock_threshold'))
+                ->count();
+
+            // Calculate percentage changes
+            $changes = [
+                'totalProducts' => $this->calculatePercentageChange($previousTotalProducts, $totalProducts),
+                'totalStock' => $this->calculatePercentageChange($previousTotalStock, $totalStock),
+                'totalStockValue' => $this->calculatePercentageChange($previousTotalStockValue, $totalStockValue),
+                'salesLastMonth' => $this->calculatePercentageChange($salesTwoMonthsAgo, $salesLastMonth),
+                'ordersLastMonth' => $this->calculatePercentageChange($ordersTwoMonthsAgo, $ordersLastMonth),
+                'lowStockAlerts' => $this->calculatePercentageChange($previousLowStockAlerts, $lowStockAlerts),
+            ];
+
             return response()->json([
-                'totalProducts' => $totalProducts,
-                'totalStock' => $totalStock,
-                'totalStockValue' => $totalStockValue,
-                'salesThisMonth' => $salesThisMonth,
-                'ordersThisMonth' => $ordersThisMonth,
-                'lowStockAlerts' => $lowStockAlerts,
+                'currentData' => [
+                    'totalProducts' => $totalProducts,
+                    'totalStock' => $totalStock,
+                    'totalStockValue' => $totalStockValue,
+                    'salesLastMonth' => $salesLastMonth,
+                    'ordersLastMonth' => $ordersLastMonth,
+                    'lowStockAlerts' => $lowStockAlerts,
+                ],
+                'changes' => $changes,
             ]);
         } catch (\Exception $e) {
             \Log::error('Error in getKpis: ' . $e->getMessage());
             return response()->json(['error' => 'An error occurred while fetching KPIs'], 500);
         }
+    }
+
+    private function calculatePercentageChange($oldValue, $newValue)
+    {
+        if ($oldValue == 0 && $newValue == 0) {
+            return 0;
+        }
+        if ($oldValue == 0) {
+            return $newValue > 0 ? 100 : 0;
+        }
+        return round((($newValue - $oldValue) / $oldValue) * 100, 1);
     }
 
     public function inventoryByCategory()

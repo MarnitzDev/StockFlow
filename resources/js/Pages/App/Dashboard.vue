@@ -21,6 +21,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { Head } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { PrimeIcons } from '@primevue/core/api';
 import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
 import KpiCards from '@/Components/Dashboard/KpiCards.vue';
 import SalesPurchasesChart from '@/Components/Dashboard/SalesPurchasesChart.vue';
@@ -40,9 +41,10 @@ const kpis = ref({
     totalProducts: 0,
     totalStock: 0,
     totalStockValue: 0,
-    salesThisMonth: 0,
-    ordersThisMonth: 0,
-    lowStockAlerts: 0
+    salesLastMonth: 0,
+    ordersLastMonth: 0,
+    lowStockAlerts: 0,
+    changes: {}
 });
 
 const salesData = ref([]);
@@ -52,20 +54,60 @@ const topSellingProducts = ref([]);
 const lowStockItems = ref([]);
 
 const kpiData = computed(() => [
-    { title: 'Total Products', value: kpis.value.totalProducts, skeletonWidth: '5rem' },
-    { title: 'Total Stock', value: kpis.value.totalStock, skeletonWidth: '5rem' },
-    { title: 'Total Stock Value', value: kpis.value.totalStockValue, formatter: formatCurrency, skeletonWidth: '8rem' },
-    { title: 'Low Stock Alerts', value: kpis.value.lowStockAlerts, skeletonWidth: '5rem' },
-    { title: 'Orders This Month', value: kpis.value.ordersThisMonth, skeletonWidth: '5rem' },
-    { title: 'Sales This Month', value: kpis.value.salesThisMonth, formatter: formatCurrency, skeletonWidth: '8rem' }
+    {
+        title: 'Total Products',
+        value: kpis.value.totalProducts,
+        icon: PrimeIcons.BOX,
+        iconColor: 'text-blue-500',
+        change: kpis.value.changes?.totalProducts ?? 0
+    },
+    {
+        title: 'Total Stock',
+        value: kpis.value.totalStock,
+        icon: PrimeIcons.SHOPPING_CART,
+        iconColor: 'text-green-500',
+        change: kpis.value.changes?.totalStock ?? 0
+    },
+    {
+        title: 'Total Stock Value',
+        value: kpis.value.totalStockValue,
+        formatter: formatCurrency,
+        icon: PrimeIcons.DOLLAR,
+        iconColor: 'text-yellow-500',
+        change: kpis.value.changes?.totalStockValue ?? 0
+    },
+    {
+        title: 'Low Stock Alerts',
+        value: kpis.value.lowStockAlerts,
+        icon: PrimeIcons.EXCLAMATION_TRIANGLE,
+        iconColor: 'text-red-500',
+        change: kpis.value.changes?.lowStockAlerts ?? 0,
+        reverseChangeColor: true
+    },
+    {
+        title: 'Orders Last Month',
+        value: kpis.value.ordersLastMonth,
+        icon: PrimeIcons.SHOPPING_BAG,
+        iconColor: 'text-purple-500',
+        change: kpis.value.changes?.ordersLastMonth ?? 0
+    },
+    {
+        title: 'Sales Last Month',
+        value: kpis.value.salesLastMonth,
+        formatter: formatCurrency,
+        icon: PrimeIcons.MONEY_BILL,
+        iconColor: 'text-green-500',
+        change: kpis.value.changes?.salesLastMonth ?? 0
+    }
 ]);
 
 const fetchKpiData = async () => {
     try {
         const response = await axios.get(route('dashboard.kpis'));
-        if (response.data) {
-            kpis.value = response.data;
-        }
+        kpis.value = {
+            ...response.data.currentData,
+            changes: response.data.changes
+        };
     } catch (error) {
         console.error('Error fetching KPI data:', error);
     } finally {

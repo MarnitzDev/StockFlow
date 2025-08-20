@@ -85,7 +85,7 @@ class PurchaseOrderSeeder extends Seeder
                     'name' => $vendorProduct->name,
                     'description' => $vendorProduct->description,
                     'category_id' => $vendorProduct->category_id,
-                    'price' => $vendorProduct->price * 1.2, // 20% markup
+                    'price' => $vendorProduct->price * 1.2,
                     'stock' => 0,
                 ]);
             });
@@ -148,7 +148,7 @@ class PurchaseOrderSeeder extends Seeder
         for ($j = 0; $j < $itemCount; $j++) {
             $inventoryItem = $inventoryItems->random();
             $quantity = $this->faker->numberBetween(10, 100);
-            $unitPrice = $inventoryItem->price / 1.2; // Remove the markup for purchase price
+            $unitPrice = $inventoryItem->price / 1.2;
 
             $order->items()->create([
                 'product_id' => $inventoryItem->id,

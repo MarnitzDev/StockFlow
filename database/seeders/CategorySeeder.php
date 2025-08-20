@@ -12,22 +12,22 @@ class CategorySeeder extends Seeder
     {
         $parentCategories = [
             'Shoes' => [
-                'Athletic Shoes', 'Boots', 'Sandals', 'Dress Shoes', 'Slippers'
+                'Athletic Shoes', 'Boots', 'Sandals', 'Dress Shoes', 'Slippers', 'Loafers', 'Sneakers', 'Heels', 'Flats', 'Oxfords'
             ],
             'Clothes' => [
-                'Shirts', 'Pants', 'Dresses', 'Jackets', 'Underwear'
+                'Shirts', 'Pants', 'Dresses', 'Jackets', 'Underwear', 'Sweaters', 'Skirts', 'Suits', 'Coats', 'Activewear'
             ],
             'Electronics' => [
-                'Smartphones', 'Laptops', 'Tablets', 'Smartwatches', 'Headphones'
+                'Smartphones', 'Laptops', 'Tablets', 'Smartwatches', 'Headphones', 'TVs', 'Cameras', 'Gaming Consoles', 'Speakers', 'E-readers'
             ],
             'Home & Garden' => [
-                'Furniture', 'Kitchenware', 'Bedding', 'Garden Tools', 'Home Decor'
+                'Furniture', 'Kitchenware', 'Bedding', 'Garden Tools', 'Home Decor', 'Lighting', 'Storage', 'Rugs', 'Curtains', 'Appliances'
             ],
             'Sports & Outdoors' => [
-                'Fitness Equipment', 'Camping Gear', 'Bicycles', 'Team Sports', 'Water Sports'
+                'Fitness Equipment', 'Camping Gear', 'Bicycles', 'Team Sports', 'Water Sports', 'Hiking', 'Fishing', 'Golf', 'Tennis', 'Skiing'
             ],
             'Beauty & Personal Care' => [
-                'Skincare', 'Haircare', 'Makeup', 'Fragrances', 'Personal Hygiene'
+                'Skincare', 'Haircare', 'Makeup', 'Fragrances', 'Personal Hygiene', 'Oral Care', 'Bath & Body', 'Nail Care', 'Men\'s Grooming', 'Sun Care'
             ]
         ];
 

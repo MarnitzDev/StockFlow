@@ -19,7 +19,7 @@ class VendorProductSeeder extends Seeder
         $vendors = Vendor::all();
 
         foreach ($vendors as $vendor) {
-            $productsCount = rand(5, 10);
+            $productsCount = rand(10, 20);
 
             for ($i = 0; $i < $productsCount; $i++) {
                 $productData = (new ProductFactory())->definition();

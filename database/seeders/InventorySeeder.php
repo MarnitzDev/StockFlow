@@ -24,16 +24,16 @@ class InventorySeeder extends Seeder
         $totalCreated = 0;
 
         foreach ($vendors as $vendor) {
-            $productsCount = rand(5, 10);
+            $productsCount = rand(50, 100);
 
             for ($i = 0; $i < $productsCount; $i++) {
                 $productData = (new ProductFactory())->definition();
 
                 $inventory = Inventory::create(array_merge($productData, [
                     'vendor_id' => $vendor->id,
-                    'stock' => rand(0, 20),
-                    'low_stock_threshold' => rand(1, 5),
-                    'image_url' => $productData['image_url'], // Use the image_url directly
+                    'stock' => rand(0, 25),
+                    'low_stock_threshold' => rand(0, 10),
+                    'image_url' => $productData['image_url'],
                 ]));
 
                 $totalCreated++;

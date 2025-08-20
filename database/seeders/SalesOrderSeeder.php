@@ -49,14 +49,14 @@ class SalesOrderSeeder extends Seeder
             $startDate = Carbon::create(Carbon::now()->year, 1, 1);
             $endDate = Carbon::now();
 
-            // Create 20 sample sales orders
-            for ($i = 0; $i < 20; $i++) {
+            // Create 50 sample sales orders
+            for ($i = 0; $i < 100; $i++) {
                 $orderDate = Carbon::parse($faker->dateTimeBetween($startDate, $endDate));
 
                 $order = SalesOrder::create([
                     'order_number' => 'SO-' . $faker->unique()->numberBetween(1000, 9999),
                     'customer_id' => $faker->randomElement($customerIds),
-                    'total_amount' => 0, // We'll calculate this based on order items
+                    'total_amount' => 0,
                     'status' => $faker->randomElement(['pending', 'processing', 'completed', 'cancelled']),
                     'notes' => $faker->optional()->sentence,
                     'created_at' => $orderDate,
