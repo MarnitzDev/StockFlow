@@ -52,6 +52,7 @@ import MultiSelect from 'primevue/multiselect';
 import OrganizationChart from 'primevue/organizationchart';
 import Chip from 'primevue/chip';
 import Checkbox from 'primevue/checkbox';
+import FileUpload from 'primevue/fileupload';
 
 import Tooltip from 'primevue/tooltip';
 
@@ -148,6 +149,7 @@ createInertiaApp({
         app.component('OrganizationChart', OrganizationChart);
         app.component('Chip', Chip);
         app.component('Checkbox', Checkbox);
+        app.component('FileUpload', FileUpload);
 
         app.directive('tooltip', Tooltip);
 

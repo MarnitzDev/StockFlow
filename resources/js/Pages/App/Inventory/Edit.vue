@@ -10,6 +10,43 @@
                     <div class="p-6 bg-white border-b border-gray-200">
                         <form @submit.prevent="submit">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="col-span-2">
+                                    <label for="image" class="block text-sm font-medium text-gray-700 mb-2">Product Image</label>
+                                    <div class="flex items-center space-x-6">
+                                        <div class="w-32 h-32 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+                                            <img
+                                                v-if="imagePreview"
+                                                :src="imagePreview"
+                                                alt="Product image preview"
+                                                class="w-full h-full object-cover"
+                                            />
+                                            <img
+                                                v-else-if="props.item.image_url"
+                                                :src="props.item.image_url"
+                                                alt="Current product image"
+                                                class="w-full h-full object-cover"
+                                            />
+                                            <span v-else class="text-gray-400">No image</span>
+                                        </div>
+                                        <div>
+                                            <FileUpload
+                                                mode="basic"
+                                                name="image"
+                                                accept="image/*"
+                                                :maxFileSize="1000000"
+                                                @select="onImageSelect"
+                                                @uploader="onImageUpload"
+                                                :auto="true"
+                                                chooseLabel="Choose Image"
+                                                class="p-button-outlined p-button-primary"
+                                            />
+                                            <p class="mt-2 text-sm text-gray-500">
+                                                PNG, JPG, GIF up to 1MB
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="col-span-1">
                                     <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
                                     <InputText id="name" v-model="form.name" :modelValue="props.item.name" class="mt-1 block w-full" required />
@@ -75,6 +112,7 @@ const props = defineProps<{
         price: number;
         stock: number;
         low_stock_threshold: number;
+        image_url: string | null;
     };
     categories: Array<{ id: number; name: string }>;
 }>();
@@ -87,6 +125,25 @@ const originalValues = {
     price: props.item.price,
     stock: props.item.stock,
     low_stock_threshold: props.item.low_stock_threshold,
+    image_url: props.item.image_url,
+};
+
+const imagePreview = ref(null);
+
+const onImageSelect = (event) => {
+    const file = event.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            imagePreview.value = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+const onImageUpload = (event) => {
+    const file = event.files[0];
+    form.image = file;
 };
 
 const form = useForm({
@@ -97,6 +154,7 @@ const form = useForm({
     price: props.item.price,
     stock: props.item.stock,
     low_stock_threshold: props.item.low_stock_threshold,
+    image: null,
 });
 
 const submit = () => {
@@ -104,6 +162,7 @@ const submit = () => {
         preserveScroll: true,
         onSuccess: () => {
             // Show success message
+            imagePreview.value = null;
         },
     });
 };
@@ -112,6 +171,9 @@ const hasChanges = computed(() => {
     return Object.keys(originalValues).some(key => {
         if (key === 'price') {
             return Number(form[key]).toFixed(2) !== Number(originalValues[key]).toFixed(2);
+        }
+        if (key === 'image_url') {
+            return form.image !== null || imagePreview.value !== null;
         }
         return form[key] !== originalValues[key];
     });
