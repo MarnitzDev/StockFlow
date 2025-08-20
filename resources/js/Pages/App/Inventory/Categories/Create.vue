@@ -11,7 +11,7 @@
                             <div class="grid grid-cols-2 gap-4 mb-4">
                                 <div>
                                     <InputLabel for="name" value="Name" />
-                                    <TextInput
+                                    <InputText
                                         id="name"
                                         type="text"
                                         class="mt-1 block w-full"
@@ -23,7 +23,7 @@
                                 </div>
                                 <div>
                                     <InputLabel for="slug" value="Slug" />
-                                    <TextInput
+                                    <InputText
                                         id="slug"
                                         type="text"
                                         class="mt-1 block w-full"

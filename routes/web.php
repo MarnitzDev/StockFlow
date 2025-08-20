@@ -44,6 +44,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/items', [InventoryController::class, 'items'])->name('items');
         Route::get('/create', [InventoryController::class, 'create'])->name('create');
         Route::post('/store', [InventoryController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [InventoryController::class, 'edit'])->name('edit');
         Route::put('/{id}/pos-availability', [InventoryController::class, 'updatePOSAvailability'])->name('updatePOSAvailability');
 
         // Categories

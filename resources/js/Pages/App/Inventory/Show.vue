@@ -55,11 +55,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="mt-8 flex space-x-4">
-                                    <Button label="Edit Item" icon="pi pi-pencil" class="p-button-outlined" />
-                                    <Button label="Manage Stock" icon="pi pi-box" class="p-button-outlined" />
-                                </div>
                             </div>
                         </div>
                     </div>

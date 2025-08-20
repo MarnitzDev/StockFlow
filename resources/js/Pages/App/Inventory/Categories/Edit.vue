@@ -33,7 +33,7 @@
                                             <form @submit.prevent="submit">
                                                 <div class="mb-4">
                                                     <InputLabel for="name" value="Name" />
-                                                    <TextInput
+                                                    <InputText
                                                         id="name"
                                                         type="text"
                                                         class="mt-1 block w-full"
@@ -46,11 +46,12 @@
 
                                                 <div class="mb-4">
                                                     <InputLabel for="slug" value="Slug" />
-                                                    <TextInput
+                                                    <InputText
                                                         id="slug"
                                                         type="text"
                                                         class="mt-1 block w-full"
                                                         v-model="form.slug"
+                                                        placeholder="asd"
                                                         required
                                                     />
                                                     <InputError :message="form.errors.slug" class="mt-2" />

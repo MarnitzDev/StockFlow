@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Inventory;
-use App\Models\InventoryImage;
+use App\Models\Category;
 use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -59,9 +59,15 @@ class InventoryController extends Controller
         return redirect()->route('inventory.items')->with('message', 'Inventory item created successfully');
     }
 
-    public function edit(Inventory $inventory)
+    public function edit($id)
     {
-        return Inertia::render('App/Inventory/Edit', ['item' => $inventory]);
+        $item = Inventory::findOrFail($id);
+        $categories = Category::all();
+
+        return Inertia::render('App/Inventory/Edit', [
+            'item' => $item,
+            'categories' => $categories
+        ]);
     }
 
     public function update(Request $request, Inventory $inventory)

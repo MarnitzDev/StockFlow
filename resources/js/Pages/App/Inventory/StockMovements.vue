@@ -60,7 +60,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { ref } from 'vue';
 import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
-import InputText from 'primevue/inputtext';
 
 const { formatCurrency } = useCurrencyFormatter();
 
