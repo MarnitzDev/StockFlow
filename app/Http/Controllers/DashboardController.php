@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Http\JsonResponse;
+use App\Models\Category;
 use App\Models\Inventory;
 use App\Models\Vendor;
 use App\Models\PurchaseOrder;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\JsonResponse;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -42,6 +43,29 @@ class DashboardController extends Controller
         } catch (\Exception $e) {
             \Log::error('Error in getKpis: ' . $e->getMessage());
             return response()->json(['error' => 'An error occurred while fetching KPIs'], 500);
+        }
+    }
+
+    public function inventoryByCategory()
+    {
+        try {
+            $inventoryByCategory = Category::select('categories.id', 'categories.name as category', DB::raw('COUNT(inventory.id) as count'))
+                ->leftJoin('categories as child_categories', 'categories.id', '=', 'child_categories.parent_id')
+                ->leftJoin('inventory', function ($join) {
+                    $join->on('categories.id', '=', 'inventory.category_id')
+                        ->orOn('child_categories.id', '=', 'inventory.category_id');
+                })
+                ->whereNull('categories.parent_id')
+                ->groupBy('categories.id', 'categories.name')
+                ->with(['children' => function ($query) {
+                    $query->withCount('inventoryItems');
+                }])
+                ->get();
+
+            return response()->json($inventoryByCategory);
+        } catch (\Exception $e) {
+            \Log::error('Error in inventoryByCategory: ' . $e->getMessage());
+            return response()->json(['error' => 'An error occurred while fetching inventory data: ' . $e->getMessage()], 500);
         }
     }
 }

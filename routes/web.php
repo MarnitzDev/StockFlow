@@ -41,6 +41,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('dashboard')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/kpis', [DashboardController::class, 'getKpis'])->name('dashboard.kpis');
+        Route::get('/inventory-by-category', [DashboardController::class, 'inventoryByCategory'])->name('dashboard.inventory-by-category');
+
     });
 
     // Inventory
