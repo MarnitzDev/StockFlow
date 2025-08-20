@@ -174,9 +174,9 @@ import { Link } from '@inertiajs/vue3';
 import { ref, computed, onMounted, nextTick, reactive } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useForm, router } from '@inertiajs/vue3';
-import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
 import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
+import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
 
 const { formatCurrency } = useCurrencyFormatter();
 const confirm = useConfirm();

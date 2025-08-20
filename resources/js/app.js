@@ -53,6 +53,7 @@ import OrganizationChart from 'primevue/organizationchart';
 import Chip from 'primevue/chip';
 import Checkbox from 'primevue/checkbox';
 import FileUpload from 'primevue/fileupload';
+import Skeleton from 'primevue/skeleton';
 
 import Tooltip from 'primevue/tooltip';
 
@@ -150,6 +151,7 @@ createInertiaApp({
         app.component('Chip', Chip);
         app.component('Checkbox', Checkbox);
         app.component('FileUpload', FileUpload);
+        app.component('Skeleton', Skeleton);
 
         app.directive('tooltip', Tooltip);
 

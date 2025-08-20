@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\POSController;
@@ -35,9 +36,12 @@ Route::prefix('pos')->name('pos.')->group(function () {
 
 // Inventory Management
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('App/Dashboard');
-    })->name('dashboard');
+
+
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/kpis', [DashboardController::class, 'getKpis'])->name('dashboard.kpis');
+    });
 
     // Inventory
     Route::prefix('inventory')->name('inventory.')->group(function () {
