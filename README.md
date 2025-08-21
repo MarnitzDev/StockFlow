@@ -32,7 +32,7 @@ StockFlow is a powerful, user-friendly inventory management system built with La
 ![Inventory Management](/public/images/Screenshots/inventory-management.png)
 
 ### Category Management
-![Category Management](/public/images/Screenshots/categories-edit.png)
+![Category Management](/public/images/Screenshots/categories.png)
 
 ### Category Edit
 ![Category Edit](/public/images/Screenshots/categories-edit.png)
