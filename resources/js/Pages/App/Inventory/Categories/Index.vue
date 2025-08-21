@@ -1,49 +1,36 @@
 <template>
     <AuthenticatedLayout>
+        <template #header-actions>
+            <Link :href="route('inventory.categories.create')">
+                <Button
+                    label="Add New Category"
+                    icon="pi pi-plus"
+                    variant="text"
+                />
+            </Link>
+        </template>
         <div class="pb-12">
             <div class="px-6">
-<!--                -->
-<!--                <div class="pb-6 grid grid-cols-1 md:grid-cols-3 gap-4">-->
-<!--                    <div class="bg-white overflow-hidden shadow rounded-lg">-->
-<!--                        <div class="px-4 py-3 sm:p-4">-->
-<!--                            <dt class="text-xs font-medium text-gray-500 truncate">-->
-<!--                                Total Categories-->
-<!--                            </dt>-->
-<!--                            <dd class="mt-1 text-2xl font-semibold text-gray-900">-->
-<!--                                {{ categories.length }}-->
-<!--                            </dd>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                    <div class="bg-white overflow-hidden shadow rounded-lg">-->
-<!--                        <div class="px-4 py-3 sm:p-4">-->
-<!--                            <dt class="text-xs font-medium text-gray-500 truncate">-->
-<!--                                Total Items in Categories-->
-<!--                            </dt>-->
-<!--                            <dd class="mt-1 text-2xl font-semibold text-gray-900">-->
-<!--                                {{ calculateTotalItems }}-->
-<!--                            </dd>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                    <div class="bg-white overflow-hidden shadow rounded-lg">-->
-<!--                        <div class="px-4 py-3 sm:p-4">-->
-<!--                            <dt class="text-xs font-medium text-gray-500 truncate">-->
-<!--                                Total Stock in Categories-->
-<!--                            </dt>-->
-<!--                            <dd class="mt-1 text-2xl font-semibold text-gray-900">-->
-<!--                                {{ calculateTotalStock }}-->
-<!--                            </dd>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-semibold">Inventory Categories</h3>
-                        <Link :href="route('inventory.categories.create')" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            Add New Category
-                        </Link>
-                    </div>
-                    <TreeTable :value="treeTableData" :expandedKeys="expandedKeys" @toggle="expandedKeys = $event">
+                    <TreeTable
+                        :value="treeTableData"
+                        :expandedKeys="expandedKeys"
+                        @toggle="onToggle"
+                        :filters="filters"
+                        filterMode="lenient"
+                        dataKey="id"
+                    >
+                        <template #header>
+                            <div class="flex flex-wrap gap-2 items-center justify-between">
+                                <h4 class="text-xl font-bold">Inventory Categories</h4>
+                                <IconField>
+                                    <InputIcon>
+                                        <i class="pi pi-search" />
+                                    </InputIcon>
+                                    <InputText v-model="filters['global']" placeholder="Search..." />
+                                </IconField>
+                            </div>
+                        </template>
                         <Column field="name" header="Category Name" expander>
                             <template #body="{ node }">
                                 {{ node.data.name }}
@@ -66,10 +53,7 @@
                         </Column>
                         <Column header="Actions">
                             <template #body="{ node }">
-<!--                                <Link :href="route('inventory.categories.edit', node.data.id)" class="text-indigo-600 hover:text-indigo-900 mr-2">Edit</Link>-->
                                 <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editCategory(node.data)" />
-                                <!-- Add delete functionality here -->
-
                             </template>
                         </Column>
                     </TreeTable>
@@ -83,14 +67,13 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Link, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
-import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
-
-const { formatCurrency } = useCurrencyFormatter();
+import { FilterMatchMode } from '@primevue/core/api';
 
 const props = defineProps({
     categories: Array
 });
 
+const filters = ref({});
 const expandedKeys = ref({});
 
 const treeTableData = computed(() => {
@@ -112,9 +95,10 @@ const getChildrenNodes = (parentId) => {
             key: child.id,
             data: {
                 ...child,
-                totalItems: getCategoryItemCount(child),
-                totalStock: getCategoryStock(child)
-            }
+                totalItems: getCategoryItemCount(child) + getChildrenItemCount(child),
+                totalStock: getCategoryStock(child) + getChildrenStock(child)
+            },
+            children: getChildrenNodes(child.id)
         }));
 };
 
@@ -128,12 +112,16 @@ const getCategoryItemCount = (category) => {
 
 const getChildrenItemCount = (category) => {
     const children = props.categories.filter(c => c.parent_id === category.id);
-    return children.reduce((total, child) => total + getCategoryItemCount(child), 0);
+    return children.reduce((total, child) => total + getCategoryItemCount(child) + getChildrenItemCount(child), 0);
 };
 
 const getChildrenStock = (category) => {
     const children = props.categories.filter(c => c.parent_id === category.id);
-    return children.reduce((total, child) => total + getCategoryStock(child), 0);
+    return children.reduce((total, child) => total + getCategoryStock(child) + getChildrenStock(child), 0);
+};
+
+const onToggle = (event) => {
+    expandedKeys.value = event;
 };
 
 const editCategory = (category) => {

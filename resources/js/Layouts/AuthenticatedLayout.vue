@@ -59,8 +59,9 @@
             <div class="flex-grow flex flex-col overflow-y-auto h-[calc(100vh-4rem)]">
                 <!-- Page Header -->
                 <div v-if="showHeader" class="bg-white shadow">
-                    <div class="py-4 px-10">
+                    <div class="flex justify-between items-center py-4 px-10">
                         <BreadcrumbNav />
+                        <slot name="header-actions"></slot>
                     </div>
                 </div>
                 <!-- Page Content -->

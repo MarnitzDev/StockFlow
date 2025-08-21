@@ -43,7 +43,7 @@ class CategoryController extends Controller
     {
         $category->load('inventoryItems');
         $allItems = Inventory::all();
-        $allCategories = Category::all();
+        $allCategories = Category::with('inventoryItems')->get();
 
         return Inertia::render('App/Inventory/Categories/Edit', [
             'category' => $category,

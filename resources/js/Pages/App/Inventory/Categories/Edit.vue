@@ -11,7 +11,7 @@
                     <div class="p-6 bg-white flex flex-col">
                         <div class="flex">
                             <!-- Vertical Tabs -->
-                            <div class="w-1/4 pr-4 border-r">
+                            <div class="w-1/5 pr-4 border-r">
                                 <div
                                     v-for="(tab, index) in tabs"
                                     :key="index"
@@ -24,7 +24,7 @@
                             </div>
 
                             <!-- Tab Content -->
-                            <div class="w-3/4 pl-6">
+                            <div class="w-4/5 pl-6">
                                 <!-- Category Details Tab -->
                                 <div v-if="activeTab === 0">
                                     <div class="grid grid-cols-2 gap-6">
@@ -81,8 +81,16 @@
                                                 <div class="flex flex-col items-center p-2 rounded-lg"
                                                      :class="{
                                                         'bg-blue-500 text-white': slotProps.node.key === props.category.id.toString()
-                                                    }">
-                                                    <span class="font-medium">{{ slotProps.node.label }}</span>
+                                                     }">
+                                                    <template v-if="slotProps.node.key === props.category.id.toString()">
+                                                        <span class="font-medium">{{ slotProps.node.label }}</span>
+                                                    </template>
+                                                    <template v-else>
+                                                        <Link :href="route('inventory.categories.edit', slotProps.node.key)"
+                                                              class="font-medium hover:underline cursor-pointer">
+                                                            {{ slotProps.node.label }}
+                                                        </Link>
+                                                    </template>
                                                 </div>
                                             </template>
                                         </OrganizationChart>
@@ -92,19 +100,52 @@
                                 <!-- Category Items Tab -->
                                 <div v-if="activeTab === 2">
                                     <div class="flex justify-between items-center mb-4">
-                                        <h3 class="text-lg font-semibold">Category Items</h3>
-                                        <Button label="Add Items" icon="pi pi-plus" @click="openAddItemsDialog" />
+                                        <h3 class="text-lg font-semibold">Category Items (Total: {{ allCategoryItems.length }})</h3>
+                                        <Button v-if="!isParentCategory" label="Add Items" variant="text" icon="pi pi-plus" @click="openAddItemsDialog" />
                                     </div>
-                                    <DataTable :value="categoryItems" :paginator="true" :rows="5">
-                                        <Column field="name" header="Name"></Column>
-                                        <Column field="sku" header="SKU"></Column>
-                                        <Column field="stock" header="Stock"></Column>
-                                        <Column header="Actions">
-                                            <template #body="slotProps">
-                                                <Button icon="pi pi-trash" class="p-button-danger p-button-sm" @click="removeItemFromCategory(slotProps.data)" />
+
+                                    <!-- Parent Category View -->
+                                    <div v-if="isParentCategory">
+                                        <p class="mb-4">This is a parent category. Here's a summary of items in its subcategories:</p>
+                                        <DataTable :value="subcategoriesSummary" :paginator="true" :rows="10">
+                                            <Column field="name" header="Subcategory Name"></Column>
+                                            <Column field="itemCount" header="Item Count"></Column>
+                                            <Column field="totalStock" header="Total Stock"></Column>
+                                        </DataTable>
+                                    </div>
+
+                                    <!-- Leaf Category View -->
+                                    <div v-else>
+                                        <DataTable :value="allCategoryItems" :paginator="true" :rows="10">
+                                            <template #empty>
+                                                <div class="text-center p-4">
+                                                    <p>No items in this category.</p>
+                                                </div>
                                             </template>
-                                        </Column>
-                                    </DataTable>
+                                            <Column field="name" header="Name"></Column>
+                                            <Column field="sku" header="SKU"></Column>
+                                            <Column field="stock" header="Stock"></Column>
+                                            <Column header="Actions">
+                                                <template #body="slotProps">
+                                                    <div class="flex gap-2">
+                                                        <Link :href="route('inventory.show', slotProps.data.id)">
+                                                            <Button
+                                                                icon="pi pi-eye"
+                                                                class="p-button-info p-button-sm"
+                                                                text
+                                                            />
+                                                        </Link>
+                                                        <Button
+                                                            icon="pi pi-trash"
+                                                            class="p-button-danger p-button-sm"
+                                                            text
+                                                            @click="removeItemFromCategory(slotProps.data)"
+                                                        />
+                                                    </div>
+                                                </template>
+                                            </Column>
+                                        </DataTable>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -141,7 +182,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useForm } from '@inertiajs/vue3';
+import { useForm, Link } from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';
@@ -246,6 +287,40 @@ const addSelectedItemsToCategory = () => {
     showAddItemsDialog.value = false;
     // You might want to make an API call here to update the backend
 };
+
+const isParentCategory = computed(() => {
+    return props.allCategories.some(cat => cat.parent_id === props.category.id);
+});
+
+const allCategoryItems = computed(() => {
+    const getItemsRecursively = (categoryId) => {
+        let items = [];
+        const category = props.allCategories.find(cat => cat.id === categoryId);
+        if (category && category.inventory_items) {
+            items = [...category.inventory_items];
+        }
+        const childCategories = props.allCategories.filter(cat => cat.parent_id === categoryId);
+        childCategories.forEach(child => {
+            items = [...items, ...getItemsRecursively(child.id)];
+        });
+        return items;
+    };
+
+    return getItemsRecursively(props.category.id);
+});
+
+const subcategoriesSummary = computed(() => {
+    return props.allCategories
+        .filter(cat => cat.parent_id === props.category.id)
+        .map(subcat => {
+            const items = allCategoryItems.value.filter(item => item.category_id === subcat.id);
+            return {
+                name: subcat.name,
+                itemCount: items.length,
+                totalStock: items.reduce((sum, item) => sum + item.stock, 0)
+            };
+        });
+});
 </script>
 
 <style scoped>

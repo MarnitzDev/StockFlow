@@ -84,7 +84,7 @@
                                 </template>
                             </Column>
 
-                            <Column field="vendor.name" header="Supplier" sortable style="width: 28%;">
+                            <Column field="vendor.name" header="Supplier" sortable style="width: 30%;">
                                 <template #filter="{ filterModel, filterCallback }">
                                     <InputText v-model="filterModel.value" @input="filterCallback()" class="p-column-filter" placeholder="Search by supplier" />
                                 </template>
@@ -108,10 +108,16 @@
                                 </template>
                             </Column>
 
-                            <Column header="Actions" :exportable="false" style="width: 15%;">
-                                <template #body="{ data }">
-                                    <Button icon="pi pi-eye" class="p-button-rounded p-button-text" @click="viewOrder(data)" />
-                                    <Button icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="editOrder(data)" />
+                            <Column header="Actions" :exportable="false" style="width: 10%;">
+                                <template #body="slotProps">
+                                    <Link :href="route('dashboard', slotProps.data.id)" class="mr-2">
+                                        <Button
+                                            icon="pi pi-eye"
+                                            severity="info"
+                                            outlined
+                                            rounded
+                                        />
+                                    </Link>
                                 </template>
                             </Column>
                         </DataTable>
@@ -124,7 +130,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { Head, router } from '@inertiajs/vue3';
+import {Head, Link, router} from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { PurchaseOrder } from '@/types';
 import { FilterMatchMode } from '@primevue/core/api';
