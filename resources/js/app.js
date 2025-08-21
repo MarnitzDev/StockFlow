@@ -3,15 +3,17 @@ import './bootstrap';
 import 'primeicons/primeicons.css';
 import '../css/theme.css';
 
+import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
-import { createApp, h } from 'vue';
-import { ZiggyVue } from '../../vendor/tightenco/ziggy';
+import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/vue.m';
 
 // Import PrimeVue
 import PrimeVue from 'primevue/config';
 import Aura from '@primeuix/themes/aura';
 import { definePreset } from '@primeuix/themes';
+
+// Import PrimeVue components
 import Button from 'primevue/button';
 import Calendar from 'primevue/calendar';
 import InputText from 'primevue/inputtext';
@@ -83,18 +85,7 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
-    resolve: name => {
-        const pages = import.meta.glob('./Pages/**/*.vue', { eager: true })
-        const page = pages[`./Pages/${name}.vue`]
-
-        // Add meta information for breadcrumbs
-        page.default.meta = {
-            ...page.default.meta,
-            breadcrumb: name.split('/').pop()
-        }
-
-        return page
-    },
+    resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
     setup({ el, App, props, plugin }) {
         const app = createApp({ render: () => h(App, props) });
 
@@ -109,49 +100,17 @@ createInertiaApp({
             .use(ConfirmationService)
             .use(ToastService);
 
-
-        app.component('Button', Button);
-        app.component('Calendar', Calendar);
-        app.component('InputText', InputText);
-        app.component('InputNumber', InputNumber);
-        app.component('Dropdown', Dropdown);
-        app.component('DataTable', DataTable);
-        app.component('DataView', DataView);
-        app.component('Column', Column);
-        app.component('ColumnGroup', ColumnGroup);
-        app.component('Row', Row);
-        app.component('Menu', Menu);
-        app.component('IconField', IconField);
-        app.component('InputIcon', InputIcon);
-        app.component('Stepper', Stepper);
-        app.component('StepPanel', StepPanel);
-        app.component('StepList', StepList);
-        app.component('StepPanels', StepPanels);
-        app.component('StepItem', StepItem);
-        app.component('Step', Step);
-        app.component('Textarea', Textarea);
-        app.component('SelectButton', SelectButton);
-        app.component('TreeTable', TreeTable);
-        app.component('Chart', Chart);
-        app.component('Card', Card);
-        app.component('Tag', Tag);
-        app.component('InputSwitch', InputSwitch);
-        app.component('Dialog', Dialog);
-        app.component('ConfirmDialog', ConfirmDialog);
-        app.component('Toast', Toast);
-        app.component('ToggleButton', ToggleButton);
-        app.component('Rating', Rating);
-        app.component('Divider', Divider);
-        app.component('Select', Select);
-        app.component('Breadcrumb', Breadcrumb);
-        app.component('Paginator', Paginator);
-        app.component('MegaMenu', MegaMenu);
-        app.component('MultiSelect', MultiSelect);
-        app.component('OrganizationChart', OrganizationChart);
-        app.component('Chip', Chip);
-        app.component('Checkbox', Checkbox);
-        app.component('FileUpload', FileUpload);
-        app.component('Skeleton', Skeleton);
+        // Register PrimeVue components
+        [
+            Button, Calendar, InputText, InputNumber, Dropdown, DataTable, DataView,
+            Column, ColumnGroup, Row, Menu, IconField, InputIcon, Stepper, StepList,
+            StepPanels, StepItem, StepPanel, Step, Textarea, SelectButton, TreeTable,
+            Chart, Card, Tag, InputSwitch, Dialog, ConfirmDialog, Toast, ToggleButton,
+            Rating, Divider, Select, Breadcrumb, Paginator, MegaMenu, MultiSelect,
+            OrganizationChart, Chip, Checkbox, FileUpload, Skeleton
+        ].forEach(component => {
+            app.component(component.name, component);
+        });
 
         app.directive('tooltip', Tooltip);
 
