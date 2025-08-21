@@ -152,10 +152,21 @@
                     </div>
                 </div>
                 <!-- Save Button outside tabs -->
-                <div class="mt-6 flex justify-end">
-                    <PrimaryButton @click="submit" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                        Save Changes
-                    </PrimaryButton>
+                <div class="mt-6 flex justify-between">
+                    <Link :href="route('inventory.categories.index')" class="mr-4">
+                        <Button
+                            label="Back to Categories"
+                            icon="pi pi-arrow-left"
+                            severity="secondary"
+                        />
+                    </Link>
+                    <Button
+                        label="Save Changes"
+                        icon="pi pi-save"
+                        @click="submit"
+                        :loading="form.processing"
+                        :disabled="form.processing"
+                    />
                 </div>
             </div>
         </div>

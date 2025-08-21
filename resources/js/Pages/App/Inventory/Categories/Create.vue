@@ -112,10 +112,21 @@
                     </div>
                 </div>
 
-                <div class="flex items-center justify-end mt-6">
-                    <PrimaryButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                        Create Category
-                    </PrimaryButton>
+                <div class="mt-6 flex justify-between">
+                    <Link :href="route('inventory.categories.index')" class="mr-4">
+                        <Button
+                            label="Back to Categories"
+                            icon="pi pi-arrow-left"
+                            severity="secondary"
+                        />
+                    </Link>
+                    <Button
+                        label="Create Category"
+                        icon="pi pi-plus"
+                        @click="submit"
+                        :loading="form.processing"
+                        :disabled="form.processing"
+                    />
                 </div>
             </div>
         </div>
@@ -124,7 +135,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { useForm } from '@inertiajs/vue3';
+import {Link, useForm} from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';

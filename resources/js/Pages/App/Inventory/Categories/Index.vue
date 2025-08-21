@@ -11,14 +11,46 @@
         </template>
         <div class="pb-12">
             <div class="px-6">
+                <!--                -->
+                <!--                <div class="pb-6 grid grid-cols-1 md:grid-cols-3 gap-4">-->
+                <!--                    <div class="bg-white overflow-hidden shadow rounded-lg">-->
+                <!--                        <div class="px-4 py-3 sm:p-4">-->
+                <!--                            <dt class="text-xs font-medium text-gray-500 truncate">-->
+                <!--                                Total Categories-->
+                <!--                            </dt>-->
+                <!--                            <dd class="mt-1 text-2xl font-semibold text-gray-900">-->
+                <!--                                {{ categories.length }}-->
+                <!--                            </dd>-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+                <!--                    <div class="bg-white overflow-hidden shadow rounded-lg">-->
+                <!--                        <div class="px-4 py-3 sm:p-4">-->
+                <!--                            <dt class="text-xs font-medium text-gray-500 truncate">-->
+                <!--                                Total Items in Categories-->
+                <!--                            </dt>-->
+                <!--                            <dd class="mt-1 text-2xl font-semibold text-gray-900">-->
+                <!--                                {{ calculateTotalItems }}-->
+                <!--                            </dd>-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+                <!--                    <div class="bg-white overflow-hidden shadow rounded-lg">-->
+                <!--                        <div class="px-4 py-3 sm:p-4">-->
+                <!--                            <dt class="text-xs font-medium text-gray-500 truncate">-->
+                <!--                                Total Stock in Categories-->
+                <!--                            </dt>-->
+                <!--                            <dd class="mt-1 text-2xl font-semibold text-gray-900">-->
+                <!--                                {{ calculateTotalStock }}-->
+                <!--                            </dd>-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+                <!--                </div>-->
+
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
                     <TreeTable
                         :value="treeTableData"
                         :expandedKeys="expandedKeys"
-                        @toggle="onToggle"
                         :filters="filters"
-                        filterMode="lenient"
-                        dataKey="id"
+                        @toggle="expandedKeys = $event"
                     >
                         <template #header>
                             <div class="flex flex-wrap gap-2 items-center justify-between">
@@ -31,29 +63,32 @@
                                 </IconField>
                             </div>
                         </template>
-                        <Column field="name" header="Category Name" expander>
+                        <Column field="name" header="Category Name" style="width: 30%;" expander>
                             <template #body="{ node }">
                                 {{ node.data.name }}
                             </template>
                         </Column>
-                        <Column field="slug" header="Slug">
+                        <Column field="slug" header="Slug" style="width: 30%;">
                             <template #body="{ node }">
                                 {{ node.data.slug }}
                             </template>
                         </Column>
-                        <Column field="totalItems" header="Total Items">
+                        <Column field="totalItems" header="Total Items" style="width: 15%;">
                             <template #body="{ node }">
                                 {{ node.data.totalItems }}
                             </template>
                         </Column>
-                        <Column field="totalStock" header="Total Stock">
+                        <Column field="totalStock" header="Total Stock" style="width: 15%;">
                             <template #body="{ node }">
                                 {{ node.data.totalStock }}
                             </template>
                         </Column>
-                        <Column header="Actions">
+                        <Column header="Actions" style="width: 10%;">
                             <template #body="{ node }">
+                                <!--                                <Link :href="route('inventory.categories.edit', node.data.id)" class="text-indigo-600 hover:text-indigo-900 mr-2">Edit</Link>-->
                                 <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editCategory(node.data)" />
+                                <!-- Add delete functionality here -->
+
                             </template>
                         </Column>
                     </TreeTable>
@@ -67,14 +102,13 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Link, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
-import { FilterMatchMode } from '@primevue/core/api';
 
 const props = defineProps({
     categories: Array
 });
 
-const filters = ref({});
 const expandedKeys = ref({});
+const filters = ref({});
 
 const treeTableData = computed(() => {
     return props.categories.filter(category => !category.parent_id).map(category => ({
@@ -95,10 +129,9 @@ const getChildrenNodes = (parentId) => {
             key: child.id,
             data: {
                 ...child,
-                totalItems: getCategoryItemCount(child) + getChildrenItemCount(child),
-                totalStock: getCategoryStock(child) + getChildrenStock(child)
-            },
-            children: getChildrenNodes(child.id)
+                totalItems: getCategoryItemCount(child),
+                totalStock: getCategoryStock(child)
+            }
         }));
 };
 
@@ -112,16 +145,12 @@ const getCategoryItemCount = (category) => {
 
 const getChildrenItemCount = (category) => {
     const children = props.categories.filter(c => c.parent_id === category.id);
-    return children.reduce((total, child) => total + getCategoryItemCount(child) + getChildrenItemCount(child), 0);
+    return children.reduce((total, child) => total + getCategoryItemCount(child), 0);
 };
 
 const getChildrenStock = (category) => {
     const children = props.categories.filter(c => c.parent_id === category.id);
-    return children.reduce((total, child) => total + getCategoryStock(child) + getChildrenStock(child), 0);
-};
-
-const onToggle = (event) => {
-    expandedKeys.value = event;
+    return children.reduce((total, child) => total + getCategoryStock(child), 0);
 };
 
 const editCategory = (category) => {
