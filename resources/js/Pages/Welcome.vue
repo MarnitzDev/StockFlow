@@ -46,12 +46,10 @@
                     <template #footer>
                         <div class="flex justify-center mt-auto">
                             <Link :href="route('dashboard')">
-                                <Link :href="route('dashboard')">
-                                    <FeatureButton
-                                        label="View Dashboard"
-                                        icon="pi pi-chart-line"
-                                    />
-                                </Link>
+                                <FeatureButton
+                                    label="View Dashboard"
+                                    icon="pi pi-chart-line"
+                                />
                             </Link>
                         </div>
                     </template>
