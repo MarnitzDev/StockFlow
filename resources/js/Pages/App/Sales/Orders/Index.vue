@@ -47,7 +47,7 @@
                             :rows="10"
                             dataKey="id"
                             :filters="filters"
-                            filterDisplay="row"
+                            filterDisplay="menu"
                             :globalFilterFields="['order_number', 'customer.name', 'total_amount', 'status']"
                             responsiveLayout="scroll"
                         >
@@ -94,7 +94,6 @@
                                         @input="filterCallback()"
                                         @clear="clearFilter('customer.name')"
                                         placeholder="Search customer"
-                                        class="w-full"
                                     />
                                 </template>
                             </Column>
@@ -106,8 +105,8 @@
                             </Column>
 
                             <Column field="status" header="Status" sortable style="width: 18%;">
-                                <template #body="slotProps">
-                                    <Tag :value="slotProps.data.status" :severity="getStatusSeverity(slotProps.data.status)" />
+                                <template #body="{ data }">
+                                    <span :class="'status-badge status-' + data.status.toLowerCase()">{{ data.status }}</span>
                                 </template>
                                 <template #filter="{ filterModel, filterCallback }">
                                     <div class="p-inputgroup">
@@ -116,7 +115,6 @@
                                             @change="filterCallback()"
                                             :options="statusOptions"
                                             placeholder="Select Status"
-                                            class="w-full"
                                             showClear
                                         />
                                     </div>
@@ -186,7 +184,7 @@ const formatDate = (value) => {
 const getStatusSeverity = (status) => {
     switch (status.toLowerCase()) {
         case 'pending':
-            return 'warning';
+            return 'warn';
         case 'processing':
             return 'info';
         case 'completed':

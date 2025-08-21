@@ -6,15 +6,30 @@
                     <div v-if="salesOrder">
                         <h3 class="text-lg font-semibold mb-4">Order #{{ salesOrder.order_number }}</h3>
 
-                        <div class="mb-4">
-                            <p><strong>Customer:</strong> {{ salesOrder.customer?.name || 'N/A' }}</p>
-                            <p><strong>Status:</strong> {{ salesOrder.status || 'N/A' }}</p>
-                            <p><strong>Total Amount:</strong> {{ formatCurrency(salesOrder.total_amount) }}</p>
-                            <p><strong>Date:</strong> {{ salesOrder.created_at ? new Date(salesOrder.created_at).toLocaleDateString() : 'N/A' }}</p>
+                        <div class="mb-6 bg-gray-50 rounded-lg p-6 shadow-sm">
+                            <h4 class="text-lg font-semibold mb-4 text-gray-700 border-b pb-2">Order Details</h4>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-sm text-gray-600">Customer</p>
+                                    <p class="font-medium">{{ salesOrder.customer?.name || 'N/A' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Status</p>
+                                    <Tag :value="salesOrder.status" :severity="getStatusSeverity(salesOrder.status)" />
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Total Amount</p>
+                                    <p class="font-medium">{{ formatCurrency(salesOrder.total_amount) }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600">Date</p>
+                                    <p class="font-medium">{{ salesOrder.created_at ? new Date(salesOrder.created_at).toLocaleDateString() : 'N/A' }}</p>
+                                </div>
+                            </div>
                         </div>
 
                         <h4 class="text-md font-semibold mb-2">Order Items</h4>
-                        <DataTable :value="salesOrder.items" class="p-datatable-sm" responsiveLayout="scroll">
+                        <DataTable :value="salesOrder.items" responsiveLayout="scroll">
                             <Column field="inventory.name" header="Item">
                                 <template #body="slotProps">
                                     {{ formatItemName(slotProps.data) }}
@@ -32,11 +47,6 @@
                                 </template>
                             </Column>
                         </DataTable>
-
-                        <div class="mt-4">
-                            <h4 class="text-md font-semibold mb-2">Notes</h4>
-                            <p>{{ salesOrder.notes || 'No notes' }}</p>
-                        </div>
                     </div>
                     <div v-else class="text-red-500">
                         Error: Sales order data not available.
@@ -72,5 +82,21 @@ const props = defineProps({
 
 const formatItemName = (item) => {
     return item.inventory?.name || 'N/A';
+};
+
+
+const getStatusSeverity = (status) => {
+    switch (status.toLowerCase()) {
+        case 'pending':
+            return 'warn';
+        case 'processing':
+            return 'info';
+        case 'completed':
+            return 'success';
+        case 'cancelled':
+            return 'danger';
+        default:
+            return null;
+    }
 };
 </script>

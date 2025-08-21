@@ -26,3 +26,37 @@
 #nprogress .bar {
     animation: nprogress-pulse 1s ease-in-out infinite;
 }
+
+/* Status */
+.status-badge {
+    border-radius: 4px;
+    padding: 0.25em 0.5rem;
+    text-transform: capitalize;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+}
+
+.status-completed {
+    background-color: #C8E6C9;
+    color: #256029;
+}
+
+.status-pending {
+    background-color: #FEEDAF;
+    color: #8A5340;
+}
+
+.status-processing {
+    background-color: #B3E5FC;
+    color: #23547B;
+}
+
+.status-cancelled {
+    background-color: #FFCDD2;
+    color: #C63737;
+}

@@ -50,7 +50,7 @@
                             paginator
                             :rows="10"
                             dataKey="id"
-                            filterDisplay="row"
+                            filterDisplay="menu"
                             :loading="loading"
                             sortField="name"
                             :sortOrder="1"
