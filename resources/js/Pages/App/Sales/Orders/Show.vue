@@ -44,8 +44,12 @@
                     </div>
 
                     <div class="mt-6">
-                        <Link :href="route('sales.orders.index')" class="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded">
-                            Back to Orders
+                        <Link :href="route('sales.orders.index')" class="mr-4">
+                            <Button
+                                label="Back to Orders"
+                                icon="pi pi-arrow-left"
+                                severity="secondary"
+                            />
                         </Link>
                     </div>
                 </div>

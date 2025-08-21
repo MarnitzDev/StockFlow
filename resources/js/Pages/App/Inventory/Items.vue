@@ -155,9 +155,7 @@
                             <Column header="Actions" :exportable="false" style="width: 10%;">
                                 <template #body="{ data }">
                                     <Button icon="pi pi-eye" outlined rounded class="mr-2" @click="viewItem(data)" />
-<!--                                    <Button icon="pi pi-plus" outlined rounded class="mr-2" @click="openStockMovementDialog(data)" />-->
                                     <Button icon="pi pi-pencil" outlined rounded class="mr-2" @click="editItem(data)" />
-                                    <!--                                    <Button icon="pi pi-trash" outlined rounded severity="danger" @click="deleteItem(data)" />-->
                                 </template>
                             </Column>
                         </DataTable>
@@ -244,8 +242,6 @@ const filters = ref({
     'category.name': { value: null, matchMode: FilterMatchMode.CONTAINS },
     sku: { value: null, matchMode: FilterMatchMode.CONTAINS }
 });
-
-
 
 const getSeverity = (stock, threshold) => {
     return stock > threshold ? 'success' : 'danger';
