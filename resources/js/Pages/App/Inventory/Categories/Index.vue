@@ -115,8 +115,8 @@ const treeTableData = computed(() => {
         key: category.id,
         data: {
             ...category,
-            totalItems: getCategoryItemCount(category) + getChildrenItemCount(category),
-            totalStock: getCategoryStock(category) + getChildrenStock(category)
+            totalItems: getTotalItems(category),
+            totalStock: getTotalStock(category)
         },
         children: getChildrenNodes(category.id)
     }));
@@ -129,10 +129,23 @@ const getChildrenNodes = (parentId) => {
             key: child.id,
             data: {
                 ...child,
-                totalItems: getCategoryItemCount(child),
-                totalStock: getCategoryStock(child)
-            }
+                totalItems: getTotalItems(child),
+                totalStock: getTotalStock(child)
+            },
+            children: getChildrenNodes(child.id)
         }));
+};
+
+const getTotalItems = (category) => {
+    const directItems = getCategoryItemCount(category);
+    const childrenItems = getChildrenItemCount(category);
+    return directItems + childrenItems;
+};
+
+const getTotalStock = (category) => {
+    const directStock = getCategoryStock(category);
+    const childrenStock = getChildrenStock(category);
+    return directStock + childrenStock;
 };
 
 const getCategoryStock = (category) => {
@@ -145,12 +158,12 @@ const getCategoryItemCount = (category) => {
 
 const getChildrenItemCount = (category) => {
     const children = props.categories.filter(c => c.parent_id === category.id);
-    return children.reduce((total, child) => total + getCategoryItemCount(child), 0);
+    return children.reduce((total, child) => total + getTotalItems(child), 0);
 };
 
 const getChildrenStock = (category) => {
     const children = props.categories.filter(c => c.parent_id === category.id);
-    return children.reduce((total, child) => total + getCategoryStock(child), 0);
+    return children.reduce((total, child) => total + getTotalStock(child), 0);
 };
 
 const editCategory = (category) => {

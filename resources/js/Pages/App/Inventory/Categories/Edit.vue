@@ -248,12 +248,12 @@ const getParentCategoryName = (parentId) => {
 };
 
 const categoryHierarchy = computed(() => {
-    const buildHierarchy = (category, isRoot = false) => {
+    const buildHierarchy = (category) => {
         const node = {
             key: category.id.toString(),
             type: 'category',
             label: category.name,
-            expanded: isRoot,
+            expanded: true,
             children: []
         };
 
@@ -263,12 +263,20 @@ const categoryHierarchy = computed(() => {
         return node;
     };
 
-    if (form.parent_id) {
-        const parent = props.allCategories.find(cat => cat.id === form.parent_id);
-        return buildHierarchy(parent, true);
-    } else {
-        return buildHierarchy(props.category, true);
-    }
+    const findRootAndBuildHierarchy = (categoryId) => {
+        let currentCategory = props.allCategories.find(cat => cat.id === categoryId);
+        if (!currentCategory) return null;
+
+        while (currentCategory.parent_id) {
+            const parent = props.allCategories.find(cat => cat.id === currentCategory.parent_id);
+            if (!parent) break;
+            currentCategory = parent;
+        }
+
+        return buildHierarchy(currentCategory);
+    };
+
+    return findRootAndBuildHierarchy(props.category.id);
 });
 
 const submit = () => {

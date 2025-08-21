@@ -10,28 +10,47 @@ class CategorySeeder extends Seeder
 {
     public function run()
     {
-        $parentCategories = [
+        $categories = [
             'Shoes' => [
-                'Athletic Shoes', 'Boots', 'Sandals', 'Dress Shoes', 'Slippers', 'Loafers', 'Sneakers', 'Heels', 'Flats', 'Oxfords'
+                'Athletic Shoes' => ['Running', 'Basketball'],
+                'Boots' => [],
+                'Sandals' => [],
+                'Dress Shoes' => ['Oxford', 'Loafers']
             ],
             'Clothes' => [
-                'Shirts', 'Pants', 'Dresses', 'Jackets', 'Underwear', 'Sweaters', 'Skirts', 'Suits', 'Coats', 'Activewear'
+                'Shirts' => ['T-Shirts', 'Dress Shirts'],
+                'Pants' => [],
+                'Dresses' => [],
+                'Jackets' => [],
+                'Underwear' => []
             ],
             'Electronics' => [
-                'Smartphones', 'Laptops', 'Tablets', 'Smartwatches', 'Headphones', 'TVs', 'Cameras', 'Gaming Consoles', 'Speakers', 'E-readers'
+                'Smartphones' => [],
+                'Laptops' => ['Gaming', 'Business'],
+                'Tablets' => [],
+                'Smartwatches' => []
             ],
             'Home & Garden' => [
-                'Furniture', 'Kitchenware', 'Bedding', 'Garden Tools', 'Home Decor', 'Lighting', 'Storage', 'Rugs', 'Curtains', 'Appliances'
+                'Furniture' => ['Living Room', 'Bedroom'],
+                'Kitchenware' => [],
+                'Bedding' => [],
+                'Garden Tools' => []
             ],
             'Sports & Outdoors' => [
-                'Fitness Equipment', 'Camping Gear', 'Bicycles', 'Team Sports', 'Water Sports', 'Hiking', 'Fishing', 'Golf', 'Tennis', 'Skiing'
+                'Fitness Equipment' => ['Cardio', 'Strength'],
+                'Camping Gear' => [],
+                'Bicycles' => [],
+                'Team Sports' => []
             ],
             'Beauty & Personal Care' => [
-                'Skincare', 'Haircare', 'Makeup', 'Fragrances', 'Personal Hygiene', 'Oral Care', 'Bath & Body', 'Nail Care', 'Men\'s Grooming', 'Sun Care'
+                'Skincare' => [],
+                'Haircare' => ['Shampoo', 'Conditioner'],
+                'Makeup' => [],
+                'Fragrances' => []
             ]
         ];
 
-        foreach ($parentCategories as $parentName => $childCategories) {
+        foreach ($categories as $parentName => $subcategories) {
             $parent = Category::create([
                 'name' => $parentName,
                 'slug' => Str::slug($parentName),
@@ -39,13 +58,22 @@ class CategorySeeder extends Seeder
                 'parent_id' => null
             ]);
 
-            foreach ($childCategories as $childName) {
-                Category::create([
-                    'name' => $childName,
-                    'slug' => Str::slug($parentName . ' ' . $childName),
-                    'description' => "Subcategory of {$parentName} for {$childName}",
+            foreach ($subcategories as $subcategoryName => $subsubcategories) {
+                $subcategory = Category::create([
+                    'name' => $subcategoryName,
+                    'slug' => Str::slug($parentName . ' ' . $subcategoryName),
+                    'description' => "Subcategory of {$parentName} for {$subcategoryName}",
                     'parent_id' => $parent->id
                 ]);
+
+                foreach ($subsubcategories as $subsubcategoryName) {
+                    Category::create([
+                        'name' => $subsubcategoryName,
+                        'slug' => Str::slug($parentName . ' ' . $subcategoryName . ' ' . $subsubcategoryName),
+                        'description' => "Sub-subcategory of {$subcategoryName} for {$subsubcategoryName}",
+                        'parent_id' => $subcategory->id
+                    ]);
+                }
             }
         }
     }
