@@ -5,11 +5,9 @@ StockFlow is a powerful, user-friendly inventory management system built with La
 ![StockFlow Landing](/public/images/Screenshots/landing.png)
 
 ## 🚀 Demo
-<div align="center">
-
-[![View Live Demo](https://img.shields.io/badge/View%20Live%20Demo-4CAF50?style=for-the-badge&logo=vue.js&logoColor=white)](https://demo.stockflow.com)
-
-</div>
+<a href="https://demo.stockflow.com" target="_blank">
+  <img src="https://img.shields.io/badge/View%20Live%20Demo-4CAF50?style=for-the-badge&labelColor=4CAF50&color=4CAF50&logoColor=white&label=%20&height=40" alt="View Live Demo" height="40">
+</a>
 
 ## ✨ Features
 
