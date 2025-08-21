@@ -23,9 +23,8 @@ StockFlow is a powerful, user-friendly inventory management system built with La
 - **HTTP Client**: [Axios](https://axios-http.com/) - Promise based HTTP client for the browser and node.js
 - **Build Tool**: [Vite](https://vitejs.dev/) - Next Generation Frontend Tooling
 
-## 📸 Screenshots
+## 📊 Inventory Management
 
-### Inventory Management
 #### Dashboard
 ![Dashboard](/public/images/Screenshots/dashboard.png)
 Get a quick overview of your business performance with key metrics and charts.
@@ -46,12 +45,18 @@ Edit category details and manage subcategories to keep your inventory well-struc
 ![Sales Overview](/public/images/Screenshots/sales.png)
 Track your sales performance and analyze trends with detailed reports and charts.
 
-### Point of Sale (POS)
+---
+
+## 🛒 Point of Sale (POS)
+
 #### POS Interface
 ![POS](/public/images/Screenshots/pos.png)
 Streamline your sales process with our user-friendly POS interface.
 
-### Vendor Management
+---
+
+## 📦 Vendor Management
+
 #### Vendor List
 ![Vendor](/public/images/Screenshots/vendor.png)
 Manage your suppliers and keep track of all your vendor information in one place.
