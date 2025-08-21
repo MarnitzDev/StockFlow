@@ -42,10 +42,10 @@ Organize your products into categories for better organization and easier naviga
 Edit category details and manage subcategories to keep your inventory well-structured.
 
 #### Sales Overview
-![Sales Overview](/public/images/Screenshots/sales.png)
-Track your sales performance and analyze trends with detailed reports and charts.
+![Sales Overview](/public/images/Screenshots/sales.png) [^1]
 
----
+[^1]: Track your sales performance and analyze trends with detailed reports and charts.
+
 
 ## 🛒 Point of Sale (POS)
 
@@ -53,7 +53,6 @@ Track your sales performance and analyze trends with detailed reports and charts
 ![POS](/public/images/Screenshots/pos.png)
 Streamline your sales process with our user-friendly POS interface.
 
----
 
 ## 📦 Vendor Management
 
