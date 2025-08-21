@@ -26,25 +26,36 @@ StockFlow is a powerful, user-friendly inventory management system built with La
 ## 📸 Screenshots
 
 ### Dashboard
+Get a quick overview of your business performance with key metrics and charts.
 ![Dashboard](/public/images/Screenshots/dashboard.png)
 
 ### Inventory Management
+#### Inventory Overview
+Manage your product inventory with ease, including stock levels, prices, and details.
 ![Inventory Management](/public/images/Screenshots/inventory-management.png)
 
-### Category Management
+#### Category Management
+Organize your products into categories for better organization and easier navigation.
 ![Category Management](/public/images/Screenshots/categories.png)
 
-### Category Edit
+#### Category Edit
+Edit category details and manage subcategories to keep your inventory well-structured.
 ![Category Edit](/public/images/Screenshots/categories-edit.png)
 
-### Sales Overview
-![Sales Overview](public/images/Screenshots/sales.png)
-
-### POS
+### Point of Sale (POS)
+#### POS Interface
+Streamline your sales process with our user-friendly POS interface.
 ![POS](/public/images/Screenshots/pos.png)
 
-### Vendor
+#### Sales Overview
+Track your sales performance and analyze trends with detailed reports and charts.
+![Sales Overview](/public/images/Screenshots/sales.png)
+
+### Vendor Management
+#### Vendor List
+Manage your suppliers and keep track of all your vendor information in one place.
 ![Vendor](/public/images/Screenshots/vendor.png)
 
-### Vendor Category
+#### Vendor Category
+Organize your vendors into categories for easier management and reporting.
 ![Vendor Category](/public/images/Screenshots/vendor-category.png)
