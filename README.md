@@ -2,7 +2,7 @@
 
 StockFlow is a powerful, user-friendly inventory management system built with Laravel and Vue.js. It provides businesses with tools to efficiently manage their stock, track sales, and streamline purchasing processes.
 
-![StockFlow Landing](/images/Screenshots/Landing.png)
+![StockFlow Landing](/public/images/Screenshots/Landing.png)
 
 ## ✨ Features
 
@@ -27,7 +27,7 @@ StockFlow is a powerful, user-friendly inventory management system built with La
 ## 📸 Screenshots
 
 ### Dashboard
-![Dashboard](/images/Screenshots/Dashboard.png)
+![Dashboard](/public/images/Screenshots/Dashboard.png)
 
 ### Inventory Management
 ![Inventory Management](images/inventory.png)
