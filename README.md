@@ -2,7 +2,7 @@
 
 StockFlow is a powerful, user-friendly inventory management system built with Laravel and Vue.js. It provides businesses with tools to efficiently manage their stock, track sales, and streamline purchasing processes.
 
-![StockFlow Landing](/public/images/Screenshots/Landing.png)
+![StockFlow Landing](/public/images/Screenshots/landing.png)
 
 ## ✨ Features
 
@@ -10,8 +10,7 @@ StockFlow is a powerful, user-friendly inventory management system built with La
 - **Sales Tracking**: Record and analyze sales data to make informed business decisions.
 - **Purchase Order Management**: Create and manage purchase orders to maintain optimal stock levels.
 - **Category Management**: Organize your products with a flexible category system, including subcategories.
-- **User-friendly Interface**: Intuitive design built with Vue.js and styled with Tailwind CSS for a smooth user experience.
-- **Responsive Design**: Access your inventory data from any device - desktop, tablet, or mobile.
+- **User-friendly Interface**: Intuitive design built with Vue.js and styled with Tailwind CSS.
 
 ## 🛠 Technologies Used
 
@@ -27,16 +26,16 @@ StockFlow is a powerful, user-friendly inventory management system built with La
 ## 📸 Screenshots
 
 ### Dashboard
-![Dashboard](/public/images/Screenshots/Dashboard.png)
+![Dashboard](/public/images/Screenshots/dashboard.png)
 
 ### Inventory Management
-![Inventory Management](images/inventory.png)
+![Inventory Management](/public/images/Screenshots/inventory-management.png)
 
 ### Category Management
-![Category Management](images/categories.png)
+![Category Management](/public/images/Screenshots/categories-edit.png)
 
 ### Category Edit
-![Category Edit](images/category-edit.png)
+![Category Edit](/public/images/Screenshots/categories-edit.png)
 
 ### Sales Overview
 ![Sales Overview](images/sales.png)
