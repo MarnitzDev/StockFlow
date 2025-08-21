@@ -26,40 +26,29 @@ StockFlow is a powerful, user-friendly inventory management system built with La
 ## 📊 Inventory Management
 
 #### Dashboard
-![Dashboard](/public/images/Screenshots/dashboard.png)
-Get a quick overview of your business performance with key metrics and charts.
+![Dashboard](/public/images/Screenshots/dashboard.png) <sup>Get a quick overview of your business performance with key metrics and charts.</sup>
 
 #### Inventory Overview
-![Inventory Management](/public/images/Screenshots/inventory-management.png)
-Manage your product inventory with ease, including stock levels, prices, and details.
+![Inventory Management](/public/images/Screenshots/inventory-management.png) <sup>Manage your product inventory with ease, including stock levels, prices, and details.</sup>
 
 #### Category Management
-![Category Management](/public/images/Screenshots/categories.png)
-Organize your products into categories for better organization and easier navigation.
+![Category Management](/public/images/Screenshots/categories.png) <sup>Organize your products into categories for better organization and easier navigation.</sup>
 
 #### Category Edit
-![Category Edit](/public/images/Screenshots/categories-edit.png)
-Edit category details and manage subcategories to keep your inventory well-structured.
+![Category Edit](/public/images/Screenshots/categories-edit.png) <sup>Edit category details and manage subcategories to keep your inventory well-structured.</sup>
 
 #### Sales Overview
-![Sales Overview](/public/images/Screenshots/sales.png) [^1]
-
-[^1]: Track your sales performance and analyze trends with detailed reports and charts.
-
+![Sales Overview](/public/images/Screenshots/sales.png) <sup>Track your sales performance and analyze trends with detailed reports and charts.</sup>
 
 ## 🛒 Point of Sale (POS)
 
 #### POS Interface
-![POS](/public/images/Screenshots/pos.png)
-Streamline your sales process with our user-friendly POS interface.
-
+![POS](/public/images/Screenshots/pos.png) <sup>Streamline your sales process with our user-friendly POS interface.</sup>
 
 ## 📦 Vendor Management
 
 #### Vendor List
-![Vendor](/public/images/Screenshots/vendor.png)
-Manage your suppliers and keep track of all your vendor information in one place.
+![Vendor](/public/images/Screenshots/vendor.png) <sup>Manage your suppliers and keep track of all your vendor information in one place.</sup>
 
 #### Vendor Category
-![Vendor Category](/public/images/Screenshots/vendor-category.png)
-Organize your vendors into categories for easier management and reporting.
+![Vendor Category](/public/images/Screenshots/vendor-category.png) <sup>Organize your vendors into categories for easier management and reporting.</sup>
