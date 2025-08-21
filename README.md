@@ -25,37 +25,37 @@ StockFlow is a powerful, user-friendly inventory management system built with La
 
 ## 📸 Screenshots
 
-### Dashboard
-Get a quick overview of your business performance with key metrics and charts.
-![Dashboard](/public/images/Screenshots/dashboard.png)
-
 ### Inventory Management
+#### Dashboard
+![Dashboard](/public/images/Screenshots/dashboard.png)
+Get a quick overview of your business performance with key metrics and charts.
+
 #### Inventory Overview
-Manage your product inventory with ease, including stock levels, prices, and details.
 ![Inventory Management](/public/images/Screenshots/inventory-management.png)
+Manage your product inventory with ease, including stock levels, prices, and details.
 
 #### Category Management
-Organize your products into categories for better organization and easier navigation.
 ![Category Management](/public/images/Screenshots/categories.png)
+Organize your products into categories for better organization and easier navigation.
 
 #### Category Edit
-Edit category details and manage subcategories to keep your inventory well-structured.
 ![Category Edit](/public/images/Screenshots/categories-edit.png)
+Edit category details and manage subcategories to keep your inventory well-structured.
+
+#### Sales Overview
+![Sales Overview](/public/images/Screenshots/sales.png)
+Track your sales performance and analyze trends with detailed reports and charts.
 
 ### Point of Sale (POS)
 #### POS Interface
-Streamline your sales process with our user-friendly POS interface.
 ![POS](/public/images/Screenshots/pos.png)
-
-#### Sales Overview
-Track your sales performance and analyze trends with detailed reports and charts.
-![Sales Overview](/public/images/Screenshots/sales.png)
+Streamline your sales process with our user-friendly POS interface.
 
 ### Vendor Management
 #### Vendor List
-Manage your suppliers and keep track of all your vendor information in one place.
 ![Vendor](/public/images/Screenshots/vendor.png)
+Manage your suppliers and keep track of all your vendor information in one place.
 
 #### Vendor Category
-Organize your vendors into categories for easier management and reporting.
 ![Vendor Category](/public/images/Screenshots/vendor-category.png)
+Organize your vendors into categories for easier management and reporting.
