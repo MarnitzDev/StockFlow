@@ -4,6 +4,13 @@ StockFlow is a powerful, user-friendly inventory management system built with La
 
 ![StockFlow Landing](/public/images/Screenshots/landing.png)
 
+## 🚀 Demo
+<div align="center">
+  <a href="https://demo.stockflow.com" target="_blank" style="background-color: #4CAF50; color: white; padding: 14px 25px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 8px;">
+    View Live Demo
+  </a>
+</div>
+
 ## ✨ Features
 
 - **Inventory Management**: Keep track of your stock levels, set low stock alerts, and manage product details.
