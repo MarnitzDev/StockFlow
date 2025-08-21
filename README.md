@@ -38,7 +38,13 @@ StockFlow is a powerful, user-friendly inventory management system built with La
 ![Category Edit](/public/images/Screenshots/categories-edit.png)
 
 ### Sales Overview
-![Sales Overview](images/sales.png)
+![Sales Overview](public/images/Screenshots/sales.png)
 
-### Purchase Orders
-![Purchase Orders](images/purchase-orders.png)
+### POS
+![POS](/public/images/Screenshots/pos.png)
+
+### Vendor
+![Vendor](/public/images/Screenshots/vendor.png)
+
+### Vendor Category
+![Vendor Category](/public/images/Screenshots/vendor-category.png)

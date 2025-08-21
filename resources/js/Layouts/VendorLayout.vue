@@ -36,9 +36,9 @@ const navLinks = computed(() => [
     // { href: route('vendors.purchases.index'), label: 'Purchase History', active: isActive(route('vendors.purchases.index')) },
 ]);
 
-const iconLinks = [
-    { href: route('dashboard'), icon: 'pi-chart-line', text: 'Dashboard' },
-    { href: route('pos.index'), icon: 'pi-shopping-cart', text: 'POS' },
-];
+// const iconLinks = [
+//     { href: route('dashboard'), icon: 'pi-chart-line', text: 'Dashboard' },
+//     { href: route('pos.index'), icon: 'pi-shopping-cart', text: 'POS' },
+// ];
 </script>
 

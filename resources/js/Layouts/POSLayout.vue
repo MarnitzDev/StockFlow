@@ -34,8 +34,8 @@ const navLinks = computed(() => [
     // { href: route('pos.history'), label: 'Purchase History', active: route().current('pos.history') },
 ]);
 
-const iconLinks = [
-    { href: route('dashboard'), icon: 'pi-chart-line', text: 'Dashboard' },
-    { href: route('vendors.index'), icon: 'pi-truck', text: 'Vendors' },
-];
+// const iconLinks = [
+//     { href: route('dashboard'), icon: 'pi-chart-line', text: 'Dashboard' },
+//     { href: route('vendors.index'), icon: 'pi-truck', text: 'Vendors' },
+// ];
 </script>
