@@ -31,6 +31,22 @@
                         <i :class="['pi', icon.icon, 'text-xl mr-2']"></i>
                         <span class="text-sm">{{ icon.text }}</span>
                     </Link>
+                    <div class="relative flex items-center">
+                        <button
+                            @click="toggleMenu"
+                            class="flex items-center space-x-2 text-white hover:text-blue-200 transition duration-150 ease-in-out focus:outline-none"
+                        >
+                            <Avatar
+                                :label="userInitials"
+                                class="bg-blue-500"
+                                shape="circle"
+                                size="small"
+                            />
+                            <span class="text-sm font-medium">{{ user.name }}</span>
+                            <i class="pi pi-chevron-down text-xs"></i>
+                        </button>
+                        <Menu ref="menu" :model="userMenuItems" :popup="true" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -38,10 +54,11 @@
 </template>
 
 <script setup>
+import { ref, computed } from 'vue';
+import { Link, router, usePage } from '@inertiajs/vue3';
 import NavLink from '@/Components/NavLink.vue';
-import { Link } from '@inertiajs/vue3';
 
-defineProps({
+const props = defineProps({
     layoutName: {
         type: String,
         required: true
@@ -55,6 +72,29 @@ defineProps({
         required: true
     }
 });
+
+const user = computed(() => usePage().props.auth.user);
+const userInitials = computed(() => {
+    const names = user.value.name.split(' ');
+    return names.map(name => name[0].toUpperCase()).join('');
+});
+const menu = ref();
+
+const signOut = () => {
+    router.post(route('logout'));
+};
+
+const userMenuItems = ref([
+    {
+        label: 'Sign Out',
+        icon: 'pi pi-power-off',
+        command: signOut
+    }
+]);
+
+const toggleMenu = (event) => {
+    menu.value.toggle(event);
+};
 </script>
 
 <style scoped>

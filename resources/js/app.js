@@ -14,6 +14,7 @@ import Aura from '@primeuix/themes/aura';
 import { definePreset } from '@primeuix/themes';
 
 // Import PrimeVue components
+import Avatar from 'primevue/avatar';
 import Button from 'primevue/button';
 import Calendar from 'primevue/calendar';
 import InputText from 'primevue/inputtext';
@@ -24,7 +25,6 @@ import DataView from 'primevue/dataview';
 import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup';
 import Row from 'primevue/row';
-import Menu from 'primevue/menu';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
 import Stepper from 'primevue/stepper';
@@ -50,6 +50,7 @@ import Select from 'primevue/select';
 import Breadcrumb from 'primevue/breadcrumb';
 import Paginator from 'primevue/paginator';
 import MegaMenu from 'primevue/megamenu';
+import Menu from 'primevue/menu';
 import MultiSelect from 'primevue/multiselect';
 import OrganizationChart from 'primevue/organizationchart';
 import Chip from 'primevue/chip';
@@ -102,11 +103,11 @@ createInertiaApp({
 
         // Register PrimeVue components
         [
-            Button, Calendar, InputText, InputNumber, Dropdown, DataTable, DataView,
+            Avatar, Button, Calendar, InputText, InputNumber, Dropdown, DataTable, DataView,
             Column, ColumnGroup, Row, Menu, IconField, InputIcon, Stepper, StepList,
             StepPanels, StepItem, StepPanel, Step, Textarea, SelectButton, TreeTable,
             Chart, Card, Tag, InputSwitch, Dialog, ConfirmDialog, Toast, ToggleButton,
-            Rating, Divider, Select, Breadcrumb, Paginator, MegaMenu, MultiSelect,
+            Rating, Divider, Select, Breadcrumb, Paginator, MegaMenu, Menu, MultiSelect,
             OrganizationChart, Chip, Checkbox, FileUpload, Skeleton
         ].forEach(component => {
             app.component(component.name, component);

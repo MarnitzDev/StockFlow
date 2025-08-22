@@ -11,9 +11,9 @@ class UserSeeder extends Seeder
     public function run()
     {
         User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('password'),
+            'name' => 'Demo User',
+            'email' => 'demo@stockflow.com',
+            'password' => Hash::make('stockflow-demo'),
         ]);
 
         User::factory(10)->create();

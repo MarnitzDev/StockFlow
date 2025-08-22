@@ -24,6 +24,22 @@
                             <i :class="['pi', link.icon, 'text-xl mr-2']"></i>
                             <span class="text-sm">{{ link.text }}</span>
                         </Link>
+                        <div class="relative flex items-center">
+                            <button
+                                @click="toggleMenu"
+                                class="flex items-center space-x-2 text-white hover:text-blue-200 transition duration-150 ease-in-out focus:outline-none"
+                            >
+                                <Avatar
+                                    :label="userInitials"
+                                    class="bg-blue-500"
+                                    shape="circle"
+                                    size="small"
+                                />
+                                <span class="text-sm font-medium">{{ user.name }}</span>
+                                <i class="pi pi-chevron-down text-xs"></i>
+                            </button>
+                            <Menu ref="menu" :model="userMenuItems" :popup="true" />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -93,7 +109,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { Link, usePage } from '@inertiajs/vue3';
+import {Link, router, usePage} from '@inertiajs/vue3';
 import NavLink from '@/Components/NavLink.vue';
 import BreadcrumbNav from '@/Components/BreadcrumbNav.vue';
 
@@ -166,16 +182,30 @@ const menuItems = ref([
     },
 ]);
 
-const navLinks = computed(() => [
-    // Add your nav links here if needed
-]);
-
-const iconLinks = [
-    // Add your icon links here if needed
-];
-
+const menu = ref();
 const toggleSubmenu = (item) => {
     item.isOpen = !item.isOpen;
 };
 
+const user = computed(() => usePage().props.auth.user);
+const userInitials = computed(() => {
+    const names = user.value.name.split(' ');
+    return names.map(name => name[0].toUpperCase()).join('');
+});
+
+const signOut = () => {
+    router.post(route('logout'));
+};
+
+const userMenuItems = ref([
+    {
+        label: 'Sign Out',
+        icon: 'pi pi-power-off',
+        command: signOut
+    }
+]);
+
+const toggleMenu = (event) => {
+    menu.value.toggle(event);
+};
 </script>
