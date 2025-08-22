@@ -5,7 +5,13 @@
                 <div class="flex items-center">
                     <div class="shrink-0 flex items-center">
                         <div class="flex items-center">
-                            <span class="font-['Outfit'] text-white text-xl font-bold mr-1">StockFlow</span>
+                            <div class="shrink-0 flex items-center">
+                                <div class="flex items-center">
+                                    <Link :href="route('home')" class="flex items-center">
+                                        <span class="font-['Outfit'] text-white text-xl font-bold mr-1">StockFlow</span>
+                                    </Link>
+                                </div>
+                            </div>
                             <span class="bg-white text-blue-700 text-xs font-semibold px-2 py-1 rounded">{{ layoutName }}</span>
                         </div>
                     </div>

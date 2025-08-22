@@ -7,7 +7,9 @@
                     <div class="flex items-center">
                         <div class="shrink-0 flex items-center">
                             <div class="flex items-center">
-                                <span class="font-['Outfit'] text-white text-xl font-bold mr-1">StockFlow</span>
+                                <Link :href="route('home')" class="flex items-center">
+                                    <span class="font-['Outfit'] text-white text-xl font-bold mr-1">StockFlow</span>
+                                </Link>
                             </div>
                         </div>
                         <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
