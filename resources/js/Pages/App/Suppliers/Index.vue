@@ -1,33 +1,5 @@
-<script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { Head, Link } from '@inertiajs/vue3';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import InputText from 'primevue/inputtext';
-
-interface Props {
-    suppliers: Array<{
-        id: number;
-        name: string;
-        email: string;
-        phone: string;
-        address: string;
-    }>;
-}
-
-const props = defineProps<Props>();
-
-const suppliers = ref(props.suppliers);
-const filters = ref({});
-
-// Remove lazyParams, loadLazyData, onPage, onSort, and onFilter functions
-
-</script>
-
 <template>
     <Head title="Suppliers" />
-
     <AuthenticatedLayout>
         <div class="pb-12">
             <div class="px-6">
@@ -82,3 +54,27 @@ const filters = ref({});
         </div>
     </AuthenticatedLayout>
 </template>
+
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { Head, Link } from '@inertiajs/vue3';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import InputText from 'primevue/inputtext';
+
+interface Props {
+    suppliers: Array<{
+        id: number;
+        name: string;
+        email: string;
+        phone: string;
+        address: string;
+    }>;
+}
+
+const props = defineProps<Props>();
+
+const suppliers = ref(props.suppliers);
+const filters = ref({});
+</script>

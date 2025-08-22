@@ -1,4 +1,5 @@
 <template>
+    <Head title="Purchase Orders" />
     <AuthenticatedLayout>
         <div class="pb-12">
             <div class="px-6">

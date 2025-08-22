@@ -126,7 +126,7 @@ class InventoryController extends Controller
         \Log::info('Inventory Item:', $inventory->toArray());
 
         $validated = $request->validate([
-            'quantity' => 'required|integer',
+            'quantity' => 'required|integer|min:1',
             'type' => 'required|in:in,out',
             'reason' => 'required|string|max:255',
             'unit_price' => 'required|numeric|min:0',
@@ -134,21 +134,61 @@ class InventoryController extends Controller
 
         \Log::info('Validated Data:', $validated);
 
-        DB::transaction(function () use ($inventory, $validated) {
-            $stockMovement = StockMovement::recordMovement(
-                $inventory->id,
-                $validated['quantity'],
-                $validated['type'],
-                $validated['reason'],
-                auth()->id(),
-                $validated['unit_price']
-            );
+        try {
+            DB::transaction(function () use ($inventory, $validated) {
+                // Calculate new stock
+                $oldStock = $inventory->stock;
+                $newStock = $validated['type'] === 'in'
+                    ? $oldStock + $validated['quantity']
+                    : $oldStock - $validated['quantity'];
 
-            \Log::info('Stock Movement Created:', $stockMovement->toArray());
-            \Log::info('Inventory Item After Update:', $inventory->fresh()->toArray());
-        });
+                if ($newStock < 0) {
+                    throw new \Exception("Stock cannot be negative. Current stock: {$oldStock}, Requested change: {$validated['quantity']}");
+                }
 
-        return redirect()->back()->with('message', 'Stock updated successfully');
+                // Calculate new average cost
+                $totalValue = $inventory->stock * $inventory->average_cost;
+                if ($validated['type'] === 'in') {
+                    $totalValue += $validated['quantity'] * $validated['unit_price'];
+                    $totalQuantity = $inventory->stock + $validated['quantity'];
+                    $newAverageCost = $totalValue / $totalQuantity;
+                } else {
+                    $newAverageCost = $inventory->average_cost; // Average cost doesn't change for outgoing stock
+                }
+
+                // Update inventory
+                $inventory->update([
+                    'stock' => $newStock,
+                    'average_cost' => $newAverageCost,
+                ]);
+
+                // Record stock movement
+                $stockMovement = StockMovement::recordMovement(
+                    $inventory->id,
+                    $validated['quantity'],
+                    $validated['type'],
+                    $validated['reason'],
+                    auth()->id(),
+                    $validated['unit_price']
+                );
+
+                \Log::info('Stock Movement Process:', [
+                    'Initial Stock' => $oldStock,
+                    'Change' => $validated['quantity'] * ($validated['type'] === 'in' ? 1 : -1),
+                    'New Stock' => $newStock,
+                    'Old Average Cost' => $inventory->getOriginal('average_cost'),
+                    'New Average Cost' => $newAverageCost,
+                    'Movement' => $stockMovement->toArray(),
+                ]);
+
+                \Log::info('Inventory Item After Update:', $inventory->fresh()->toArray());
+            });
+
+            return redirect()->back()->with('message', 'Stock updated successfully');
+        } catch (\Exception $e) {
+            \Log::error('Error in stock update process: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error updating stock: ' . $e->getMessage());
+        }
     }
 
     public function lowStockAlert()

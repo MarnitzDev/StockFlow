@@ -1,42 +1,3 @@
-<script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
-import POSLayout from '@/Layouts/POSLayout.vue';
-import Button from 'primevue/button';
-import {ref} from "vue";
-
-interface Order {
-    id: number;
-    order_number: string;
-    total_amount: number;
-    items: any[];
-    created_at: string;
-}
-
-const props = defineProps<{
-    order: Order;
-}>();
-
-const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR' }).format(amount);
-};
-
-const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('en-ZA', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-};
-
-const breadcrumbItems = ref([
-    { icon: 'pi pi-shopping-cart', label: 'POS' },
-    { label: 'Purchase Complete' }
-]);
-
-</script>
-
 <template>
     <POSLayout>
         <template #header>
@@ -112,3 +73,42 @@ const breadcrumbItems = ref([
     }
 }
 </style>
+
+<script setup lang="ts">
+import { Head, Link } from '@inertiajs/vue3';
+import POSLayout from '@/Layouts/POSLayout.vue';
+import Button from 'primevue/button';
+import {ref} from "vue";
+
+interface Order {
+    id: number;
+    order_number: string;
+    total_amount: number;
+    items: any[];
+    created_at: string;
+}
+
+const props = defineProps<{
+    order: Order;
+}>();
+
+const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR' }).format(amount);
+};
+
+const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString('en-ZA', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+};
+
+const breadcrumbItems = ref([
+    { icon: 'pi pi-shopping-cart', label: 'POS' },
+    { label: 'Purchase Complete' }
+]);
+
+</script>

@@ -1,13 +1,5 @@
-<script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Link } from '@inertiajs/vue3';
-
-defineProps({
-    customers: Array,
-});
-</script>
-
 <template>
+    <Head title="Customers" />
     <AuthenticatedLayout>
         <div class="pb-12">
             <div class="px-6">
@@ -45,3 +37,12 @@ defineProps({
         </div>
     </AuthenticatedLayout>
 </template>
+
+<script setup>
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import {Head, Link} from '@inertiajs/vue3';
+
+defineProps({
+    customers: Array,
+});
+</script>

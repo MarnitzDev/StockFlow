@@ -1,21 +1,5 @@
-<script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Link } from '@inertiajs/vue3';
-import { ref, onMounted } from 'vue';
-
-const props = defineProps({
-    stockAdjustments: Array,
-});
-
-const adjustments = ref([]);
-
-onMounted(() => {
-    console.log('Stock Adjustments:', props.stockAdjustments);
-    adjustments.value = props.stockAdjustments || [];
-});
-</script>
-
 <template>
+    <Head title="Stock Adjustments" />
     <AuthenticatedLayout>
         <div class="pb-12">
             <div class="px-6">
@@ -79,3 +63,20 @@ onMounted(() => {
         </div>
     </AuthenticatedLayout>
 </template>
+
+<script setup>
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import {Head, Link} from '@inertiajs/vue3';
+import { ref, onMounted } from 'vue';
+
+const props = defineProps({
+    stockAdjustments: Array,
+});
+
+const adjustments = ref([]);
+
+onMounted(() => {
+    console.log('Stock Adjustments:', props.stockAdjustments);
+    adjustments.value = props.stockAdjustments || [];
+});
+</script>

@@ -27,7 +27,7 @@
             </div>
         </header>
 
-        <!-- Content area (below fixed header) -->
+        <!-- Content -->
         <div class="flex flex-grow pt-16">
             <!-- Sidebar -->
             <div class="w-64 bg-slate-800 shadow-xl z-10 transition-all duration-300 ease-in-out flex-shrink-0 overflow-y-auto h-[calc(100vh-4rem)]">
@@ -46,9 +46,21 @@
                                 </svg>
                             </button>
                             <div v-if="item.isOpen" class="mt-2 space-y-2 px-4">
-                                <Link v-for="subItem in item.submenu" :key="subItem.label" :href="route(subItem.route)" class="block px-4 py-2 text-sm text-blue-200 hover:bg-blue-600 hover:text-white rounded-md">
-                                    {{ subItem.label }}
-                                </Link>
+                                <template v-for="subItem in item.submenu" :key="subItem.label">
+                                    <Link
+                                        v-if="!subItem.disabled"
+                                        :href="route(subItem.route)"
+                                        class="block px-4 py-2 text-sm text-blue-200 hover:bg-blue-600 hover:text-white rounded-md"
+                                    >
+                                        {{ subItem.label }}
+                                    </Link>
+                                    <span
+                                        v-else
+                                        class="block px-4 py-2 text-sm text-gray-500 cursor-not-allowed rounded-md"
+                                    >
+                                        {{ subItem.label }}
+                                    </span>
+                                </template>
                             </div>
                         </div>
                     </div>
@@ -99,6 +111,7 @@ const menuItems = ref([
             { label: 'Items', route: 'inventory.items' },
             { label: 'Categories', route: 'inventory.categories.index' },
             { label: 'Stock Movements', route: 'inventory.stockMovements' },
+            { label: 'Low Stock Alert', route: 'inventory.lowStockAlert', disabled: true },
         ]
     },
     {
@@ -106,6 +119,10 @@ const menuItems = ref([
         icon: 'pi pi-shopping-cart',
         submenu: [
             { label: 'Orders', route: 'sales.orders.index' },
+            { label: 'Invoices', route: 'sales.invoices', disabled: true },
+            { label: 'Customers', route: 'sales.customers', disabled: true },
+            { label: 'Returns', route: 'sales.returns', disabled: true },
+            { label: 'Point of Sale', route: 'sales.pos', disabled: true },
         ]
     },
     {
@@ -113,8 +130,9 @@ const menuItems = ref([
         icon: 'pi pi-shopping-bag',
         submenu: [
             { label: 'Orders', route: 'purchases.orders' },
-            { label: 'Bills', route: 'purchases.bills' },
-            { label: 'Payments', route: 'purchases.payments' },
+            { label: 'Bills', route: 'purchases.bills', disabled: true },
+            { label: 'Payments', route: 'purchases.payments', disabled: true },
+            { label: 'Returns', route: 'purchases.returns', disabled: true },
         ]
     },
     {
@@ -122,7 +140,26 @@ const menuItems = ref([
         icon: 'pi pi-truck',
         submenu: [
             { label: 'List All', route: 'suppliers.index' },
-            { label: 'Add New', route: 'suppliers.create' },
+            { label: 'Add New', route: 'suppliers.create', disabled: true },
+        ]
+    },
+    {
+        label: 'Reports',
+        icon: 'pi pi-chart-bar',
+        submenu: [
+            { label: 'Sales Report', route: 'reports.sales', disabled: true },
+            { label: 'Inventory Report', route: 'reports.inventory', disabled: true },
+            { label: 'Profit & Loss', route: 'reports.profitLoss', disabled: true },
+            { label: 'Tax Report', route: 'reports.tax', disabled: true },
+        ]
+    },
+    {
+        label: 'Settings',
+        icon: 'pi pi-cog',
+        submenu: [
+            { label: 'General', route: 'settings.general', disabled: true },
+            { label: 'Users & Roles', route: 'settings.users', disabled: true },
+            { label: 'Integrations', route: 'settings.integrations', disabled: true },
         ]
     },
 ]);

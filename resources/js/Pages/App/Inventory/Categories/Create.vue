@@ -1,4 +1,5 @@
 <template>
+    <Head title="Category Create" />
     <AuthenticatedLayout>
         <div class="pb-12">
             <div class="px-6">
@@ -135,7 +136,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import {Link, useForm} from '@inertiajs/vue3';
+import {Head, Link, useForm} from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import TextInput from '@/Components/TextInput.vue';

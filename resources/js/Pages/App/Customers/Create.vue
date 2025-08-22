@@ -1,26 +1,5 @@
-<script setup lang="ts">
-import { Head, useForm } from '@inertiajs/vue3';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-
-const form = useForm({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-});
-
-const submit = () => {
-    form.post(route('contacts.customers.store'));
-};
-</script>
-
 <template>
-    <Head title="Create Customer" />
-
+    <Head title="Customer Create" />
     <AuthenticatedLayout>
         <div class="pb-12">
             <div class="px-6">
@@ -87,3 +66,22 @@ const submit = () => {
     </AuthenticatedLayout>
 </template>
 
+<script setup lang="ts">
+import { Head, useForm } from '@inertiajs/vue3';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import InputError from '@/Components/InputError.vue';
+import InputLabel from '@/Components/InputLabel.vue';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
+import TextInput from '@/Components/TextInput.vue';
+
+const form = useForm({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+});
+
+const submit = () => {
+    form.post(route('contacts.customers.store'));
+};
+</script>

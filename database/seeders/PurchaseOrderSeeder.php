@@ -8,6 +8,7 @@ use App\Models\Vendor;
 use App\Models\VendorProduct;
 use App\Models\Inventory;
 use App\Models\Category;
+use App\Models\StockMovement;
 use Faker\Factory as Faker;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -160,14 +161,29 @@ class PurchaseOrderSeeder extends Seeder
 
             $totalAmount += $quantity * $unitPrice;
 
-            $this->updateInventory($inventoryItem, $quantity);
+            $this->updateInventory($inventoryItem, $quantity, $orderDate, $unitPrice);
         }
 
         $order->update(['total_amount' => $totalAmount]);
     }
 
-    protected function updateInventory($inventoryItem, $quantity)
+    protected function updateInventory($inventoryItem, $quantity, $orderDate, $unitPrice)
     {
         $inventoryItem->increment('stock', $quantity);
+
+        // Create a stock movement record
+        StockMovement::create([
+            'inventory_id' => $inventoryItem->id,
+            'stock' => $quantity,
+            'quantity' => $quantity,
+            'type' => 'in',
+            'reason' => 'Purchase Order',
+            'user_id' => 1,
+            'unit_price' => $unitPrice,
+            'created_at' => $orderDate,
+            'updated_at' => $orderDate,
+        ]);
+
+        $this->command->info("Created stock movement for inventory item {$inventoryItem->name}: +{$quantity}");
     }
 }

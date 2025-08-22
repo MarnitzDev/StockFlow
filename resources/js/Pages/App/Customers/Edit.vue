@@ -1,40 +1,5 @@
-<script setup lang="ts">
-import { Head, useForm } from '@inertiajs/vue3';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-
-interface Customer {
-    id: number;
-    name: string;
-    email: string;
-    phone: string;
-    address: string;
-}
-
-interface Props {
-    customer: Customer;
-}
-
-const props = defineProps<Props>();
-
-const form = useForm({
-    name: props.customer.name,
-    email: props.customer.email,
-    phone: props.customer.phone,
-    address: props.customer.address,
-});
-
-const submit = () => {
-    form.put(route('contacts.customers.update', props.customer.id));
-};
-</script>
-
 <template>
-    <Head title="Edit Customer" />
-
+    <Head title="Customer Edit" />
     <AuthenticatedLayout>
         <div class="pb-12">
             <div class="px-6">
@@ -101,3 +66,36 @@ const submit = () => {
     </AuthenticatedLayout>
 </template>
 
+<script setup lang="ts">
+import { Head, useForm } from '@inertiajs/vue3';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import InputError from '@/Components/InputError.vue';
+import InputLabel from '@/Components/InputLabel.vue';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
+import TextInput from '@/Components/TextInput.vue';
+
+interface Customer {
+    id: number;
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+}
+
+interface Props {
+    customer: Customer;
+}
+
+const props = defineProps<Props>();
+
+const form = useForm({
+    name: props.customer.name,
+    email: props.customer.email,
+    phone: props.customer.phone,
+    address: props.customer.address,
+});
+
+const submit = () => {
+    form.put(route('contacts.customers.update', props.customer.id));
+};
+</script>

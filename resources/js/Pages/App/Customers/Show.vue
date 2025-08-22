@@ -1,27 +1,5 @@
-<script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Link } from '@inertiajs/vue3';
-
-interface Customer {
-    id: number;
-    name: string;
-    email: string;
-    phone: string;
-    address: string;
-    // Add any other customer properties here
-}
-
-interface Props {
-    customer: Customer;
-}
-
-const props = defineProps<Props>();
-</script>
-
 <template>
     <Head title="Customer Details" />
-
     <AuthenticatedLayout>
         <div class="pb-12">
             <div class="px-6">
@@ -60,6 +38,23 @@ const props = defineProps<Props>();
     </AuthenticatedLayout>
 </template>
 
-<style scoped>
-/* Add any scoped styles here if needed */
-</style>
+<script setup lang="ts">
+import { Head } from '@inertiajs/vue3';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { Link } from '@inertiajs/vue3';
+
+interface Customer {
+    id: number;
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+    // Add any other customer properties here
+}
+
+interface Props {
+    customer: Customer;
+}
+
+const props = defineProps<Props>();
+</script>

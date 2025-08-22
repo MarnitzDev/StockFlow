@@ -1,3 +1,173 @@
+<template>
+    <Head title="POS" />
+    <POSLayout>
+        <template #header>
+            <div class="flex justify-between items-center">
+                <Breadcrumb :model="breadcrumbItems" class="p-0">
+                    <template #item="{ item }">
+                        <span class="flex items-center">
+                            <span v-if="item.icon" :class="[item.icon, 'mr-2 text-gray-500']"></span>
+                            <span :class="{'font-semibold text-gray-700': !item.icon, 'text-gray-500': item.icon}">
+                                {{ item.label }}
+                            </span>
+                        </span>
+                    </template>
+                </Breadcrumb>
+                <Button
+                    icon="pi pi-question-circle"
+                    iconPos="right"
+                    label="Guide"
+                    @click="showHelp"
+                    class="p-button-text p-button-rounded"
+                    aria-label="Help Guide"
+                />
+            </div>
+        </template>
+
+        <Dialog v-model:visible="visible" modal header="How to Use the StockFlow POS"  :breakpoints="{ '960px': '75vw', '640px': '90vw' }">
+            <POSHelpContent />
+        </Dialog>
+
+        <div class="pb-12">
+            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <div class="surface-ground">
+                    <div class="grid grid-cols-12 gap-4">
+                        <!-- Product Grid -->
+                        <div class="col-span-12 lg:col-span-8">
+                            <Paginator
+                                v-model:rows="itemsPerPage"
+                                :totalRecords="availableProducts.length"
+                                @page="onPageChange"
+                                @rows-change="onRowsChange"
+                                :first="(currentPage - 1) * itemsPerPage"
+                                :rowsPerPageOptions="[6, 12, 18]"
+                                template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+                                :pageLinkSize="5"
+                                class="mb-4">
+                            </Paginator>
+                            <div class="grid grid-cols-1 gap-4">
+                                <div v-for="product in paginatedProducts" :key="product.id" class="surface-card bg-white rounded p-4">
+                                    <div class="flex items-start">
+                                        <div class="w-28 h-28 flex-shrink-0 rounded overflow-hidden border border-gray-300 shadow-sm">
+                                            <img :src="product.image || '/images/placeholder-item.svg'"
+                                                 :alt="product.name"
+                                                 class="w-full h-full object-cover"
+                                                 @error="$event.target.src = '/images/placeholder-item.svg'"
+                                            />
+                                        </div>
+                                        <div class="ml-4 flex-grow">
+                                            <div class="flex justify-between items-start">
+                                                <span class="text-lg font-medium line-clamp-1">{{ product.name }}</span>
+                                                <Rating :modelValue="product.rating" :readonly="true" :cancel="false" />
+                                            </div>
+                                            <div class="max-w-md">
+                                                <p class="text-sm text-gray-600 mt-2 line-clamp-3">
+                                                    {{ product.description || loremIpsumText }}
+                                                </p>
+                                            </div>
+                                            <div class="flex items-center justify-between mt-2">
+                                                <span class="text-xl font-semibold">{{ formatCurrency(product.price) }}</span>
+                                            </div>
+                                            <div class="flex items-center justify-between mt-3">
+                                                <div class="flex items-center">
+                                                    <Button @click="addToCart(product)"
+                                                            label="Add to Cart"
+                                                            icon="pi pi-plus"
+                                                            size="small"
+                                                            :disabled="getRemainingStock(product) === 0"
+                                                            v-tooltip.bottom="getRemainingStock(product) === 0 ? 'Out of stock' : ''"
+                                                    >
+                                                    </Button>
+                                                    <Tag :value="isInCart(product) ? `In Cart (${getCartQuantity(product)}) | Available: ${getRemainingStock(product)}` : `Available: ${getRemainingStock(product)}`"
+                                                         :severity="isInCart(product) ? 'info' : 'secondary'"
+                                                         class="ml-2 text-xs" />
+                                                </div>
+                                                <div class="flex flex-col items-end">
+                                                    <Button @click="viewProduct(product)"
+                                                            label="View Product"
+                                                            icon="pi pi-eye"
+                                                            size="small"
+                                                            text>
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cart -->
+                        <div class="col-span-12 lg:col-span-4">
+                            <div class="bg-white sticky top-20 flex flex-col h-[calc(100vh-15rem)]">
+                                <h2 class="text-xl font-bold p-4 border-b">Order Summary</h2>
+                                <div class="overflow-y-auto flex-grow">
+                                    <div v-if="cart.length === 0" class="flex flex-col items-center justify-center h-full text-gray-500">
+                                        <i class="pi pi-shopping-cart mb-4" style="font-size: 1.5rem"></i>
+                                        <p class="text-lg font-medium">Your cart is empty</p>
+                                        <p class="text-sm mt-2">Add some items to get started!</p>
+                                    </div>
+                                    <div v-else v-for="item in cart" :key="item.id" class="flex justify-between items-start p-4 border-b">
+                                        <div class="flex-grow pr-4">
+                                            <span class="font-medium text-sm block mb-1">{{ item.name }}</span>
+                                            <div class="text-sm text-gray-500 flex items-center mt-2">
+                                                <span class="mr-2">Quantity:</span>
+                                                <InputNumber v-model="item.quantity"
+                                                             :min="1"
+                                                             :max="getRemainingStock(item) + item.quantity"
+                                                             @input="updateCartItemQuantity(item, $event)"
+                                                             showButtons
+                                                             size="small"
+                                                             class="w-20"
+                                                             :inputStyle="{ width: '2rem' }" />
+                                                <Button @click="removeFromCart(item)"
+                                                        icon="pi pi-trash"
+                                                        severity="danger"
+                                                        text
+                                                        size="small"
+                                                        class="ml-2" />
+                                            </div>
+                                        </div>
+                                        <div class="w-32 flex flex-col items-end">
+                                            <div class="font-medium">{{ formatCurrency(item.price * item.quantity) }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="border-t p-4">
+                                    <div class="mb-4">
+                                        <div class="flex justify-between py-2">
+                                            <span class="font-medium">Subtotal</span>
+                                            <span class="font-medium">{{ formatCurrency(cartTotal) }}</span>
+                                        </div>
+                                        <div class="flex justify-between py-2">
+                                            <span class="font-medium">Shipping</span>
+                                            <span class="font-medium">Free</span>
+                                        </div>
+                                        <div class="flex justify-between py-2 border-t border-b">
+                                            <span class="font-bold">Total</span>
+                                            <span class="font-bold">{{ formatCurrency(cartTotal) }}</span>
+                                        </div>
+                                    </div>
+                                    <Button
+                                        @click="checkout"
+                                        severity="success"
+                                        label="Proceed to Checkout"
+                                        icon="pi pi-shopping-cart"
+                                        class="w-full"
+                                        :disabled="isCartEmpty || form.processing"
+                                        :loading="form.processing"
+                                        v-tooltip.bottom="isCartEmpty ? 'Your cart is empty' : ''"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </POSLayout>
+</template>
+
 <script setup>
 import { ref, computed } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
@@ -209,174 +379,3 @@ const onRowsChange = (event) => {
     currentPage.value = 1;
 };
 </script>
-
-<template>
-    <Head title="StockFlow POS" />
-
-    <POSLayout>
-        <template #header>
-            <div class="flex justify-between items-center">
-                <Breadcrumb :model="breadcrumbItems" class="p-0">
-                    <template #item="{ item }">
-                        <span class="flex items-center">
-                            <span v-if="item.icon" :class="[item.icon, 'mr-2 text-gray-500']"></span>
-                            <span :class="{'font-semibold text-gray-700': !item.icon, 'text-gray-500': item.icon}">
-                                {{ item.label }}
-                            </span>
-                        </span>
-                    </template>
-                </Breadcrumb>
-                <Button
-                    icon="pi pi-question-circle"
-                    iconPos="right"
-                    label="Guide"
-                    @click="showHelp"
-                    class="p-button-text p-button-rounded"
-                    aria-label="Help Guide"
-                />
-            </div>
-        </template>
-
-        <Dialog v-model:visible="visible" modal header="How to Use the StockFlow POS"  :breakpoints="{ '960px': '75vw', '640px': '90vw' }">
-            <POSHelpContent />
-        </Dialog>
-
-        <div class="pb-12">
-            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                <div class="surface-ground">
-                    <div class="grid grid-cols-12 gap-4">
-                        <!-- Product Grid -->
-                        <div class="col-span-12 lg:col-span-8">
-                            <Paginator
-                                v-model:rows="itemsPerPage"
-                                :totalRecords="availableProducts.length"
-                                @page="onPageChange"
-                                @rows-change="onRowsChange"
-                                :first="(currentPage - 1) * itemsPerPage"
-                                :rowsPerPageOptions="[6, 12, 18]"
-                                template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
-                                :pageLinkSize="5"
-                                class="mb-4">
-                            </Paginator>
-                            <div class="grid grid-cols-1 gap-4">
-                                <div v-for="product in paginatedProducts" :key="product.id" class="surface-card bg-white rounded p-4">
-                                    <div class="flex items-start">
-                                        <div class="w-28 h-28 flex-shrink-0 rounded overflow-hidden border border-gray-300 shadow-sm">
-                                            <img :src="product.image || '/images/placeholder-item.svg'"
-                                                 :alt="product.name"
-                                                 class="w-full h-full object-cover"
-                                                 @error="$event.target.src = '/images/placeholder-item.svg'"
-                                            />
-                                        </div>
-                                        <div class="ml-4 flex-grow">
-                                            <div class="flex justify-between items-start">
-                                                <span class="text-lg font-medium line-clamp-1">{{ product.name }}</span>
-                                                <Rating :modelValue="product.rating" :readonly="true" :cancel="false" />
-                                            </div>
-                                            <div class="max-w-md">
-                                                <p class="text-sm text-gray-600 mt-2 line-clamp-3">
-                                                    {{ product.description || loremIpsumText }}
-                                                </p>
-                                            </div>
-                                            <div class="flex items-center justify-between mt-2">
-                                                <span class="text-xl font-semibold">{{ formatCurrency(product.price) }}</span>
-                                            </div>
-                                            <div class="flex items-center justify-between mt-3">
-                                                <div class="flex items-center">
-                                                    <Button @click="addToCart(product)"
-                                                            label="Add to Cart"
-                                                            icon="pi pi-plus"
-                                                            size="small"
-                                                            :disabled="getRemainingStock(product) === 0"
-                                                            v-tooltip.bottom="getRemainingStock(product) === 0 ? 'Out of stock' : ''"
-                                                    >
-                                                    </Button>
-                                                    <Tag :value="isInCart(product) ? `In Cart (${getCartQuantity(product)}) | Available: ${getRemainingStock(product)}` : `Available: ${getRemainingStock(product)}`"
-                                                         :severity="isInCart(product) ? 'info' : 'secondary'"
-                                                         class="ml-2 text-xs" />
-                                                </div>
-                                                <div class="flex flex-col items-end">
-                                                    <Button @click="viewProduct(product)"
-                                                            label="View Product"
-                                                            icon="pi pi-eye"
-                                                            size="small"
-                                                            text>
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Cart -->
-                        <div class="col-span-12 lg:col-span-4">
-                            <div class="bg-white sticky top-20 flex flex-col h-[calc(100vh-15rem)]">
-                                <h2 class="text-xl font-bold p-4 border-b">Order Summary</h2>
-                                <div class="overflow-y-auto flex-grow">
-                                    <div v-if="cart.length === 0" class="flex flex-col items-center justify-center h-full text-gray-500">
-                                        <i class="pi pi-shopping-cart mb-4" style="font-size: 1.5rem"></i>
-                                        <p class="text-lg font-medium">Your cart is empty</p>
-                                        <p class="text-sm mt-2">Add some items to get started!</p>
-                                    </div>
-                                    <div v-else v-for="item in cart" :key="item.id" class="flex justify-between items-start p-4 border-b">
-                                        <div class="flex-grow pr-4">
-                                            <span class="font-medium text-sm block mb-1">{{ item.name }}</span>
-                                            <div class="text-sm text-gray-500 flex items-center mt-2">
-                                                <span class="mr-2">Quantity:</span>
-                                                <InputNumber v-model="item.quantity"
-                                                             :min="1"
-                                                             :max="getRemainingStock(item) + item.quantity"
-                                                             @input="updateCartItemQuantity(item, $event)"
-                                                             showButtons
-                                                             size="small"
-                                                             class="w-20"
-                                                             :inputStyle="{ width: '2rem' }" />
-                                                <Button @click="removeFromCart(item)"
-                                                        icon="pi pi-trash"
-                                                        severity="danger"
-                                                        text
-                                                        size="small"
-                                                        class="ml-2" />
-                                            </div>
-                                        </div>
-                                        <div class="w-32 flex flex-col items-end">
-                                            <div class="font-medium">{{ formatCurrency(item.price * item.quantity) }}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="border-t p-4">
-                                    <div class="mb-4">
-                                        <div class="flex justify-between py-2">
-                                            <span class="font-medium">Subtotal</span>
-                                            <span class="font-medium">{{ formatCurrency(cartTotal) }}</span>
-                                        </div>
-                                        <div class="flex justify-between py-2">
-                                            <span class="font-medium">Shipping</span>
-                                            <span class="font-medium">Free</span>
-                                        </div>
-                                        <div class="flex justify-between py-2 border-t border-b">
-                                            <span class="font-bold">Total</span>
-                                            <span class="font-bold">{{ formatCurrency(cartTotal) }}</span>
-                                        </div>
-                                    </div>
-                                    <Button
-                                        @click="checkout"
-                                        severity="success"
-                                        label="Proceed to Checkout"
-                                        icon="pi pi-shopping-cart"
-                                        class="w-full"
-                                        :disabled="isCartEmpty || form.processing"
-                                        :loading="form.processing"
-                                        v-tooltip.bottom="isCartEmpty ? 'Your cart is empty' : ''"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </POSLayout>
-</template>

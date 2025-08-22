@@ -18,6 +18,7 @@ class StockMovement extends Model
         'user_id',
         'unit_price',
         'reference',
+        'created_at',
     ];
 
     protected $casts = [
@@ -39,13 +40,13 @@ class StockMovement extends Model
         return $this->belongsTo(User::class);
     }
 
-    public static function recordMovement($inventoryId, $quantity, $type, $reason, $userId, $unitPrice, $reference = null)
+    public static function recordMovement($inventoryId, $quantity, $type, $reason, $userId, $unitPrice, $reference = null, $createdAt = null)
     {
         $inventory = Inventory::findOrFail($inventoryId);
 
-        $newStock = $type === 'in' ? $inventory->stock + $quantity : $inventory->stock - $quantity;
+        $newStock = $type === self::TYPE_IN ? $inventory->stock + $quantity : $inventory->stock - $quantity;
 
-        $movement = self::create([
+        $movementData = [
             'inventory_id' => $inventoryId,
             'quantity' => $quantity,
             'stock' => $newStock,
@@ -54,10 +55,32 @@ class StockMovement extends Model
             'user_id' => $userId,
             'unit_price' => $unitPrice,
             'reference' => $reference,
-        ]);
+        ];
 
-        $inventory->update(['stock' => $newStock]);
+        if ($createdAt) {
+            $movementData['created_at'] = $createdAt;
+        }
+
+        $movement = self::create($movementData);
+
+        if (!$createdAt || $createdAt->greaterThan(now())) {
+            $inventory->update(['stock' => $newStock]);
+        }
 
         return $movement;
+    }
+
+    public static function reconcileInventory($inventoryId)
+    {
+        $inventory = Inventory::findOrFail($inventoryId);
+        $movements = self::where('inventory_id', $inventoryId)->orderBy('created_at')->get();
+
+        $currentStock = 0;
+        foreach ($movements as $movement) {
+            $currentStock = $movement->type === self::TYPE_IN ? $currentStock + $movement->quantity : $currentStock - $movement->quantity;
+            $movement->update(['stock' => $currentStock]);
+        }
+
+        $inventory->update(['stock' => $currentStock]);
     }
 }

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 class PurchaseOrder extends Model
 {
@@ -47,7 +48,8 @@ class PurchaseOrder extends Model
                     'Purchase Order',
                     auth()->id(),
                     $item->unit_price,
-                    "PO-{$this->id}"
+                    "PO-{$this->id}",
+                    $this->order_date
                 );
 
                 $item->update(['received_quantity' => $item->quantity]);
@@ -59,9 +61,15 @@ class PurchaseOrder extends Model
                 'purchase_order_id' => $this->id,
                 'vendor_id' => $this->vendor_id,
                 'amount' => $this->total_amount,
-                'due_date' => now()->addDays(30), // Adjust as needed
+                'due_date' => $this->order_date->addDays(30),
                 'status' => 'pending'
             ]);
+
+            // Reconcile inventory after processing the order
+            $inventoryIds = $this->items->pluck('inventory_id')->unique();
+            foreach ($inventoryIds as $inventoryId) {
+                StockMovement::reconcileInventory($inventoryId);
+            }
         });
     }
 }

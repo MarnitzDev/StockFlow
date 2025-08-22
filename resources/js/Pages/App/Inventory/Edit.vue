@@ -1,4 +1,5 @@
 <template>
+    <Head title="Inventory Edit" />
     <AuthenticatedLayout>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Edit Inventory Item</h2>
@@ -110,7 +111,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import {Link, useForm, usePage} from '@inertiajs/vue3';
+import {Head, Link, useForm, usePage} from '@inertiajs/vue3';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 
 const props = defineProps<{

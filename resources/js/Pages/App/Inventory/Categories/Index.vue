@@ -1,4 +1,5 @@
 <template>
+    <Head title="Categories" />
     <AuthenticatedLayout>
         <template #header-actions>
             <Link :href="route('inventory.categories.create')">
@@ -100,7 +101,7 @@
 
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Link, router } from '@inertiajs/vue3';
+import {Head, Link, router} from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 
 const props = defineProps({

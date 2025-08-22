@@ -7,6 +7,7 @@ use App\Models\SalesOrder;
 use App\Models\SalesOrderItem;
 use App\Models\Customer;
 use App\Models\Inventory;
+use App\Models\StockMovement;
 use Faker\Factory as Faker;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -49,7 +50,7 @@ class SalesOrderSeeder extends Seeder
             $startDate = Carbon::create(Carbon::now()->year, 1, 1);
             $endDate = Carbon::now();
 
-            // Create 50 sample sales orders
+            // Create 100 sample sales orders
             for ($i = 0; $i < 100; $i++) {
                 $orderDate = Carbon::parse($faker->dateTimeBetween($startDate, $endDate));
 
@@ -85,8 +86,8 @@ class SalesOrderSeeder extends Seeder
 
                     $totalAmount += $subtotal;
 
-                    // Update inventory stock
-                    $inventoryItem->decrement('stock', $quantity);
+                    // Update inventory stock and create stock movement
+                    $this->updateInventoryAndCreateStockMovement($inventoryItem, $quantity, $orderDate, $unitPrice);
                 }
 
                 // Update the total amount of the sales order
@@ -103,5 +104,25 @@ class SalesOrderSeeder extends Seeder
             Log::error('Error in SalesOrderSeeder: ' . $e->getMessage());
             $this->command->error('Failed to create sales orders: ' . $e->getMessage());
         }
+    }
+
+    protected function updateInventoryAndCreateStockMovement($inventoryItem, $quantity, $orderDate, $unitPrice)
+    {
+        $inventoryItem->decrement('stock', $quantity);
+
+        // Create a stock movement record
+        StockMovement::create([
+            'inventory_id' => $inventoryItem->id,
+            'stock' => -$quantity,
+            'quantity' => -$quantity,
+            'type' => 'out',
+            'reason' => 'Sales Order',
+            'user_id' => 1,
+            'unit_price' => $unitPrice,
+            'created_at' => $orderDate,
+            'updated_at' => $orderDate,
+        ]);
+
+        $this->command->info("Created stock movement for inventory item {$inventoryItem->id}: -{$quantity}");
     }
 }

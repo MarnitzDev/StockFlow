@@ -1,4 +1,5 @@
 <template>
+    <Head title="Inventory Items" />
     <AuthenticatedLayout>
         <template #summary>
             <div class="mb-6">
@@ -168,7 +169,7 @@
 
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Link } from '@inertiajs/vue3';
+import {Head, Link} from '@inertiajs/vue3';
 import { ref, computed, onMounted, nextTick, reactive } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useForm, router } from '@inertiajs/vue3';

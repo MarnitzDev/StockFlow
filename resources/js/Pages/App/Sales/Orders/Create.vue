@@ -1,35 +1,3 @@
-<script setup>
-import { useForm } from '@inertiajs/vue3';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { ref } from 'vue';
-
-const props = defineProps({
-    customers: Array,
-    inventoryItems: Array,
-});
-
-const form = useForm({
-    customer_id: '',
-    items: [{ inventory_id: '', quantity: 1 }],
-    notes: ''
-});
-
-const addItem = () => {
-    form.items.push({ inventory_id: '', quantity: 1 });
-};
-
-const removeItem = (index) => {
-    form.items.splice(index, 1);
-};
-
-const submit = () => {
-    form.post(route('sales.orders.store'), {
-        preserveScroll: true,
-        preserveState: true,
-    });
-};
-</script>
-
 <template>
     <AuthenticatedLayout>
         <div class="pb-12">
@@ -99,3 +67,35 @@ const submit = () => {
         </div>
     </AuthenticatedLayout>
 </template>
+
+<script setup>
+import { useForm } from '@inertiajs/vue3';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { ref } from 'vue';
+
+const props = defineProps({
+    customers: Array,
+    inventoryItems: Array,
+});
+
+const form = useForm({
+    customer_id: '',
+    items: [{ inventory_id: '', quantity: 1 }],
+    notes: ''
+});
+
+const addItem = () => {
+    form.items.push({ inventory_id: '', quantity: 1 });
+};
+
+const removeItem = (index) => {
+    form.items.splice(index, 1);
+};
+
+const submit = () => {
+    form.post(route('sales.orders.store'), {
+        preserveScroll: true,
+        preserveState: true,
+    });
+};
+</script>

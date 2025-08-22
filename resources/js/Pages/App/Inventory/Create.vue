@@ -1,29 +1,5 @@
-<script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { useForm } from '@inertiajs/vue3';
-import Button from 'primevue/button';
-
-const form = useForm({
-    name: '',
-    sku: '',
-    stock: 0,
-    price: 0,
-    category_id: '',
-    low_stock_threshold: 0,
-    unit_of_measurement: '',
-});
-
-const submit = () => {
-    form.post(route('inventory.store'), {
-        preserveScroll: true,
-        onSuccess: () => {
-            form.reset();
-        },
-    });
-};
-</script>
-
 <template>
+    <Head title="Inventory Create" />
     <AuthenticatedLayout>
         <template #summary>
             <div class="flex justify-between items-center mb-4">
@@ -72,3 +48,28 @@ const submit = () => {
         </div>
     </AuthenticatedLayout>
 </template>
+
+<script setup>
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import {Head, useForm} from '@inertiajs/vue3';
+import Button from 'primevue/button';
+
+const form = useForm({
+    name: '',
+    sku: '',
+    stock: 0,
+    price: 0,
+    category_id: '',
+    low_stock_threshold: 0,
+    unit_of_measurement: '',
+});
+
+const submit = () => {
+    form.post(route('inventory.store'), {
+        preserveScroll: true,
+        onSuccess: () => {
+            form.reset();
+        },
+    });
+};
+</script>

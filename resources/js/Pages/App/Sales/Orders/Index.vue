@@ -1,4 +1,5 @@
 <template>
+    <Head title="Sales Orders" />
     <AuthenticatedLayout>
         <div class="pb-12">
             <div class="px-6">
@@ -145,7 +146,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { ref, computed } from 'vue';
 import { FilterMatchMode } from '@primevue/core/api';
-import { Link } from '@inertiajs/vue3';
+import {Head, Link} from '@inertiajs/vue3';
 import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
 
 const { formatCurrency } = useCurrencyFormatter();

@@ -1,4 +1,5 @@
 <template>
+    <Head title="Sale Order" />
     <AuthenticatedLayout>
         <div class="pb-12">
             <div class="px-6">
@@ -70,7 +71,7 @@
 
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Link } from '@inertiajs/vue3';
+import {Head, Link} from '@inertiajs/vue3';
 import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
 import { ref, computed} from "vue";
 

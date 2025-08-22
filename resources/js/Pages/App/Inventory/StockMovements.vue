@@ -1,5 +1,5 @@
-
 <template>
+    <Head title="Stock Movements" />
     <AuthenticatedLayout>
         <div class="">
             <div class="px-6">
@@ -60,6 +60,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { ref } from 'vue';
 import { useCurrencyFormatter } from '@/Composables/useCurrencyFormatter';
+import {Head} from "@inertiajs/vue3";
 
 const { formatCurrency } = useCurrencyFormatter();
 

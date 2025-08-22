@@ -1,65 +1,5 @@
-<script setup lang="ts">
-import { ref } from 'vue';
-import { useForm } from '@inertiajs/vue3';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import InputNumber from 'primevue/inputnumber';
-import Textarea from 'primevue/textarea';
-import Dropdown from 'primevue/dropdown';
-import FileUpload from 'primevue/fileupload';
-import Button from 'primevue/button';
-import { Head } from '@inertiajs/vue3';
-
-const form = useForm({
-    companyName: '',
-    tradingName: '',
-    registrationNumber: '',
-    vatNumber: '',
-    website: '',
-    primaryContact: {
-        name: '',
-        email: '',
-        phone: '',
-    },
-    billingAddress: {
-        street: '',
-        city: '',
-        state: '',
-        postalCode: '',
-        country: '',
-    },
-    shippingAddress: {
-        sameAsBilling: true,
-        street: '',
-        city: '',
-        state: '',
-        postalCode: '',
-        country: '',
-    },
-    paymentTerms: '',
-    creditLimit: 0,
-    supplierType: '',
-    documents: [],
-});
-
-const supplierTypes = ref(['Manufacturer', 'Wholesaler', 'Distributor', 'Importer']);
-
-const submitForm = () => {
-    form.post(route('suppliers.store'), {
-        preserveScroll: true,
-        onSuccess: () => {
-            // Handle success (e.g., show notification, redirect)
-        },
-    });
-};
-
-const onFileUpload = (event) => {
-    form.documents = [...form.documents, ...event.files];
-};
-</script>
-
 <template>
     <Head title="Add Supplier" />
-
     <AuthenticatedLayout>
         <div class="pb-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -174,3 +114,62 @@ const onFileUpload = (event) => {
         </div>
     </AuthenticatedLayout>
 </template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useForm } from '@inertiajs/vue3';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import InputNumber from 'primevue/inputnumber';
+import Textarea from 'primevue/textarea';
+import Dropdown from 'primevue/dropdown';
+import FileUpload from 'primevue/fileupload';
+import Button from 'primevue/button';
+import { Head } from '@inertiajs/vue3';
+
+const form = useForm({
+    companyName: '',
+    tradingName: '',
+    registrationNumber: '',
+    vatNumber: '',
+    website: '',
+    primaryContact: {
+        name: '',
+        email: '',
+        phone: '',
+    },
+    billingAddress: {
+        street: '',
+        city: '',
+        state: '',
+        postalCode: '',
+        country: '',
+    },
+    shippingAddress: {
+        sameAsBilling: true,
+        street: '',
+        city: '',
+        state: '',
+        postalCode: '',
+        country: '',
+    },
+    paymentTerms: '',
+    creditLimit: 0,
+    supplierType: '',
+    documents: [],
+});
+
+const supplierTypes = ref(['Manufacturer', 'Wholesaler', 'Distributor', 'Importer']);
+
+const submitForm = () => {
+    form.post(route('suppliers.store'), {
+        preserveScroll: true,
+        onSuccess: () => {
+            // Handle success (e.g., show notification, redirect)
+        },
+    });
+};
+
+const onFileUpload = (event) => {
+    form.documents = [...form.documents, ...event.files];
+};
+</script>

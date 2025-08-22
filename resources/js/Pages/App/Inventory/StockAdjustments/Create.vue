@@ -1,24 +1,5 @@
-<script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { useForm } from '@inertiajs/vue3';
-
-const props = defineProps({
-    inventoryItems: Array,
-});
-
-const form = useForm({
-    inventory_id: '',
-    stock: '',
-    type: '',
-    reason: '',
-});
-
-const submit = () => {
-    form.post(route('inventory.stockAdjustments.store'));
-};
-</script>
-
 <template>
+    <Head title="Stock Adjustments Create" />
     <AuthenticatedLayout>
         <div class="pb-12">
             <div class="px-6">
@@ -68,3 +49,23 @@ const submit = () => {
         </div>
     </AuthenticatedLayout>
 </template>
+
+<script setup>
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import {Head, useForm} from '@inertiajs/vue3';
+
+const props = defineProps({
+    inventoryItems: Array,
+});
+
+const form = useForm({
+    inventory_id: '',
+    stock: '',
+    type: '',
+    reason: '',
+});
+
+const submit = () => {
+    form.post(route('inventory.stockAdjustments.store'));
+};
+</script>

@@ -1,17 +1,5 @@
-<script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head } from '@inertiajs/vue3';
-
-defineProps({
-    currentStock: Array,
-    outOfStock: Array,
-    inventoryValuation: Number,
-});
-</script>
-
 <template>
     <Head title="Inventory Report" />
-
     <AuthenticatedLayout>
         <div class="pb-12">
             <div class="px-6">
@@ -61,3 +49,14 @@ defineProps({
         </div>
     </AuthenticatedLayout>
 </template>
+
+<script setup>
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { Head } from '@inertiajs/vue3';
+
+defineProps({
+    currentStock: Array,
+    outOfStock: Array,
+    inventoryValuation: Number,
+});
+</script>
