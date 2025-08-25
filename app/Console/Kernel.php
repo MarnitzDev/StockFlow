@@ -12,7 +12,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('db:refresh-and-seed')->dailyAt('10:00');
+        $schedule->command('db:refresh-and-seed')->dailyAt('10:05');
     }
 
     /**
